@@ -123,13 +123,14 @@ export const Hero: React.FC = () => {
               <div className="relative rounded-2xl border border-[#202A40] bg-[#101525]/95 backdrop-blur-md p-4 shadow-2xl overflow-hidden group">
                 {/* Aspect Ratio Box (16:9) */}
                 <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#080C1E] border border-[#202A40] flex flex-col justify-between p-3">
-                  {/* Simulated Visual Reel Art */}
-                  <div
-                    className="absolute inset-0 opacity-80 transition-transform duration-700 group-hover:scale-105"
-                    style={{
-                      background:
-                        "radial-gradient(ellipse at 40% 40%, rgba(37, 99, 235, 0.35), transparent 70%), linear-gradient(135deg, #080C1E 0%, #161D33 50%, #050817 100%)",
-                    }}
+                  {/* Real Cinematic Background Video Preview */}
+                  <video
+                    src="/videos/Person_working_on_computer_4039aed9.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover opacity-50 transition-transform duration-700 group-hover:scale-105 pointer-events-none"
                   />
 
                   {/* Film Letterbox Bars */}

@@ -28,6 +28,37 @@ const PLAYLIST: Track[] = [
 let globalAudio: HTMLAudioElement | null = null;
 let hasUserExplicitlyPaused = false;
 let globalCurrentTrackIndex = 0;
+let isDucked = false;
+let userVolume = 0.7;
+
+/**
+ * Gently duck background music volume while video plays with audio,
+ * without ever stopping or resetting the music playback.
+ */
+export const duckBackgroundAudio = (shouldDuck: boolean) => {
+  if (!globalAudio) return;
+  if (shouldDuck) {
+    if (!isDucked) {
+      userVolume = globalAudio.muted ? 0 : globalAudio.volume;
+      isDucked = true;
+    }
+    // Duck to ~25% of user volume (min 0.04, max 0.16)
+    if (!globalAudio.muted && userVolume > 0) {
+      globalAudio.volume = Math.max(0.04, Math.min(userVolume * 0.28, 0.16));
+    }
+  } else {
+    if (isDucked) {
+      if (!globalAudio.muted) {
+        globalAudio.volume = userVolume;
+      }
+      isDucked = false;
+    }
+  }
+};
+
+export const restoreBackgroundAudio = () => {
+  duckBackgroundAudio(false);
+};
 
 export const MusicPlayer: React.FC = () => {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(globalCurrentTrackIndex);
@@ -211,6 +242,8 @@ export const MusicPlayer: React.FC = () => {
     setVolume(val);
     if (globalAudio) {
       globalAudio.volume = val;
+      userVolume = val;
+      isDucked = false;
       if (val > 0 && isMuted) {
         setIsMuted(false);
         globalAudio.muted = false;

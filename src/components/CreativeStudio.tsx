@@ -1,21 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { Film, Play, Pause, Sparkles, Layers, Sliders, Maximize2, MonitorPlay } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Film, Play, Pause, Sparkles, Sliders, Maximize2, 
+  Volume2, VolumeX, RotateCcw, Scissors 
+} from "lucide-react";
 import { ShowreelModal } from "./ShowreelModal";
+import { duckBackgroundAudio, restoreBackgroundAudio } from "./MusicPlayer";
 
 interface CreativePiece {
   id: string;
   title: string;
   tagline: string;
-  category: "AI Cinema" | "Short-Form" | "Commercial" | "Visual Lab";
+  category: "AI Cinema" | "Video Editing" | "Commercial" | "Visual Lab";
+  videoSrc: string;
   aspectRatio: "2.39:1" | "16:9" | "9:16";
   tools: string[];
   themeColor: string;
   gradient: string;
   description: string;
   duration: string;
+  highlightTag: string;
 }
 
 export const CreativeStudio: React.FC = () => {
@@ -23,68 +29,168 @@ export const CreativeStudio: React.FC = () => {
     {
       id: "echoes",
       title: "Echoes of Tomorrow",
-      tagline: "Generative Speculative Cinema",
+      tagline: "Generative Speculative Cinema & Monologue",
       category: "AI Cinema",
+      videoSrc: "/videos/Man_speaking_in_dark_studio_8a8b1698.mp4",
       aspectRatio: "2.39:1",
-      tools: ["Google Flow", "Adobe Premiere Pro"],
-      themeColor: "#7dd3fc",
-      gradient: "radial-gradient(ellipse at center, rgba(125, 211, 252, 0.3), rgba(6, 10, 18, 0.98))",
-      description: "Explores human identity in an automated future. Built with prompt-architected shot continuity, unified anamorphic framing, and custom sound design in Premiere Pro.",
-      duration: "02:14",
+      tools: ["Google Flow", "Adobe Premiere Pro", "Anamorphic Pipeline"],
+      themeColor: "#38bdf8",
+      gradient: "radial-gradient(ellipse at center, rgba(56, 189, 248, 0.28), rgba(6, 10, 18, 0.98))",
+      description: "Generative AI filmmaking exploring synthetic human narrative in a dark atmospheric studio. Features prompt-architected shot continuity, cinematic key-to-fill ratios, and emotional vocal pacing.",
+      duration: "00:10",
+      highlightTag: "FEATURED AI CINEMA",
     },
     {
       id: "kinetic",
       title: "Kinetic Velocity Reel",
-      tagline: "High-Retention Vertical Motion",
-      category: "Short-Form",
-      aspectRatio: "9:16",
-      tools: ["Adobe Premiere Pro", "CapCut"],
+      tagline: "High-Retention Timeline & Multi-Track Editing",
+      category: "Video Editing",
+      videoSrc: "/videos/Person_editing_video_on_computer_393b5e4c.mp4",
+      aspectRatio: "16:9",
+      tools: ["Adobe Premiere Pro", "CapCut", "Audio Mastering"],
       themeColor: "#c084fc",
       gradient: "radial-gradient(ellipse at center, rgba(192, 132, 252, 0.28), rgba(16, 7, 24, 0.98))",
-      description: "Engineered for 9:16 social platforms. Features millisecond beat-syncing, dynamic motion typography, sound effects, and retention-maximizing visual pacing.",
-      duration: "00:45",
+      description: "Hands-on video editing workflow displaying multi-track timeline trimming, color grading, speed ramps, and frame-accurate audio waveform synchronization.",
+      duration: "00:10",
+      highlightTag: "FEATURED VIDEO EDIT",
     },
     {
       id: "aura",
-      title: "Aura Lifestyle Ad",
-      tagline: "Speculative Luxury Commercial",
+      title: "Digital Studio Workflow",
+      tagline: "Creative Architecture & Visual Production",
       category: "Commercial",
+      videoSrc: "/videos/Person_working_on_computer_4039aed9.mp4",
       aspectRatio: "16:9",
-      tools: ["Google Flow", "Adobe Premiere Pro", "CapCut"],
+      tools: ["Google Flow", "Adobe Premiere Pro", "Creative Direction"],
       themeColor: "#fb7185",
       gradient: "radial-gradient(ellipse at center, rgba(251, 113, 133, 0.25), rgba(20, 8, 12, 0.98))",
-      description: "Exploring commercial viability of synthetic product cinematography. Features luxurious lighting transitions and crisp commercial audio foley.",
-      duration: "00:30",
-    },
-    {
-      id: "vistas",
-      title: "Volumetric Atmosphere Lab",
-      tagline: "Neural Environmental Experiment",
-      category: "Visual Lab",
-      aspectRatio: "16:9",
-      tools: ["Google Flow", "AI Prompt Architecture"],
-      themeColor: "#38bdf8",
-      gradient: "radial-gradient(ellipse at center, rgba(56, 189, 248, 0.25), rgba(5, 12, 22, 0.98))",
-      description: "Researching camera physics, anamorphic flares, and fog density in generative pipelines to achieve organic, analog-feeling cinematography.",
-      duration: "01:10",
+      description: "Professional digital studio execution: generative prompt structuring, model inference, and real-time visual curation for commercial media campaigns.",
+      duration: "00:10",
+      highlightTag: "STUDIO WORKFLOW",
     },
   ];
 
   const [activePiece, setActivePiece] = useState<CreativePiece>(pieces[0]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(10);
   const [isShowreelModalOpen, setIsShowreelModalOpen] = useState(false);
 
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Switch video source when activePiece changes
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.src = activePiece.videoSrc;
+    video.load();
+    setIsPlaying(false);
+    setCurrentTime(0);
+    restoreBackgroundAudio();
+  }, [activePiece]);
+
+  // Video event listeners and audio ducking
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const onLoadedMetadata = () => {
+      setDuration(video.duration || 10);
+    };
+
+    const onTimeUpdate = () => {
+      setCurrentTime(video.currentTime);
+    };
+
+    const onEnded = () => {
+      setIsPlaying(false);
+      restoreBackgroundAudio();
+    };
+
+    const onPlay = () => {
+      setIsPlaying(true);
+      if (!video.muted) {
+        duckBackgroundAudio(true);
+      }
+    };
+
+    const onPause = () => {
+      setIsPlaying(false);
+      restoreBackgroundAudio();
+    };
+
+    video.addEventListener("loadedmetadata", onLoadedMetadata);
+    video.addEventListener("timeupdate", onTimeUpdate);
+    video.addEventListener("ended", onEnded);
+    video.addEventListener("play", onPlay);
+    video.addEventListener("pause", onPause);
+
+    return () => {
+      video.removeEventListener("loadedmetadata", onLoadedMetadata);
+      video.removeEventListener("timeupdate", onTimeUpdate);
+      video.removeEventListener("ended", onEnded);
+      video.removeEventListener("play", onPlay);
+      video.removeEventListener("pause", onPause);
+      restoreBackgroundAudio();
+    };
+  }, []);
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video.play().then(() => {
+        setIsPlaying(true);
+        if (!video.muted) {
+          duckBackgroundAudio(true);
+        }
+      }).catch(() => {});
+    } else {
+      video.pause();
+      setIsPlaying(false);
+      restoreBackgroundAudio();
+    }
+  };
+
+  const toggleMute = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+    video.muted = nextMuted;
+
+    if (isPlaying) {
+      if (nextMuted) {
+        restoreBackgroundAudio();
+      } else {
+        duckBackgroundAudio(true);
+      }
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `0${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
+
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
+
   return (
-    <section id="creative-studio" className="py-28 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817]">
+    <section id="creative-studio" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817]">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-8 border-b border-[#202A40]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14 sm:mb-16 pb-8 border-b border-[#202A40]">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101525] border border-[#202A40] text-xs font-medium text-[#2563EB] mb-3">
               <Film size={12} />
               <span>02 / CREATIVE STUDIO</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
               AI Filmmaking &amp; <br />
               <span className="text-[#94A3B8] font-normal font-serif italic">Visual Production.</span>
             </h2>
@@ -98,84 +204,128 @@ export const CreativeStudio: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-16">
           {/* Main Cinema Viewport */}
           <div className="lg:col-span-8 space-y-4">
-            <div className="relative rounded-2xl border border-[#202A40] bg-[#101525] p-4 sm:p-6 shadow-2xl overflow-hidden group">
+            <div className="relative rounded-2xl border border-[#202A40] bg-[#101525] p-3 sm:p-5 shadow-2xl overflow-hidden group">
               {/* Aspect Ratio Framing */}
               <div
-                className={`relative w-full rounded-xl overflow-hidden flex flex-col justify-between p-4 sm:p-6 transition-all duration-500 ${
+                className={`relative w-full rounded-xl overflow-hidden flex flex-col justify-between bg-black transition-all duration-500 ${
                   activePiece.aspectRatio === "2.39:1"
                     ? "aspect-[21/9] sm:aspect-[2.39/1]"
-                    : activePiece.aspectRatio === "9:16"
-                    ? "aspect-[16/9] sm:aspect-[16/9]"
                     : "aspect-video"
                 }`}
-                style={{ background: activePiece.gradient }}
               >
-                {/* Simulated Film Letterbox bars for 2.39:1 cinema */}
-                <div className="absolute top-0 inset-x-0 h-4 bg-black/90 pointer-events-none z-10" />
-                <div className="absolute bottom-0 inset-x-0 h-4 bg-black/90 pointer-events-none z-10" />
+                {/* HTML5 Video Element */}
+                <video
+                  ref={videoRef}
+                  playsInline
+                  muted={isMuted}
+                  className="absolute inset-0 w-full h-full object-cover cursor-pointer"
+                  onClick={togglePlay}
+                />
 
-                {/* Viewport Top Meta */}
-                <div className="relative z-20 flex items-center justify-between text-[11px] font-mono text-white/80">
-                  <span className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/10">
-                    <Sparkles size={11} className="text-[#2563EB]" />
-                    <span>{activePiece.category}</span>
+                {/* Simulated Film Letterbox bars for 2.39:1 cinema */}
+                {activePiece.aspectRatio === "2.39:1" && (
+                  <>
+                    <div className="absolute top-0 inset-x-0 h-4 bg-black/90 pointer-events-none z-10" />
+                    <div className="absolute bottom-0 inset-x-0 h-4 bg-black/90 pointer-events-none z-10" />
+                  </>
+                )}
+
+                {/* Video Overlay Top Meta */}
+                <div className="relative z-20 flex items-center justify-between p-4 text-[11px] font-mono text-white/90 bg-gradient-to-b from-black/80 via-black/20 to-transparent pointer-events-none">
+                  <span className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 pointer-events-auto">
+                    <Sparkles size={11} className="text-[#38BDF8]" />
+                    <span className="font-bold">{activePiece.highlightTag}</span>
                   </span>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-black/50 text-[10px] text-[#CBD5E1] border border-white/10 hidden sm:inline">
-                      ASPECT {activePiece.aspectRatio}
+                  <div className="flex items-center gap-2 pointer-events-auto">
+                    <span className="px-2 py-0.5 rounded bg-black/60 text-[10px] text-[#CBD5E1] border border-white/10 hidden sm:inline font-mono">
+                      {activePiece.aspectRatio} CINEMA
                     </span>
                     <button
                       onClick={() => setIsShowreelModalOpen(true)}
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#2563EB] text-white text-[10px] font-mono hover:bg-[#1D4ED8] transition-all hover:scale-105"
-                      title="Launch Fullscreen Cinematic Player"
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#2563EB] text-white text-[10px] font-mono hover:bg-[#1D4ED8] transition-all hover:scale-105 shadow-md"
+                      title="Launch Fullscreen Cinematic Showreel"
                     >
                       <Maximize2 size={10} />
-                      <span>EXPAND CINEMA</span>
+                      <span>FULLSCREEN</span>
                     </button>
-                    <span className="text-[#93C5FD] font-semibold">{activePiece.duration}</span>
                   </div>
                 </div>
 
-                {/* Play / Pause Interactive Trigger */}
-                <div className="relative z-20 my-auto text-center py-6">
-                  <button
-                    onClick={() => setIsPlaying(!isPlaying)}
-                    type="button"
-                    className="inline-flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-[#2563EB]/80 backdrop-blur-xl border border-[#2563EB] text-white hover:bg-[#1D4ED8] hover:scale-105 transition-all duration-300 shadow-[0_0_30px_rgba(37,99,235,0.5)] mx-auto"
-                    aria-label={isPlaying ? "Pause cinematic preview" : "Play cinematic preview"}
-                  >
-                    {isPlaying ? <Pause size={24} /> : <Play size={24} className="translate-x-0.5" />}
-                  </button>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mt-4 tracking-tight font-heading">
-                    {activePiece.title}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-white/80 max-w-md mx-auto mt-1">
-                    {activePiece.tagline}
-                  </p>
-                </div>
+                {/* Play / Pause Interactive Center Overlay (Visible when paused) */}
+                {!isPlaying && (
+                  <div className="relative z-20 my-auto text-center py-6 pointer-events-auto">
+                    <button
+                      onClick={togglePlay}
+                      type="button"
+                      className="inline-flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-[#2563EB]/90 backdrop-blur-xl border border-[#2563EB] text-white hover:bg-[#1D4ED8] hover:scale-110 transition-all duration-300 shadow-[0_0_35px_rgba(37,99,235,0.6)] mx-auto"
+                      aria-label="Play video"
+                    >
+                      <Play size={26} className="translate-x-0.5" />
+                    </button>
+                    <h3 className="text-lg sm:text-2xl font-bold text-white mt-3 tracking-tight font-heading drop-shadow-md">
+                      {activePiece.title}
+                    </h3>
+                    <p className="text-xs sm:text-sm text-white/80 max-w-md mx-auto mt-1 px-4 drop-shadow">
+                      {activePiece.tagline}
+                    </p>
+                  </div>
+                )}
 
-                {/* Timeline Progress Bar Simulation */}
-                <div className="relative z-20 space-y-2">
-                  <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                    <motion.div
-                      className="bg-[#2563EB] h-full rounded-full"
-                      animate={{ width: isPlaying ? "100%" : "35%" }}
-                      transition={{ duration: isPlaying ? 25 : 0.5, ease: "linear" }}
+                {/* Video Overlay Bottom Controls */}
+                <div className="relative z-20 p-4 space-y-2 bg-gradient-to-t from-black/85 via-black/40 to-transparent">
+                  {/* Timeline Scrub Bar */}
+                  <div
+                    onClick={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const clickX = e.clientX - rect.left;
+                      const percent = clickX / rect.width;
+                      if (videoRef.current) {
+                        videoRef.current.currentTime = percent * duration;
+                      }
+                    }}
+                    className="w-full bg-white/20 h-1.5 rounded-full overflow-hidden cursor-pointer"
+                  >
+                    <div
+                      className="bg-[#2563EB] h-full rounded-full transition-all"
+                      style={{ width: `${progressPercent}%` }}
                     />
                   </div>
-                  <div className="flex items-center justify-between text-[10px] font-mono text-[#94A3B8]">
-                    <span>{isPlaying ? "PLAYING STREAM" : "00:08 / " + activePiece.duration}</span>
+
+                  <div className="flex items-center justify-between text-[10px] font-mono text-[#CBD5E1]">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={togglePlay}
+                        type="button"
+                        className="text-white hover:text-[#38BDF8] transition-colors"
+                        aria-label={isPlaying ? "Pause video" : "Play video"}
+                      >
+                        {isPlaying ? <Pause size={14} /> : <Play size={14} />}
+                      </button>
+
+                      <button
+                        onClick={toggleMute}
+                        type="button"
+                        className="text-white hover:text-[#38BDF8] transition-colors flex items-center gap-1"
+                        aria-label={isMuted ? "Unmute video" : "Mute video"}
+                      >
+                        {isMuted ? <VolumeX size={14} className="text-red-400" /> : <Volume2 size={14} />}
+                        <span className="hidden xs:inline text-[9px]">{isMuted ? "MUTED" : "SOUND ON"}</span>
+                      </button>
+
+                      <span>{formatTime(currentTime)} / {formatTime(duration)}</span>
+                    </div>
+
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[#2563EB]">CONFIRMED PIPELINE:</span>
-                      <span>{activePiece.tools.join(" • ")}</span>
+                      <span className="text-[#38BDF8] hidden sm:inline">PIPELINE:</span>
+                      <span className="truncate max-w-[200px]">{activePiece.tools.join(" • ")}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Description & Tools */}
-              <div className="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-[#202A40]">
-                <p className="text-xs sm:text-sm text-[#94A3B8] max-w-xl">
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-[#202A40]">
+                <p className="text-xs sm:text-sm text-[#94A3B8] max-w-xl leading-relaxed">
                   {activePiece.description}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -196,40 +346,46 @@ export const CreativeStudio: React.FC = () => {
           <div className="lg:col-span-4 space-y-3">
             <div className="text-xs font-mono uppercase tracking-widest text-[#64748B] mb-2 flex items-center justify-between">
               <span>Select Film Piece</span>
-              <span>{pieces.length} Pieces</span>
+              <span>{pieces.length} Production Pieces</span>
             </div>
 
             {pieces.map((piece) => {
               const isSelected = activePiece.id === piece.id;
+              const isVideoEditing = piece.category === "Video Editing";
               return (
                 <button
                   key={piece.id}
                   onClick={() => {
                     setActivePiece(piece);
-                    setIsPlaying(false);
                   }}
                   type="button"
                   className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex flex-col gap-2 ${
                     isSelected
-                      ? "border-[#2563EB] bg-[#161D33] shadow-lg shadow-[rgba(37,99,235,0.15)]"
+                      ? "border-[#2563EB] bg-[#161D33] shadow-lg shadow-[rgba(37,99,235,0.2)]"
                       : "border-[#202A40] bg-[#101525] hover:border-[#2563EB]/60 hover:bg-[#161D33]/60"
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span
-                      className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded ${
+                      className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded font-bold flex items-center gap-1 ${
                         isSelected
-                          ? "bg-[#2563EB]/20 text-[#93C5FD]"
+                          ? "bg-[#2563EB]/25 text-[#93C5FD]"
+                          : isVideoEditing
+                          ? "bg-[#c084fc]/15 text-[#c084fc]"
                           : "bg-[#080C1E] text-[#94A3B8]"
                       }`}
                     >
-                      {piece.category}
+                      {isVideoEditing && <Scissors size={10} />}
+                      <span>{piece.category}</span>
                     </span>
-                    <span className="text-[11px] font-mono text-[#64748B]">{piece.duration}</span>
+                    <span className="text-[11px] font-mono text-[#64748B] flex items-center gap-1">
+                      <Play size={10} />
+                      <span>{piece.duration}</span>
+                    </span>
                   </div>
                   <div>
-                    <h4 className="text-sm font-semibold text-white">{piece.title}</h4>
-                    <p className="text-xs text-[#94A3B8] line-clamp-1">{piece.tagline}</p>
+                    <h4 className="text-sm font-semibold text-white font-heading">{piece.title}</h4>
+                    <p className="text-xs text-[#94A3B8] line-clamp-1 mt-0.5">{piece.tagline}</p>
                   </div>
                 </button>
               );
@@ -239,19 +395,19 @@ export const CreativeStudio: React.FC = () => {
             <div className="p-5 rounded-xl border border-[#202A40] bg-[#101525] space-y-3 mt-4">
               <div className="text-xs font-mono uppercase tracking-wider text-[#2563EB] flex items-center gap-1.5 font-bold">
                 <Sliders size={12} />
-                <span>Creative Pipeline</span>
+                <span>Production Pipeline</span>
               </div>
               <ul className="text-xs text-[#94A3B8] space-y-2">
                 <li className="flex items-start gap-2">
-                  <span className="text-white font-mono">01.</span>
+                  <span className="text-white font-mono font-bold">01.</span>
                   <span>Concept &amp; Prompt Architecture in Google Flow</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-white font-mono">02.</span>
+                  <span className="text-white font-mono font-bold">02.</span>
                   <span>Timeline Editing &amp; Rhythm Sync in Premiere Pro</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-white font-mono">03.</span>
+                  <span className="text-white font-mono font-bold">03.</span>
                   <span>Short-form kinetic refinement &amp; captions in CapCut</span>
                 </li>
               </ul>
@@ -264,6 +420,7 @@ export const CreativeStudio: React.FC = () => {
       <ShowreelModal
         isOpen={isShowreelModalOpen}
         onClose={() => setIsShowreelModalOpen(false)}
+        initialVideoId={activePiece.id === "kinetic" ? "video-editing" : activePiece.id === "echoes" ? "ai-cinema" : "creative-workflow"}
       />
     </section>
   );

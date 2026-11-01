@@ -1,9 +1,13 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ExternalLink, Sparkles, CheckCircle2, Layers, Calendar, Terminal } from "lucide-react";
+import { 
+  X, ExternalLink, Sparkles, CheckCircle2, Layers, Calendar, 
+  Terminal, Play, Pause, Volume2, VolumeX 
+} from "lucide-react";
 import { Project } from "@/data/projects";
+import { duckBackgroundAudio, restoreBackgroundAudio } from "./MusicPlayer";
 
 interface ProjectModalProps {
   project: Project | null;
@@ -11,9 +15,13 @@ interface ProjectModalProps {
 }
 
 export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") handleClose();
     };
 
     if (project) {
@@ -24,8 +32,61 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) 
     return () => {
       document.body.style.overflow = "unset";
       window.removeEventListener("keydown", handleKeyDown);
+      restoreBackgroundAudio();
     };
-  }, [project, onClose]);
+  }, [project]);
+
+  useEffect(() => {
+    setIsPlaying(false);
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+    }
+    restoreBackgroundAudio();
+  }, [project]);
+
+  const handleClose = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+    restoreBackgroundAudio();
+    onClose();
+  };
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video.play().then(() => {
+        setIsPlaying(true);
+        if (!video.muted) {
+          duckBackgroundAudio(true);
+        }
+      }).catch(() => {});
+    } else {
+      video.pause();
+      setIsPlaying(false);
+      restoreBackgroundAudio();
+    }
+  };
+
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+    video.muted = nextMuted;
+
+    if (isPlaying) {
+      if (nextMuted) {
+        restoreBackgroundAudio();
+      } else {
+        duckBackgroundAudio(true);
+      }
+    }
+  };
 
   if (!project) return null;
 
@@ -42,7 +103,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          onClick={handleClose}
           className="fixed inset-0 bg-[#050817]/85 backdrop-blur-md"
         />
 
@@ -67,7 +128,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) 
             </div>
 
             <button
-              onClick={onClose}
+              onClick={handleClose}
               type="button"
               className="w-9 h-9 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
               aria-label="Close project modal"
@@ -78,33 +139,90 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) 
 
           {/* Modal Content Scroll Area */}
           <div className="p-6 sm:p-8 overflow-y-auto space-y-8">
-            {/* Project Hero Visual Frame */}
-            <div
-              className="relative w-full aspect-video rounded-2xl overflow-hidden border border-[#202A40] p-6 flex flex-col justify-between shadow-inner"
-              style={{ background: project.visualPreview.themeGradient }}
-            >
-              <div className="flex items-center justify-between text-[11px] font-mono text-white/70">
-                <span className="flex items-center gap-1.5">
-                  <Sparkles size={12} className="text-[#2563EB]" />
-                  <span>PROJECT SPECIFICATION</span>
-                </span>
-                <span>{project.id.toUpperCase()}</span>
-              </div>
+            {/* Project Hero Visual Frame (Video or Graphic) */}
+            {project.videoSrc ? (
+              <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-[#202A40] bg-black shadow-inner group">
+                <video
+                  ref={videoRef}
+                  src={project.videoSrc}
+                  playsInline
+                  muted={isMuted}
+                  onEnded={() => {
+                    setIsPlaying(false);
+                    restoreBackgroundAudio();
+                  }}
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={togglePlay}
+                />
 
-              <div className="my-auto text-center space-y-2">
-                <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-heading">
-                  {project.visualPreview.headline}
-                </div>
-                <div className="text-xs sm:text-sm font-mono text-white/80">
-                  {project.visualPreview.subline}
-                </div>
-              </div>
+                {/* Video Overlay */}
+                <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-4 bg-gradient-to-t from-black/80 via-transparent to-black/40">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-white/80">
+                    <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
+                      <Sparkles size={11} className="text-[#38BDF8]" />
+                      <span>{project.badge || "VERIFIED MEDIA"}</span>
+                    </span>
+                    <button
+                      onClick={toggleMute}
+                      type="button"
+                      className="pointer-events-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 hover:bg-[#2563EB] text-white text-[10px] font-mono transition-colors border border-white/10"
+                    >
+                      {isMuted ? <VolumeX size={12} className="text-red-400" /> : <Volume2 size={12} />}
+                      <span>{isMuted ? "MUTED" : "SOUND ON"}</span>
+                    </button>
+                  </div>
 
-              <div className="flex items-center justify-between text-[10px] font-mono text-white/60">
-                <span>FORMAT: {project.aspectRatio}</span>
-                <span>ACTIVE MEDIA ARCHIVE</span>
+                  {/* Play Overlay when paused */}
+                  {!isPlaying && (
+                    <div className="my-auto text-center pointer-events-auto">
+                      <button
+                        onClick={togglePlay}
+                        type="button"
+                        className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#2563EB]/90 hover:bg-[#1D4ED8] text-white shadow-[0_0_30px_rgba(37,99,235,0.6)] transition-all hover:scale-110"
+                        aria-label="Play video"
+                      >
+                        <Play size={22} className="translate-x-0.5" />
+                      </button>
+                      <div className="text-xs font-mono text-white/90 mt-2 font-medium">
+                        Click to Watch Project Reel
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between text-[10px] font-mono text-white/60">
+                    <span>FORMAT: {project.aspectRatio}</span>
+                    <span>HD 720P • SOUNDTRACK ACTIVE</span>
+                  </div>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div
+                className="relative w-full aspect-video rounded-2xl overflow-hidden border border-[#202A40] p-6 flex flex-col justify-between shadow-inner"
+                style={{ background: project.visualPreview.themeGradient }}
+              >
+                <div className="flex items-center justify-between text-[11px] font-mono text-white/70">
+                  <span className="flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-[#2563EB]" />
+                    <span>PROJECT SPECIFICATION</span>
+                  </span>
+                  <span>{project.id.toUpperCase()}</span>
+                </div>
+
+                <div className="my-auto text-center space-y-2">
+                  <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-heading">
+                    {project.visualPreview.headline}
+                  </div>
+                  <div className="text-xs sm:text-sm font-mono text-white/80">
+                    {project.visualPreview.subline}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[10px] font-mono text-white/60">
+                  <span>FORMAT: {project.aspectRatio}</span>
+                  <span>ACTIVE MEDIA ARCHIVE</span>
+                </div>
+              </div>
+            )}
 
             {/* Title & Summary */}
             <div className="space-y-3">
@@ -168,7 +286,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) 
             <span>Saimon Rana Magar Portfolio</span>
             <a
               href="#contact"
-              onClick={onClose}
+              onClick={handleClose}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#2563EB] text-white font-semibold hover:bg-[#1D4ED8] transition-colors shadow-[0_0_15px_rgba(37,99,235,0.4)]"
             >
               <span>Inquire About Similar Project</span>
