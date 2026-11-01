@@ -125,7 +125,7 @@ export const Hero: React.FC = () => {
                 <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-[#080C1E] border border-[#202A40] flex flex-col justify-between p-3">
                   {/* Real Cinematic Background Video Preview */}
                   <video
-                    src="/videos/Person_working_on_computer_4039aed9.mp4"
+                    src="/videos/work.mp4"
                     autoPlay
                     loop
                     muted

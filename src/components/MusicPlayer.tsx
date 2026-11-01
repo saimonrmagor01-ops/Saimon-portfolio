@@ -28,36 +28,46 @@ const PLAYLIST: Track[] = [
 let globalAudio: HTMLAudioElement | null = null;
 let hasUserExplicitlyPaused = false;
 let globalCurrentTrackIndex = 0;
-let isDucked = false;
-let userVolume = 0.7;
+let wasPlayingBeforeVideo = false;
+let activeVideoCount = 0;
 
 /**
- * Gently duck background music volume while video plays with audio,
- * without ever stopping or resetting the music playback.
+ * Pause background music when portfolio video starts playing,
+ * and resume it at previous position only if it was playing before.
  */
-export const duckBackgroundAudio = (shouldDuck: boolean) => {
+export const pauseBackgroundAudioForVideo = () => {
   if (!globalAudio) return;
-  if (shouldDuck) {
-    if (!isDucked) {
-      userVolume = globalAudio.muted ? 0 : globalAudio.volume;
-      isDucked = true;
-    }
-    // Duck to ~25% of user volume (min 0.04, max 0.16)
-    if (!globalAudio.muted && userVolume > 0) {
-      globalAudio.volume = Math.max(0.04, Math.min(userVolume * 0.28, 0.16));
-    }
-  } else {
-    if (isDucked) {
-      if (!globalAudio.muted) {
-        globalAudio.volume = userVolume;
-      }
-      isDucked = false;
+  activeVideoCount++;
+  if (activeVideoCount === 1) {
+    if (!globalAudio.paused) {
+      wasPlayingBeforeVideo = true;
+      globalAudio.pause();
+    } else {
+      wasPlayingBeforeVideo = false;
     }
   }
 };
 
+export const resumeBackgroundAudioAfterVideo = () => {
+  if (!globalAudio) return;
+  activeVideoCount = Math.max(0, activeVideoCount - 1);
+  if (activeVideoCount === 0 && wasPlayingBeforeVideo && !hasUserExplicitlyPaused) {
+    globalAudio.play().catch(() => {});
+    wasPlayingBeforeVideo = false;
+  }
+};
+
+// Backwards-compatible aliases
+export const duckBackgroundAudio = (shouldDuck: boolean) => {
+  if (shouldDuck) {
+    pauseBackgroundAudioForVideo();
+  } else {
+    resumeBackgroundAudioAfterVideo();
+  }
+};
+
 export const restoreBackgroundAudio = () => {
-  duckBackgroundAudio(false);
+  resumeBackgroundAudioAfterVideo();
 };
 
 export const MusicPlayer: React.FC = () => {
@@ -242,8 +252,6 @@ export const MusicPlayer: React.FC = () => {
     setVolume(val);
     if (globalAudio) {
       globalAudio.volume = val;
-      userVolume = val;
-      isDucked = false;
       if (val > 0 && isMuted) {
         setIsMuted(false);
         globalAudio.muted = false;

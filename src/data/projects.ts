@@ -82,7 +82,7 @@ export const projects: Project[] = [
     accentColor: "#7dd3fc",
     aspectRatio: "21/9",
     isFeatured: true,
-    videoSrc: "/videos/Man_speaking_in_dark_studio_8a8b1698.mp4",
+    videoSrc: "/videos/intro.mp4",
     badge: "AI Cinema",
     visualPreview: {
       type: "cinematic-still",
@@ -110,7 +110,7 @@ export const projects: Project[] = [
     accentColor: "#c084fc",
     aspectRatio: "9/16",
     isFeatured: true,
-    videoSrc: "/videos/Person_editing_video_on_computer_393b5e4c.mp4",
+    videoSrc: "/videos/work.mp4",
     badge: "High-Retention Edit",
     visualPreview: {
       type: "video-preview",
