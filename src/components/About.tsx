@@ -1,13 +1,44 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useSpring } from "framer-motion";
 import { Film, Code, Bot, Compass, Sparkles, Terminal, MapPin } from "lucide-react";
 import { SocialLinks } from "./SocialLinks";
-import { TiltCard } from "./TiltCard";
 
 export const About: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Subtle pointer-driven movement for depth (few pixels max, upright and steady)
+  const portraitX = useSpring(0, { damping: 30, stiffness: 200, mass: 0.5 });
+  const portraitY = useSpring(0, { damping: 30, stiffness: 200, mass: 0.5 });
+  const glowX = useSpring(0, { damping: 25, stiffness: 140, mass: 0.6 });
+  const glowY = useSpring(0, { damping: 25, stiffness: 140, mass: 0.6 });
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Disable on touch devices and reduced-motion preferences
+    if (e.pointerType === "touch") return;
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const relX = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2); // -1 to 1
+    const relY = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2); // -1 to 1
+
+    // Subtly shift portrait (max ±5px) and glow (max ±12px) at different speeds for depth
+    portraitX.set(relX * 5);
+    portraitY.set(relY * 5);
+    glowX.set(relX * 12);
+    glowY.set(relY * 12);
+  };
+
+  const handlePointerLeave = () => {
+    portraitX.set(0);
+    portraitY.set(0);
+    glowX.set(0);
+    glowY.set(0);
+  };
+
   const pillars = [
     {
       icon: Film,
@@ -30,16 +61,16 @@ export const About: React.FC = () => {
   ];
 
   return (
-    <section id="about" className="py-28 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817]">
+    <section id="about" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817] overflow-hidden">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-8 border-b border-[#202A40]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14 sm:mb-16 pb-8 border-b border-[#202A40]">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101525] border border-[#202A40] text-xs font-medium text-[#2563EB] mb-3">
               <Sparkles size={12} />
               <span>01 / ABOUT ME</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
               Creative thinking. <br />
               <span className="text-[#94A3B8] font-normal font-serif italic">Technical execution.</span>
             </h2>
@@ -49,71 +80,85 @@ export const About: React.FC = () => {
           </p>
         </div>
 
-        {/* Master Portrait & Editorial Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start mb-16">
-          {/* Left: Custom Illustrated Profile Portrait Card */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 20 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 flex flex-col items-center w-full"
-          >
-            <TiltCard maxTilt={6} className="w-full max-w-md">
-              <div className="relative w-full rounded-3xl border border-[#202A40] bg-[#101525] p-4 sm:p-5 shadow-2xl overflow-hidden group">
-                {/* Subtle ambient lighting behind portrait */}
-                <div
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full pointer-events-none radial-glow-blue opacity-60 blur-3xl"
-                  aria-hidden="true"
-                />
-
-                {/* Portrait Container with Gentle Floating Effect */}
-                <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#080C1E] border border-[#202A40] flex items-center justify-center p-3 animate-float-slow">
-                  <Image
-                    src="/portrait.png"
-                    alt="Saimon Rana Magar — Custom Illustrated Portrait"
-                    width={520}
-                    height={520}
-                    priority
-                    className="w-full h-full object-contain sticker-outline select-none transition-transform duration-700 group-hover:scale-105"
-                  />
-
-                  {/* Subtle corner frame accents */}
-                  <div className="absolute top-3 left-3 w-3 h-3 border-t border-l border-[#2563EB]" />
-                  <div className="absolute top-3 right-3 w-3 h-3 border-t border-r border-[#2563EB]" />
-                  <div className="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-[#2563EB]" />
-                  <div className="absolute bottom-3 right-3 w-3 h-3 border-b border-r border-[#2563EB]" />
-                </div>
-
-                {/* Portrait Bottom Caption & Metadata */}
-                <div className="mt-4 pt-3 border-t border-[#202A40] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                  <div>
-                    <div className="text-white font-bold tracking-wider font-heading text-sm">
-                      SAIMON RANA MAGAR
-                    </div>
-                    <div className="text-[#94A3B8] text-[11px] font-mono flex items-center gap-1.5 mt-0.5">
-                      <MapPin size={11} className="text-[#2563EB]" />
-                      <span>Nepal • Digital Creator &amp; Dev</span>
-                    </div>
-                  </div>
-
-                  {/* Integrated Social Links */}
-                  <SocialLinks size="sm" />
-                </div>
-              </div>
-            </TiltCard>
-          </motion.div>
-
-          {/* Right: Editorial Narrative & Statement */}
-          <div className="lg:col-span-7 space-y-6">
+        {/* Master Narrative & Portrait Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-14 items-center mb-16">
+          {/* Mobile Step 1 / Desktop Left Top: Lead Narrative Statement */}
+          <div className="lg:col-span-7 lg:row-start-1 space-y-4">
             <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-snug font-heading">
               I work across creative media and technology, using the right tools to tell stories, build useful products, and shape engaging digital experiences.
             </h3>
+            <p className="text-[#94A3B8] text-sm sm:text-base leading-relaxed">
+              Based in <span className="text-white font-medium">Nepal</span>, my journey is driven by an insatiable curiosity for how cutting-edge tools transform human creativity. Rather than seeing a divide between art and engineering, I view code and cinema as two languages describing the same impulse: bringing an idea into reality.
+            </p>
+          </div>
 
+          {/* Mobile Step 2 / Desktop Right: Prominent Transparent Portrait */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:row-span-2 flex flex-col items-center justify-center my-4 lg:my-0"
+          >
+            <div
+              ref={containerRef}
+              onPointerMove={handlePointerMove}
+              onPointerLeave={handlePointerLeave}
+              className="relative w-full max-w-[320px] xs:max-w-[360px] sm:max-w-[400px] lg:max-w-[440px] flex items-center justify-center pt-4 pb-2"
+            >
+              {/* Subtle broad blue radial glow behind upper body */}
+              <motion.div
+                style={{ x: glowX, y: glowY }}
+                aria-hidden="true"
+                className="absolute top-[8%] sm:top-[12%] left-1/2 -translate-x-1/2 w-[280px] sm:w-[380px] lg:w-[420px] h-[280px] sm:h-[380px] lg:h-[420px] rounded-full pointer-events-none select-none"
+              >
+                <div
+                  className="w-full h-full rounded-full"
+                  style={{
+                    background:
+                      "radial-gradient(circle at 50% 45%, rgba(37, 99, 235, 0.28) 0%, rgba(56, 189, 248, 0.12) 42%, transparent 72%)",
+                    filter: "blur(32px)",
+                  }}
+                />
+              </motion.div>
+
+              {/* Portrait Image with Gentle Lower Edge Gradient Mask */}
+              <motion.div
+                style={{ x: portraitX, y: portraitY }}
+                className="relative z-10 w-full flex justify-center"
+              >
+                <div
+                  className="relative w-full overflow-visible"
+                  style={{
+                    WebkitMaskImage:
+                      "linear-gradient(to bottom, black 0%, black 72%, rgba(0, 0, 0, 0.85) 82%, rgba(0, 0, 0, 0.3) 93%, transparent 100%)",
+                    maskImage:
+                      "linear-gradient(to bottom, black 0%, black 72%, rgba(0, 0, 0, 0.85) 82%, rgba(0, 0, 0, 0.3) 93%, transparent 100%)",
+                  }}
+                >
+                  <Image
+                    src="/saimon-portrait.png"
+                    alt="Saimon Rana Magar — Digital Creator & Developer"
+                    width={876}
+                    height={1024}
+                    priority
+                    sizes="(max-width: 640px) 320px, (max-width: 1024px) 400px, 440px"
+                    className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-[0_15px_35px_rgba(5,8,23,0.7)]"
+                  />
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Subtle caption pill */}
+            <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101525]/80 border border-[#202A40] text-[11px] font-mono text-[#94A3B8]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+              <span>Saimon Rana Magar • Digital Creator &amp; Dev</span>
+            </div>
+          </motion.div>
+
+          {/* Mobile Step 3 / Desktop Left Bottom: Deep Narrative & Philosophy */}
+          <div className="lg:col-span-7 lg:row-start-2 space-y-6 pt-2">
             <div className="space-y-4 text-[#94A3B8] text-sm sm:text-base leading-relaxed">
-              <p>
-                Based in <span className="text-white font-medium">Nepal</span>, my journey is driven by an insatiable curiosity for how cutting-edge tools transform human creativity. Rather than seeing a divide between art and engineering, I view code and cinema as two languages describing the same impulse: bringing an idea into reality.
-              </p>
               <p>
                 In the creative realm, I explore <span className="text-white font-medium">AI filmmaking</span>, video editing, and short-form pacing. In development, I architect clean web interfaces with <span className="text-white font-medium">Next.js and modern JavaScript</span>, alongside <span className="text-white font-medium">Python automation</span> and Discord community bots.
               </p>
@@ -123,17 +168,28 @@ export const About: React.FC = () => {
             </div>
 
             {/* Core Philosophy Callout */}
-            <div className="p-6 rounded-2xl border border-[#202A40] bg-[#101525] relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-3 text-[#202A40]">
+            <div className="p-5 sm:p-6 rounded-2xl border border-[#202A40] bg-[#101525] relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-3 text-[#202A40]" aria-hidden="true">
                 <Terminal size={42} />
               </div>
               <div className="text-[11px] font-mono text-[#2563EB] uppercase tracking-wider mb-2 flex items-center gap-1.5">
                 <Compass size={12} />
                 <span>Creative Philosophy</span>
               </div>
-              <blockquote className="text-base text-white font-medium italic font-serif">
+              <blockquote className="text-sm sm:text-base text-white font-medium italic font-serif leading-relaxed">
                 &ldquo;Master the tool, respect the story, and write the code that makes it all function effortlessly.&rdquo;
               </blockquote>
+            </div>
+
+            {/* Identity & Social links row */}
+            <div className="pt-2 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#94A3B8] border-t border-[#202A40]/70">
+              <div className="flex items-center gap-2">
+                <MapPin size={12} className="text-[#2563EB]" />
+                <span className="text-white font-medium">Kathmandu, Nepal</span>
+                <span className="text-[#202A40]">•</span>
+                <span>Available Worldwide</span>
+              </div>
+              <SocialLinks size="sm" />
             </div>
           </div>
         </div>
@@ -159,13 +215,10 @@ export const About: React.FC = () => {
                   <div className="p-3 rounded-xl bg-[#080C1E] border border-[#202A40] text-[#2563EB] group-hover:scale-105 group-hover:bg-[#2563EB]/10 transition-all w-fit mb-4">
                     <Icon size={20} />
                   </div>
-                  <div className="text-xs font-mono text-[#64748B] tracking-wider mb-1">
-                    DISCIPLINE / 0{idx + 1}
-                  </div>
-                  <h4 className="text-base font-bold text-white group-hover:text-[#2563EB] transition-colors font-heading mb-2">
+                  <h4 className="text-lg font-bold text-white mb-2 font-heading group-hover:text-[#2563EB] transition-colors">
                     {pillar.title}
                   </h4>
-                  <p className="text-xs text-[#94A3B8] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
                     {pillar.description}
                   </p>
                 </motion.div>

@@ -127,16 +127,16 @@ export const WelcomePopup: React.FC = () => {
               <span>WELCOME TO MY CREATIVE SPACE</span>
             </div>
 
-            {/* Illustrated Portrait Frame */}
-            <div className="relative w-28 h-28 sm:w-32 sm:h-32 mx-auto rounded-2xl bg-[#080C1E] border border-[#202A40] p-2 shadow-2xl mb-4 group">
+            {/* Portrait Frame */}
+            <div className="relative w-28 h-28 sm:w-32 sm:h-32 mx-auto rounded-2xl bg-[#080C1E] border border-[#202A40] p-1.5 shadow-2xl mb-4 group">
               <div className="relative w-full h-full rounded-xl overflow-hidden bg-[#050817] flex items-center justify-center">
                 <Image
-                  src="/portrait.png"
+                  src="/saimon-avatar.png"
                   alt="Saimon Rana Magar Portrait"
                   width={240}
                   height={240}
                   priority
-                  className="w-full h-full object-contain sticker-outline select-none transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover select-none transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
 

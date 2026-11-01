@@ -66,19 +66,19 @@ export const Navbar: React.FC<NavbarProps> = () => {
               : "bg-[#101525]/70 backdrop-blur-md border-[#202A40]/80"
           }`}
         >
-          {/* Brand with illustrated avatar and live green dot (Reference Style) */}
+          {/* Brand with face-focused avatar and live green dot (Reference Style) */}
           <a
             href="#home"
             className="flex items-center gap-2.5 group focus-visible:ring-1 focus-visible:ring-[#2563EB] rounded-full shrink-0"
             aria-label="Saimon Rana Magar Home"
           >
-            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-[#080C1E] border border-[#202A40] flex items-center justify-center p-0.5">
+            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-[#080C1E] border border-[#202A40] flex items-center justify-center">
               <Image
-                src="/portrait.png"
-                alt="Saimon Avatar"
+                src="/saimon-avatar.png"
+                alt="Saimon Rana Magar Avatar"
                 width={32}
                 height={32}
-                className="w-full h-full object-contain sticker-outline"
+                className="w-full h-full object-cover select-none"
               />
             </div>
             <div className="flex flex-col">
