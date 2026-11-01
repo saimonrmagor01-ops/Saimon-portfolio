@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Film, Code, Bot, Compass, Sparkles, Terminal, MapPin } from "lucide-react";
 import { SocialLinks } from "./SocialLinks";
+import { TiltCard } from "./TiltCard";
 
 export const About: React.FC = () => {
   const pillars = [
@@ -56,49 +57,51 @@ export const About: React.FC = () => {
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 flex flex-col items-center"
+            className="lg:col-span-5 flex flex-col items-center w-full"
           >
-            <div className="relative w-full max-w-md rounded-3xl border border-[#202A40] bg-[#101525] p-4 sm:p-5 shadow-2xl overflow-hidden group">
-              {/* Subtle ambient lighting behind portrait */}
-              <div
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full pointer-events-none radial-glow-blue opacity-60 blur-3xl"
-                aria-hidden="true"
-              />
-
-              {/* Portrait Container with Gentle Floating Effect */}
-              <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#080C1E] border border-[#202A40] flex items-center justify-center p-3 animate-float-slow">
-                <Image
-                  src="/portrait.png"
-                  alt="Saimon Rana Magar — Custom Illustrated Portrait"
-                  width={520}
-                  height={520}
-                  priority
-                  className="w-full h-full object-contain sticker-outline select-none transition-transform duration-700 group-hover:scale-105"
+            <TiltCard maxTilt={6} className="w-full max-w-md">
+              <div className="relative w-full rounded-3xl border border-[#202A40] bg-[#101525] p-4 sm:p-5 shadow-2xl overflow-hidden group">
+                {/* Subtle ambient lighting behind portrait */}
+                <div
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full pointer-events-none radial-glow-blue opacity-60 blur-3xl"
+                  aria-hidden="true"
                 />
 
-                {/* Subtle corner frame accents */}
-                <div className="absolute top-3 left-3 w-3 h-3 border-t border-l border-[#2563EB]" />
-                <div className="absolute top-3 right-3 w-3 h-3 border-t border-r border-[#2563EB]" />
-                <div className="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-[#2563EB]" />
-                <div className="absolute bottom-3 right-3 w-3 h-3 border-b border-r border-[#2563EB]" />
-              </div>
+                {/* Portrait Container with Gentle Floating Effect */}
+                <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#080C1E] border border-[#202A40] flex items-center justify-center p-3 animate-float-slow">
+                  <Image
+                    src="/portrait.png"
+                    alt="Saimon Rana Magar — Custom Illustrated Portrait"
+                    width={520}
+                    height={520}
+                    priority
+                    className="w-full h-full object-contain sticker-outline select-none transition-transform duration-700 group-hover:scale-105"
+                  />
 
-              {/* Portrait Bottom Caption & Metadata */}
-              <div className="mt-4 pt-3 border-t border-[#202A40] flex items-center justify-between text-xs">
-                <div>
-                  <div className="text-white font-bold tracking-wider font-heading text-sm">
-                    SAIMON RANA MAGAR
-                  </div>
-                  <div className="text-[#94A3B8] text-[11px] font-mono flex items-center gap-1.5 mt-0.5">
-                    <MapPin size={11} className="text-[#2563EB]" />
-                    <span>Nepal • Digital Creator &amp; Dev</span>
-                  </div>
+                  {/* Subtle corner frame accents */}
+                  <div className="absolute top-3 left-3 w-3 h-3 border-t border-l border-[#2563EB]" />
+                  <div className="absolute top-3 right-3 w-3 h-3 border-t border-r border-[#2563EB]" />
+                  <div className="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-[#2563EB]" />
+                  <div className="absolute bottom-3 right-3 w-3 h-3 border-b border-r border-[#2563EB]" />
                 </div>
 
-                {/* Integrated Social Links */}
-                <SocialLinks size="sm" />
+                {/* Portrait Bottom Caption & Metadata */}
+                <div className="mt-4 pt-3 border-t border-[#202A40] flex items-center justify-between text-xs">
+                  <div>
+                    <div className="text-white font-bold tracking-wider font-heading text-sm">
+                      SAIMON RANA MAGAR
+                    </div>
+                    <div className="text-[#94A3B8] text-[11px] font-mono flex items-center gap-1.5 mt-0.5">
+                      <MapPin size={11} className="text-[#2563EB]" />
+                      <span>Nepal • Digital Creator &amp; Dev</span>
+                    </div>
+                  </div>
+
+                  {/* Integrated Social Links */}
+                  <SocialLinks size="sm" />
+                </div>
               </div>
-            </div>
+            </TiltCard>
           </motion.div>
 
           {/* Right: Editorial Narrative & Statement */}

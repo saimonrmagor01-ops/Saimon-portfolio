@@ -8,6 +8,7 @@ import {
   Home, User, Briefcase, Film, Code, FolderGit2, Wrench, Mail 
 } from "lucide-react";
 import { SocialLinks } from "./SocialLinks";
+import { Magnetic } from "./Magnetic";
 
 interface NavbarProps {
   activeSection?: string;
@@ -128,14 +129,16 @@ export const Navbar: React.FC<NavbarProps> = () => {
               <SocialLinks size="sm" />
             </div>
 
-            {/* Direct CTA (Reference Accent Blue) */}
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200 font-heading shadow-[0_0_15px_rgba(37,99,235,0.35)] shrink-0"
-            >
-              <span>Let&apos;s Talk</span>
-              <ArrowUpRight size={13} />
-            </a>
+            {/* Direct CTA (Reference Accent Blue) with Magnetic Hover */}
+            <Magnetic strength={0.25}>
+              <a
+                href="#contact"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200 font-heading shadow-[0_0_15px_rgba(37,99,235,0.35)] shrink-0"
+              >
+                <span>Let&apos;s Talk</span>
+                <ArrowUpRight size={13} />
+              </a>
+            </Magnetic>
 
             {/* Mobile Menu Button */}
             <button

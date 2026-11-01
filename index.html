@@ -1564,6 +1564,8 @@
   </style>
 </head>
 <body>
+  <div id="scrollProgressBar" style="position:fixed; top:0; left:0; height:3px; width:0%; background:linear-gradient(90deg, #2563EB, #38BDF8); z-index:99999; pointer-events:none; box-shadow:0 0 10px rgba(37,99,235,0.8);"></div>
+
   <div class="film-grain" aria-hidden="true"></div>
 
   <!-- Desktop Custom Cursor with Hover States -->
@@ -3467,6 +3469,31 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
         document.getElementById('formSuccess').style.display = 'block';
       }, 700);
     }
+
+    // Scroll Progress Bar Update
+    window.addEventListener('scroll', () => {
+      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+      const bar = document.getElementById('scrollProgressBar');
+      if (bar) bar.style.width = progress + '%';
+    }, { passive: true });
+
+    // Interactive 3D Card Tilt with Specular Spring
+    document.querySelectorAll('.project-card, .hero-reel-card, .pillar-card').forEach(card => {
+      card.style.transition = 'transform 0.15s ease-out, box-shadow 0.3s ease';
+      card.style.transformStyle = 'preserve-3d';
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        const rotX = (0.5 - y) * 14;
+        const rotY = (x - 0.5) * 14;
+        card.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+      });
+    });
 
     // Welcome Popup Controller (Once per session)
     function checkWelcomePopup() {

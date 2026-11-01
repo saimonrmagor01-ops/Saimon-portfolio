@@ -15,6 +15,7 @@ import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { MusicPlayer } from "@/components/MusicPlayer";
 import { WelcomePopup } from "@/components/WelcomePopup";
+import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 
 export default function Home() {
   const [selectedService, setSelectedService] = useState<string>("");
@@ -25,6 +26,9 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen bg-[#050817] text-[#f8fafc] selection:bg-[#2563eb] selection:text-white">
+      {/* 3D & Motion: Scroll Progress Bar */}
+      <ScrollProgressBar />
+
       {/* Cinematic Animated Welcome Popup (Once per session) */}
       <WelcomePopup />
 
