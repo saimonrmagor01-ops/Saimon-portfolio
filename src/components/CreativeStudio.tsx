@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Film, Play, Pause, Sparkles, Layers, Sliders, Maximize2, MonitorPlay } from "lucide-react";
+import { ShowreelModal } from "./ShowreelModal";
 
 interface CreativePiece {
   id: string;
@@ -71,6 +72,7 @@ export const CreativeStudio: React.FC = () => {
 
   const [activePiece, setActivePiece] = useState<CreativePiece>(pieces[0]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isShowreelModalOpen, setIsShowreelModalOpen] = useState(false);
 
   return (
     <section id="creative-studio" className="py-28 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817]">
@@ -118,10 +120,18 @@ export const CreativeStudio: React.FC = () => {
                     <Sparkles size={11} className="text-[#2563EB]" />
                     <span>{activePiece.category}</span>
                   </span>
-                  <div className="flex items-center gap-3">
-                    <span className="px-2 py-0.5 rounded bg-black/50 text-[10px] text-[#CBD5E1] border border-white/10">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded bg-black/50 text-[10px] text-[#CBD5E1] border border-white/10 hidden sm:inline">
                       ASPECT {activePiece.aspectRatio}
                     </span>
+                    <button
+                      onClick={() => setIsShowreelModalOpen(true)}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#2563EB] text-white text-[10px] font-mono hover:bg-[#1D4ED8] transition-all hover:scale-105"
+                      title="Launch Fullscreen Cinematic Player"
+                    >
+                      <Maximize2 size={10} />
+                      <span>EXPAND CINEMA</span>
+                    </button>
                     <span className="text-[#93C5FD] font-semibold">{activePiece.duration}</span>
                   </div>
                 </div>
@@ -249,6 +259,12 @@ export const CreativeStudio: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Full-Screen Cinematic AI Showreel Modal */}
+      <ShowreelModal
+        isOpen={isShowreelModalOpen}
+        onClose={() => setIsShowreelModalOpen(false)}
+      />
     </section>
   );
 };

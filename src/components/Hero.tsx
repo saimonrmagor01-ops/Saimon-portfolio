@@ -2,15 +2,17 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Play, Pause, Sparkles, MapPin, Globe } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Play, Pause, Sparkles, MapPin, Globe, Maximize2 } from "lucide-react";
 import { SocialLinks } from "./SocialLinks";
 import { Hero3DScene } from "./Hero3DScene";
 import { AnimatedHeading } from "./AnimatedHeading";
 import { Magnetic } from "./Magnetic";
 import { TiltCard } from "./TiltCard";
+import { ShowreelModal } from "./ShowreelModal";
 
 export const Hero: React.FC = () => {
   const [isPlayingReel, setIsPlayingReel] = useState(false);
+  const [isShowreelOpen, setIsShowreelOpen] = useState(false);
 
   return (
     <section
@@ -146,15 +148,19 @@ export const Hero: React.FC = () => {
                   {/* Reel Center Action */}
                   <div className="relative z-20 my-auto text-center">
                     <button
-                      onClick={() => setIsPlayingReel(!isPlayingReel)}
+                      onClick={() => setIsShowreelOpen(true)}
                       className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-[#2563EB]/80 backdrop-blur-md border border-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.5)] mx-auto hover:scale-105"
-                      aria-label={isPlayingReel ? "Pause showreel preview" : "Play showreel preview"}
+                      aria-label="Open full-screen cinematic showreel"
                     >
-                      {isPlayingReel ? <Pause size={18} /> : <Play size={18} className="translate-x-0.5" />}
+                      <Play size={18} className="translate-x-0.5" />
                     </button>
-                    <p className="text-[11px] font-medium tracking-wide text-white/90 mt-2 font-heading">
-                      {isPlayingReel ? "Playing Generative Reel..." : "Preview Creative Showreel"}
-                    </p>
+                    <button
+                      onClick={() => setIsShowreelOpen(true)}
+                      className="group/btn inline-flex items-center gap-1.5 text-[11px] font-medium tracking-wide text-white/90 mt-2 font-heading hover:text-[#93C5FD] transition-colors"
+                    >
+                      <span>Watch Full AI Showreel</span>
+                      <Maximize2 size={11} className="opacity-70 group-hover/btn:opacity-100 transition-opacity" />
+                    </button>
                   </div>
 
                   {/* Reel Footer Audio / Timecode */}
@@ -205,6 +211,12 @@ export const Hero: React.FC = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Full-Screen Cinematic AI Showreel Modal */}
+      <ShowreelModal
+        isOpen={isShowreelOpen}
+        onClose={() => setIsShowreelOpen(false)}
+      />
     </section>
   );
 };

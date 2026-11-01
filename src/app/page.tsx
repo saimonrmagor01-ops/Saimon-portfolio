@@ -16,6 +16,8 @@ import { Footer } from "@/components/Footer";
 import { MusicPlayer } from "@/components/MusicPlayer";
 import { WelcomePopup } from "@/components/WelcomePopup";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
+import { Preloader } from "@/components/Preloader";
+import { FloatingBackToTop } from "@/components/FloatingBackToTop";
 
 export default function Home() {
   const [selectedService, setSelectedService] = useState<string>("");
@@ -26,6 +28,9 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen bg-[#050817] text-[#f8fafc] selection:bg-[#2563eb] selection:text-white">
+      {/* Brand Identity Preloader Curtain */}
+      <Preloader />
+
       {/* 3D & Motion: Scroll Progress Bar */}
       <ScrollProgressBar />
 
@@ -35,8 +40,11 @@ export default function Home() {
       {/* Desktop Custom Animated Cursor */}
       <CustomCursor />
 
-      {/* Floating Background Music Controller */}
+      {/* Floating Background Music Controller (Bottom-Right) */}
       <MusicPlayer />
+
+      {/* Floating Back-To-Top Button (Bottom-Left) */}
+      <FloatingBackToTop />
 
       {/* Navigation Header */}
       <Navbar />
