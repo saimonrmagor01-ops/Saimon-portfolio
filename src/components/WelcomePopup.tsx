@@ -3,34 +3,65 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, Sparkles, MessageSquare, Compass, Send } from "lucide-react";
+import { X, ArrowRight, Sparkles } from "lucide-react";
 import { SOCIAL_LINKS } from "@/data/socials";
+
+// Module-level lifecycle flag: ensures the popup only displays once per fresh visit/reload
+// and NEVER re-triggers during internal navigation, re-renders, or section hopping.
+let hasDismissedInCurrentVisit = false;
 
 export const WelcomePopup: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [placeholderNotice, setPlaceholderNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if shown in this session
+    // 1. Clean up outdated permanent flags from previous builds
     try {
-      const hasSeen = sessionStorage.getItem("saimon_welcome_shown");
-      if (!hasSeen) {
-        const timer = setTimeout(() => {
-          setIsOpen(true);
-        }, 400);
-        return () => clearTimeout(timer);
-      }
+      localStorage.removeItem("saimon_welcome_shown");
+      localStorage.removeItem("saimon_popup_closed");
+      localStorage.removeItem("saimon_welcome_dismissed");
+      sessionStorage.removeItem("saimon_welcome_shown");
     } catch {
-      // Fallback if sessionStorage is disabled
+      // Safe fallback if storage is restricted
     }
+
+    // 2. Only show if not already dismissed in this visit
+    if (hasDismissedInCurrentVisit) {
+      return;
+    }
+
+    // Smooth entrance timer (allows initial DOM & font paint)
+    const timer = setTimeout(() => {
+      if (!hasDismissedInCurrentVisit) {
+        setIsOpen(true);
+      }
+    }, 600);
+
+    // ESC key listener for accessibility
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        handleClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const handleClose = () => {
+    hasDismissedInCurrentVisit = true;
     setIsOpen(false);
-    try {
-      sessionStorage.setItem("saimon_welcome_shown", "true");
-    } catch {
-      // ignore
+  };
+
+  const handleExplore = () => {
+    handleClose();
+    // Smooth scroll to the hero or about section
+    const target = document.getElementById("about") || document.getElementById("home");
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -50,7 +81,7 @@ export const WelcomePopup: React.FC = () => {
           role="dialog"
           aria-modal="true"
           aria-label="Welcome to Saimon Rana Magar's Portfolio"
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+          className="fixed inset-0 z-[10001] flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
         >
           {/* Backdrop */}
           <motion.div
@@ -188,7 +219,7 @@ export const WelcomePopup: React.FC = () => {
 
             {/* Explore Portfolio Action Button */}
             <button
-              onClick={handleClose}
+              onClick={handleExplore}
               type="button"
               className="w-full py-3.5 px-6 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_25px_rgba(37,99,235,0.4)] hover:shadow-[0_4px_30px_rgba(37,99,235,0.6)] group"
             >
