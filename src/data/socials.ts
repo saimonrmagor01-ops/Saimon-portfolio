@@ -29,8 +29,8 @@ export interface DirectContactConfig {
  */
 export const DIRECT_CONTACT_CONFIG: DirectContactConfig = {
   instagram: {
-    handle: "[ADD_INSTAGRAM_HANDLE]", // e.g. "@saimon_creates"
-    url: "[ADD_INSTAGRAM_URL]", // e.g. "https://instagram.com/saimon_creates"
+    handle: "@shymoneyyyyyy",
+    url: "https://www.instagram.com/shymoneyyyyyy?exln=ZWkyazFmZ2QzdnI5",
     cta: "Message me on Instagram",
     description: "Direct messaging for creative collaborations, video direction, and visual inquiries.",
     color: "#E4405F",
@@ -38,8 +38,8 @@ export const DIRECT_CONTACT_CONFIG: DirectContactConfig = {
     borderHover: "rgba(228, 64, 95, 0.5)",
   },
   whatsapp: {
-    handle: "[ADD_WHATSAPP_NUMBER]", // e.g. "+977 98XXXXXXXX"
-    url: "[ADD_WHATSAPP_LINK]", // e.g. "https://wa.me/97798XXXXXXXX"
+    handle: "+977 9869113247",
+    url: "https://wa.me/9779869113247",
     cta: "Let’s discuss your project",
     description: "Instant chat and voice messaging for rapid project discussions and timeline estimates.",
     color: "#25D366",
@@ -47,9 +47,9 @@ export const DIRECT_CONTACT_CONFIG: DirectContactConfig = {
     borderHover: "rgba(37, 211, 102, 0.5)",
   },
   discord: {
-    username: "[ADD_DISCORD_USERNAME]", // e.g. "saimon_magar"
-    handle: "[ADD_DISCORD_USERNAME]",
-    url: "[ADD_DISCORD_PROFILE_OR_INVITE]", // e.g. "https://discord.gg/yourinvite"
+    username: "1385452498931945627",
+    handle: "1385452498931945627",
+    url: "https://discordapp.com/users/1385452498931945627",
     cta: "Connect with me on Discord",
     description: "Real-time communication for bot development, web engineering, and asset reviews.",
     color: "#5865F2",
