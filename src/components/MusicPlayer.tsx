@@ -34,17 +34,18 @@ export const MusicPlayer: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentTrack = PLAYLIST[currentTrackIndex];
 
-  // Initialize Audio
+  // Initialize Audio with Autoplay
   useEffect(() => {
     const savedMute = localStorage.getItem("saimon_portfolio_mute");
+    const initialMute = savedMute === "true";
     if (savedMute !== null) {
-      setIsMuted(savedMute === "true");
+      setIsMuted(initialMute);
     }
 
     const audio = new Audio();
     audio.src = currentTrack.src;
-    audio.preload = "metadata";
-    audio.volume = isMuted ? 0 : volume;
+    audio.preload = "auto";
+    audio.volume = initialMute ? 0 : volume;
 
     const onTimeUpdate = () => {
       if (audio.duration) {
@@ -66,6 +67,45 @@ export const MusicPlayer: React.FC = () => {
     audio.addEventListener("ended", onEnded);
 
     audioRef.current = audio;
+
+    // Autoplay attempt with seamless fallback to first user interaction
+    const attemptAutoplay = () => {
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch(() => {
+            // Browser blocked un-interacted autoplay: start on first touch, click, scroll or key
+            const startOnInteraction = () => {
+              if (audioRef.current && audioRef.current.paused) {
+                audioRef.current
+                  .play()
+                  .then(() => setIsPlaying(true))
+                  .catch(() => {});
+              }
+              cleanupListeners();
+            };
+
+            const cleanupListeners = () => {
+              window.removeEventListener("pointerdown", startOnInteraction);
+              window.removeEventListener("click", startOnInteraction);
+              window.removeEventListener("scroll", startOnInteraction);
+              window.removeEventListener("keydown", startOnInteraction);
+              window.removeEventListener("touchstart", startOnInteraction);
+            };
+
+            window.addEventListener("pointerdown", startOnInteraction, { once: true, passive: true });
+            window.addEventListener("click", startOnInteraction, { once: true, passive: true });
+            window.addEventListener("scroll", startOnInteraction, { once: true, passive: true });
+            window.addEventListener("keydown", startOnInteraction, { once: true, passive: true });
+            window.addEventListener("touchstart", startOnInteraction, { once: true, passive: true });
+          });
+      }
+    };
+
+    attemptAutoplay();
 
     return () => {
       audio.pause();

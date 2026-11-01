@@ -2967,6 +2967,7 @@ export const MetricCard: React.FC&lt;MetricProps&gt; = ({ label, value, detail }
 
     // Load initial track
     bgAudio.src = playlist[currentTrackIdx].src;
+    bgAudio.preload = 'auto';
 
     // Check saved mute state
     const savedMute = localStorage.getItem('saimon_portfolio_mute');
@@ -2975,18 +2976,60 @@ export const MetricCard: React.FC&lt;MetricProps&gt; = ({ label, value, detail }
       muteBtn.style.color = '#ef4444';
     }
 
+    // Set playing visual state
+    function setAudioPlayingUI(isPlaying) {
+      if (isPlaying) {
+        playBtn.textContent = '❚❚';
+        waveBars.classList.add('playing');
+      } else {
+        playBtn.textContent = '▶';
+        waveBars.classList.remove('playing');
+      }
+    }
+
+    // Autoplay attempt with fallback on first user interaction
+    function triggerAutoplay() {
+      const playPromise = bgAudio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setAudioPlayingUI(true);
+          })
+          .catch(() => {
+            const startOnInteraction = () => {
+              if (bgAudio.paused) {
+                bgAudio.play().then(() => setAudioPlayingUI(true)).catch(() => {});
+              }
+              cleanup();
+            };
+            const cleanup = () => {
+              window.removeEventListener('pointerdown', startOnInteraction);
+              window.removeEventListener('click', startOnInteraction);
+              window.removeEventListener('scroll', startOnInteraction);
+              window.removeEventListener('keydown', startOnInteraction);
+              window.removeEventListener('touchstart', startOnInteraction);
+            };
+            window.addEventListener('pointerdown', startOnInteraction, { once: true, passive: true });
+            window.addEventListener('click', startOnInteraction, { once: true, passive: true });
+            window.addEventListener('scroll', startOnInteraction, { once: true, passive: true });
+            window.addEventListener('keydown', startOnInteraction, { once: true, passive: true });
+            window.addEventListener('touchstart', startOnInteraction, { once: true, passive: true });
+          });
+      }
+    }
+
+    triggerAutoplay();
+
     playBtn.addEventListener('click', () => {
       if (bgAudio.paused) {
         bgAudio.play().then(() => {
-          playBtn.textContent = '❚❚';
-          waveBars.classList.add('playing');
+          setAudioPlayingUI(true);
         }).catch(err => {
           console.log("Audio playback error:", err);
         });
       } else {
         bgAudio.pause();
-        playBtn.textContent = '▶';
-        waveBars.classList.remove('playing');
+        setAudioPlayingUI(false);
       }
     });
 
