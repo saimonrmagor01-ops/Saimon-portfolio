@@ -1,44 +1,12 @@
 "use client";
 
-import React, { useRef } from "react";
-import Image from "next/image";
-import { motion, useSpring } from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
 import { Film, Code, Bot, Compass, Sparkles, Terminal, MapPin } from "lucide-react";
 import { SocialLinks } from "./SocialLinks";
+import { Avatar3DScene } from "./Avatar3DScene";
 
 export const About: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Subtle pointer-driven movement for depth (few pixels max, upright and steady)
-  const portraitX = useSpring(0, { damping: 30, stiffness: 200, mass: 0.5 });
-  const portraitY = useSpring(0, { damping: 30, stiffness: 200, mass: 0.5 });
-  const glowX = useSpring(0, { damping: 25, stiffness: 140, mass: 0.6 });
-  const glowY = useSpring(0, { damping: 25, stiffness: 140, mass: 0.6 });
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    // Disable on touch devices and reduced-motion preferences
-    if (e.pointerType === "touch") return;
-    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (!containerRef.current) return;
-
-    const rect = containerRef.current.getBoundingClientRect();
-    const relX = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2); // -1 to 1
-    const relY = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2); // -1 to 1
-
-    // Subtly shift portrait (max ±5px) and glow (max ±12px) at different speeds for depth
-    portraitX.set(relX * 5);
-    portraitY.set(relY * 5);
-    glowX.set(relX * 12);
-    glowY.set(relY * 12);
-  };
-
-  const handlePointerLeave = () => {
-    portraitX.set(0);
-    portraitY.set(0);
-    glowX.set(0);
-    glowY.set(0);
-  };
-
   const pillars = [
     {
       icon: Film,
@@ -80,7 +48,7 @@ export const About: React.FC = () => {
           </p>
         </div>
 
-        {/* Master Narrative & Portrait Layout */}
+        {/* Master Narrative & 3D Avatar Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-14 items-center mb-16">
           {/* Mobile Step 1 / Desktop Left Top: Lead Narrative Statement */}
           <div className="lg:col-span-7 lg:row-start-1 space-y-4">
@@ -92,67 +60,23 @@ export const About: React.FC = () => {
             </p>
           </div>
 
-          {/* Mobile Step 2 / Desktop Right: Prominent Transparent Portrait */}
+          {/* Mobile Step 2 / Desktop Right: Cinematic 3D Interactive Avatar */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:row-span-2 flex flex-col items-center justify-center my-4 lg:my-0"
+            className="lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:row-span-2 flex flex-col items-center justify-center my-2 lg:my-0"
           >
-            <div
-              ref={containerRef}
-              onPointerMove={handlePointerMove}
-              onPointerLeave={handlePointerLeave}
-              className="relative w-full max-w-[320px] xs:max-w-[360px] sm:max-w-[400px] lg:max-w-[440px] flex items-center justify-center pt-4 pb-2"
-            >
-              {/* Subtle broad blue radial glow behind upper body */}
-              <motion.div
-                style={{ x: glowX, y: glowY }}
-                aria-hidden="true"
-                className="absolute top-[8%] sm:top-[12%] left-1/2 -translate-x-1/2 w-[280px] sm:w-[380px] lg:w-[420px] h-[280px] sm:h-[380px] lg:h-[420px] rounded-full pointer-events-none select-none"
-              >
-                <div
-                  className="w-full h-full rounded-full"
-                  style={{
-                    background:
-                      "radial-gradient(circle at 50% 45%, rgba(37, 99, 235, 0.28) 0%, rgba(56, 189, 248, 0.12) 42%, transparent 72%)",
-                    filter: "blur(32px)",
-                  }}
-                />
-              </motion.div>
+            <div className="relative w-full max-w-[340px] xs:max-w-[380px] sm:max-w-[420px] lg:max-w-[460px] flex flex-col items-center justify-center">
+              {/* 3D WebGL Avatar Scene with Depth Parallax, Rim Light & 3D Particles */}
+              <Avatar3DScene />
 
-              {/* Portrait Image with Gentle Lower Edge Gradient Mask */}
-              <motion.div
-                style={{ x: portraitX, y: portraitY }}
-                className="relative z-10 w-full flex justify-center"
-              >
-                <div
-                  className="relative w-full overflow-visible"
-                  style={{
-                    WebkitMaskImage:
-                      "linear-gradient(to bottom, black 0%, black 72%, rgba(0, 0, 0, 0.85) 82%, rgba(0, 0, 0, 0.3) 93%, transparent 100%)",
-                    maskImage:
-                      "linear-gradient(to bottom, black 0%, black 72%, rgba(0, 0, 0, 0.85) 82%, rgba(0, 0, 0, 0.3) 93%, transparent 100%)",
-                  }}
-                >
-                  <Image
-                    src="/saimon-portrait.png"
-                    alt="Saimon Rana Magar — Digital Creator & Developer"
-                    width={876}
-                    height={1024}
-                    priority
-                    sizes="(max-width: 640px) 320px, (max-width: 1024px) 400px, 440px"
-                    className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-[0_15px_35px_rgba(5,8,23,0.7)]"
-                  />
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Subtle caption pill */}
-            <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101525]/80 border border-[#202A40] text-[11px] font-mono text-[#94A3B8]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
-              <span>Saimon Rana Magar • Digital Creator &amp; Dev</span>
+              {/* Subtle caption pill */}
+              <div className="mt-1 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101525]/80 border border-[#202A40] text-[11px] font-mono text-[#94A3B8]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+                <span>Saimon Rana Magar • Digital Creator &amp; Dev</span>
+              </div>
             </div>
           </motion.div>
 
