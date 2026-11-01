@@ -13,6 +13,7 @@ import { Experience } from "@/components/Experience";
 import { Services } from "@/components/Services";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
+import { MusicPlayer } from "@/components/MusicPlayer";
 
 export default function Home() {
   const [selectedService, setSelectedService] = useState<string>("");
@@ -22,9 +23,12 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050505] text-[#f4f4f1] selection:bg-[#9fbdff] selection:text-[#050505]">
-      {/* Desktop Custom Cursor */}
+    <div className="relative min-h-screen bg-[#050505] text-[#f5f5f5] selection:bg-[#9fbdff] selection:text-[#050505]">
+      {/* Desktop Custom Animated Cursor */}
       <CustomCursor />
+
+      {/* Floating Background Music Controller */}
+      <MusicPlayer />
 
       {/* Navigation Header */}
       <Navbar />
@@ -34,7 +38,7 @@ export default function Home() {
         {/* Section A: Home / Hero */}
         <Hero />
 
-        {/* Section B: About Me */}
+        {/* Section B: About Me with Illustrated Portrait */}
         <About />
 
         {/* Section C: Creative Studio */}
@@ -55,7 +59,7 @@ export default function Home() {
         {/* Section H: Services */}
         <Services onSelectService={handleSelectService} />
 
-        {/* Section I: Contact */}
+        {/* Section I: Contact with Social Links */}
         <Contact
           selectedService={selectedService}
           onServiceChange={(s) => setSelectedService(s)}

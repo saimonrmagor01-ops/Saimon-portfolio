@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Send, CheckCircle2, AlertCircle, Sparkles, MapPin, Clock, ArrowUpRight, RefreshCw } from "lucide-react";
 import { services } from "@/data/services";
+import { SocialLinks } from "./SocialLinks";
 
 interface ContactProps {
   selectedService?: string;
@@ -18,7 +19,7 @@ export const Contact: React.FC<ContactProps> = ({
     name: "",
     email: "",
     service: selectedService || services[0].title,
-    timeline: "Flexible (1-3 weeks)",
+    timeline: "Standard (1-3 weeks)",
     message: "",
   });
 
@@ -81,7 +82,7 @@ export const Contact: React.FC<ContactProps> = ({
     // Simulate realistic asynchronous submission
     setTimeout(() => {
       setStatus("success");
-    }, 900);
+    }, 800);
   };
 
   const handleReset = () => {
@@ -89,7 +90,7 @@ export const Contact: React.FC<ContactProps> = ({
       name: "",
       email: "",
       service: services[0].title,
-      timeline: "Flexible (1-3 weeks)",
+      timeline: "Standard (1-3 weeks)",
       message: "",
     });
     setErrors({});
@@ -106,7 +107,7 @@ export const Contact: React.FC<ContactProps> = ({
               <Mail size={12} />
               <span>08 / GET IN TOUCH</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
               Have an idea? <br />
               <span className="text-[#888888] font-normal font-serif italic">Let&apos;s make it real.</span>
             </h2>
@@ -130,7 +131,7 @@ export const Contact: React.FC<ContactProps> = ({
                 <span className="text-[10px] font-mono uppercase tracking-widest text-[#9fbdff]">
                   DIRECT INQUIRY
                 </span>
-                <h3 className="text-2xl font-bold text-white tracking-tight">
+                <h3 className="text-2xl font-bold text-white tracking-tight font-heading">
                   Start a Conversation
                 </h3>
                 <p className="text-xs sm:text-sm text-[#8e8e93] leading-relaxed">
@@ -168,11 +169,22 @@ export const Contact: React.FC<ContactProps> = ({
                 </div>
               </div>
 
+              {/* Social Channels Callout */}
+              <div className="pt-2 border-t border-white/[0.06]">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-[#666666] mb-2.5">
+                  Direct Channels
+                </div>
+                <div className="flex items-center justify-between">
+                  <SocialLinks size="md" />
+                  <span className="text-[11px] font-mono text-[#888888]">Instant Chat</span>
+                </div>
+              </div>
+
               {/* Email direct action */}
               <div className="pt-2">
                 <a
                   href={`mailto:saimonranamagar@example.com?subject=Project%20Inquiry%20via%20Portfolio&body=Hi%20Saimon,%0A%0AI%20would%20like%20to%20discuss%20a%20project...`}
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full border border-white/20 bg-white/[0.04] text-white text-xs font-semibold uppercase tracking-wider hover:bg-white hover:text-black transition-all duration-200"
+                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full border border-white/20 bg-white/[0.04] text-white text-xs font-semibold uppercase tracking-wider hover:bg-white hover:text-black transition-all duration-200 font-heading"
                 >
                   <Mail size={14} />
                   <span>Open Direct Mail Client</span>
@@ -198,7 +210,7 @@ export const Contact: React.FC<ContactProps> = ({
                       <CheckCircle2 size={32} />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-2xl font-bold text-white tracking-tight">
+                      <h3 className="text-2xl font-bold text-white tracking-tight font-heading">
                         Inquiry Received
                       </h3>
                       <p className="text-xs sm:text-sm text-[#92928f] max-w-md mx-auto leading-relaxed">
@@ -210,7 +222,7 @@ export const Contact: React.FC<ContactProps> = ({
                       <button
                         onClick={handleReset}
                         type="button"
-                        className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-medium border border-white/10 bg-white/[0.03] text-white hover:bg-white/10 transition-colors"
+                        className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-medium border border-white/10 bg-white/[0.03] text-white hover:bg-white/10 transition-colors font-heading"
                       >
                         <RefreshCw size={12} />
                         <span>Send Another Message</span>
@@ -333,7 +345,7 @@ export const Contact: React.FC<ContactProps> = ({
                         <option value="Urgent (Within 1 week)" className="bg-[#0c0c10] text-white">
                           Urgent (Within 1 week)
                         </option>
-                        <option value="Flexible (1-3 weeks)" className="bg-[#0c0c10] text-white">
+                        <option value="Standard (1-3 weeks)" className="bg-[#0c0c10] text-white">
                           Standard (1-3 weeks)
                         </option>
                         <option value="Long-term partnership" className="bg-[#0c0c10] text-white">
@@ -377,7 +389,7 @@ export const Contact: React.FC<ContactProps> = ({
                     <button
                       type="submit"
                       disabled={status === "submitting"}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-[#9fbdff] disabled:opacity-50 transition-all duration-200"
+                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-[#9fbdff] disabled:opacity-50 transition-all duration-200 font-heading"
                     >
                       {status === "submitting" ? (
                         <>

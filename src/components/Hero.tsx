@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowDown, ArrowUpRight, Play, Pause, Sparkles, MapPin, Globe } from "lucide-react";
+import { SocialLinks } from "./SocialLinks";
 
 export const Hero: React.FC = () => {
   const [isPlayingReel, setIsPlayingReel] = useState(false);
@@ -23,25 +24,30 @@ export const Hero: React.FC = () => {
       />
 
       <div className="max-w-6xl w-full mx-auto my-auto relative z-10 pt-4 pb-8">
-        {/* Availability & Location Pill */}
+        {/* Availability, Location & Social Links Header */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-wrap items-center gap-3 mb-8"
+          className="flex flex-wrap items-center justify-between gap-4 mb-8"
         >
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md text-[11px] font-mono tracking-wider text-[#a0a0a0]">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9fbdff] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9fbdff]"></span>
-            </span>
-            <span>AVAILABLE FOR SELECT COLLABORATIONS</span>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md text-[11px] font-mono tracking-wider text-[#a0a0a0]">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9fbdff] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9fbdff]"></span>
+              </span>
+              <span>AVAILABLE FOR SELECT COLLABORATIONS</span>
+            </div>
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/5 bg-white/[0.02] text-[11px] font-mono text-[#777777]">
+              <MapPin size={11} className="text-[#9fbdff]" />
+              <span>NEPAL</span>
+            </div>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/5 bg-white/[0.02] text-[11px] font-mono text-[#777777]">
-            <MapPin size={11} className="text-[#9fbdff]" />
-            <span>NEPAL</span>
-          </div>
+          {/* Social Icons Bar */}
+          <SocialLinks size="sm" />
         </motion.div>
 
         {/* Master Editorial Typography */}
@@ -50,11 +56,10 @@ export const Hero: React.FC = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="text-5xl sm:text-7xl md:text-8xl lg:text-[102px] font-extrabold tracking-tightest leading-[0.93] text-white"
+            className="text-5xl sm:text-7xl md:text-8xl lg:text-[100px] font-extrabold tracking-tightest leading-[0.94] text-white font-heading"
           >
-            I create. <br />
-            <span className="text-[#6d7178] font-normal italic font-serif">I develop.</span> <br />
-            I bring ideas to life.
+            Creative mind. <br />
+            <span className="text-[#6d7178] font-normal italic font-serif">Digital execution.</span>
           </motion.h1>
         </div>
 
@@ -67,7 +72,7 @@ export const Hero: React.FC = () => {
             className="lg:col-span-7 space-y-6"
           >
             <p className="text-base sm:text-lg text-[#a3a3a3] max-w-2xl font-normal leading-relaxed">
-              I&apos;m <span className="text-white font-medium">Saimon Rana Magar</span> — a Digital Creator &amp; Developer exploring the intersection of <span className="text-[#9fbdff]">AI filmmaking</span>, visual storytelling, and <span className="text-[#e2e8f0]">web technology</span>.
+              I&apos;m <span className="text-white font-medium">Saimon Rana Magar</span> — an <span className="text-[#9fbdff]">AI filmmaker</span>, content creator and developer building cinematic experiences and <span className="text-[#e2e8f0]">digital products</span>.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -130,7 +135,7 @@ export const Hero: React.FC = () => {
                   >
                     {isPlayingReel ? <Pause size={18} /> : <Play size={18} className="translate-x-0.5" />}
                   </button>
-                  <p className="text-[11px] font-medium tracking-wide text-white/90 mt-2">
+                  <p className="text-[11px] font-medium tracking-wide text-white/90 mt-2 font-heading">
                     {isPlayingReel ? "Playing Generative Reel..." : "Preview Creative Showreel"}
                   </p>
                 </div>

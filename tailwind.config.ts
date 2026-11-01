@@ -11,13 +11,13 @@ const config: Config = {
     extend: {
       colors: {
         background: "#050505",
-        surface: "#0b0b0b",
-        "surface-elevated": "#121212",
-        "surface-card": "#0f0f10",
+        surface: "#0b0b0f",
+        "surface-elevated": "#121216",
+        "surface-card": "#0e0e12",
         border: {
-          subtle: "#1a1a1a",
-          DEFAULT: "#242424",
-          highlight: "#363636",
+          subtle: "#1a1a20",
+          DEFAULT: "#222228",
+          highlight: "#363640",
         },
         accent: {
           blue: "#9fbdff",
@@ -40,23 +40,28 @@ const config: Config = {
           "Roboto",
           "sans-serif",
         ],
-        display: [
-          "Cinzel",
-          "Syne",
+        heading: [
+          "'Space Grotesk'",
           "Inter",
           "-apple-system",
           "sans-serif",
         ],
+        serif: [
+          "Georgia",
+          "Cambria",
+          "'Times New Roman'",
+          "serif",
+        ],
       },
       animation: {
         "pulse-subtle": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "float-slow": "float 8s ease-in-out infinite",
+        "float-slow": "float 6s ease-in-out infinite",
         "glow-slow": "glow 4s ease-in-out infinite alternate",
       },
       keyframes: {
         float: {
           "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-8px)" },
+          "50%": { transform: "translateY(-6px)" },
         },
         glow: {
           "0%": { opacity: "0.4" },

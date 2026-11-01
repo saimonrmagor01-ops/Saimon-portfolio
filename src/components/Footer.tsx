@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { ArrowUp, Sparkles, MapPin, Globe } from "lucide-react";
+import { ArrowUp, Globe } from "lucide-react";
+import { SocialLinks } from "./SocialLinks";
 
 export const Footer: React.FC = () => {
   const scrollToTop = () => {
@@ -14,7 +15,7 @@ export const Footer: React.FC = () => {
         {/* Top Footer Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-white/[0.06]">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-white font-bold tracking-widest text-sm">
+            <div className="flex items-center gap-2 text-white font-bold tracking-widest text-sm font-heading">
               <span className="w-2 h-2 rounded-full bg-[#9fbdff]" />
               <span>SAIMON RANA MAGAR</span>
             </div>
@@ -23,15 +24,18 @@ export const Footer: React.FC = () => {
             </p>
           </div>
 
-          <button
-            onClick={scrollToTop}
-            type="button"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/[0.02] text-xs font-mono text-[#888888] hover:text-white hover:border-white/20 transition-all self-start sm:self-auto"
-            aria-label="Back to top"
-          >
-            <span>Back to top</span>
-            <ArrowUp size={12} />
-          </button>
+          <div className="flex items-center gap-4">
+            <SocialLinks size="sm" />
+            <button
+              onClick={scrollToTop}
+              type="button"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/[0.02] text-xs font-mono text-[#888888] hover:text-white hover:border-white/20 transition-all font-heading"
+              aria-label="Back to top"
+            >
+              <span>Back to top</span>
+              <ArrowUp size={12} />
+            </button>
+          </div>
         </div>
 
         {/* Links & Information Grid */}
@@ -107,7 +111,7 @@ export const Footer: React.FC = () => {
 
           <div className="space-y-3">
             <span className="text-[10px] font-mono uppercase tracking-widest text-[#555555]">
-              Location &amp; Identity
+              Location &amp; Channels
             </span>
             <p className="text-[#8e8e93] leading-relaxed">
               Based in Kathmandu, Nepal. Collaborating with creative minds and tech innovators globally.

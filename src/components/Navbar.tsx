@@ -2,19 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Menu, X, Volume2, VolumeX } from "lucide-react";
+import { ArrowUpRight, Menu, X } from "lucide-react";
+import { SocialLinks } from "./SocialLinks";
 
 interface NavbarProps {
   activeSection?: string;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ activeSection: propActive }) => {
+export const Navbar: React.FC<NavbarProps> = () => {
   const [activeSection, setActiveSection] = useState<string>("home");
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  const [gainNode, setGainNode] = useState<GainNode | null>(null);
 
   // Nav items
   const navItems = [
@@ -50,67 +48,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection: propActive }) => 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Web Audio subtle cinematic ambient drone generator (zero external assets needed)
-  const toggleAmbientSound = () => {
-    if (!isAudioPlaying) {
-      try {
-        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-        const ctx = audioContext || new AudioCtx();
-        if (ctx.state === "suspended") {
-          ctx.resume();
-        }
-
-        const masterGain = ctx.createGain();
-        masterGain.gain.setValueAtTime(0.001, ctx.currentTime);
-        masterGain.gain.exponentialRampToValueAtTime(0.04, ctx.currentTime + 2);
-        masterGain.connect(ctx.destination);
-
-        // Low frequency cinematic drone oscillators
-        const osc1 = ctx.createOscillator();
-        const osc2 = ctx.createOscillator();
-        const filter = ctx.createBiquadFilter();
-
-        filter.type = "lowpass";
-        filter.frequency.setValueAtTime(240, ctx.currentTime);
-
-        osc1.type = "sine";
-        osc1.frequency.setValueAtTime(55, ctx.currentTime); // A1 note
-
-        osc2.type = "triangle";
-        osc2.frequency.setValueAtTime(82.4, ctx.currentTime); // E2 note
-
-        osc1.connect(filter);
-        osc2.connect(filter);
-        filter.connect(masterGain);
-
-        osc1.start();
-        osc2.start();
-
-        setAudioContext(ctx);
-        setGainNode(masterGain);
-        setIsAudioPlaying(true);
-      } catch {
-        // AudioContext not supported or blocked
-      }
-    } else {
-      if (gainNode && audioContext) {
-        gainNode.gain.setValueAtTime(gainNode.gain.value, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.8);
-        setTimeout(() => {
-          setIsAudioPlaying(false);
-        }, 850);
-      } else {
-        setIsAudioPlaying(false);
-      }
-    }
-  };
-
   const closeMenu = () => setMobileMenuOpen(false);
 
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 sm:py-4 px-4 sm:px-8 flex justify-center`}
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 sm:py-4 px-4 sm:px-8 flex justify-center"
       >
         <div
           className={`w-full max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 rounded-full border transition-all duration-300 ${
@@ -129,9 +72,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection: propActive }) => 
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9fbdff] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9fbdff]"></span>
             </span>
-            <div className="flex items-baseline gap-1.5 font-bold tracking-wider text-xs sm:text-sm text-white">
+            <div className="flex items-baseline gap-1.5 font-bold tracking-wider text-xs sm:text-sm text-white font-heading">
               <span>SAIMON</span>
-              <span className="text-[#686868] font-normal tracking-normal text-[11px] hidden sm:inline">
+              <span className="text-[#686868] font-normal tracking-normal text-[11px] hidden sm:inline font-sans">
                 / PORTFOLIO
               </span>
             </div>
@@ -162,27 +105,17 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection: propActive }) => 
             })}
           </nav>
 
-          {/* Actions: Ambient Audio & Contact CTA */}
+          {/* Actions: Social Icons & Contact CTA */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Ambient Sound Toggle */}
-            <button
-              onClick={toggleAmbientSound}
-              type="button"
-              className={`p-2 rounded-full border transition-all text-xs flex items-center justify-center ${
-                isAudioPlaying
-                  ? "border-[#9fbdff]/50 bg-[#9fbdff]/10 text-[#9fbdff]"
-                  : "border-white/10 text-[#888888] hover:text-white hover:border-white/20"
-              }`}
-              title={isAudioPlaying ? "Mute ambient audio" : "Play subtle ambient soundscape"}
-              aria-label={isAudioPlaying ? "Mute ambient audio" : "Play ambient audio"}
-            >
-              {isAudioPlaying ? <Volume2 size={14} className="animate-pulse" /> : <VolumeX size={14} />}
-            </button>
+            {/* Header Social Icons */}
+            <div className="hidden sm:block">
+              <SocialLinks size="sm" />
+            </div>
 
             {/* Direct CTA */}
             <a
               href="#contact"
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium bg-white text-black hover:bg-[#9fbdff] hover:text-black transition-all duration-200 font-semibold"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black hover:bg-[#9fbdff] hover:text-black transition-all duration-200 font-heading"
             >
               <span>Let&apos;s Talk</span>
               <ArrowUpRight size={13} />
@@ -212,8 +145,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection: propActive }) => 
             className="fixed inset-x-4 top-20 z-40 bg-[#0e0e12]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-6 shadow-2xl lg:hidden flex flex-col gap-4"
           >
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <span className="text-xs uppercase tracking-widest text-[#777777]">Navigation</span>
-              <span className="text-[11px] text-[#9fbdff]">Saimon Rana Magar</span>
+              <span className="text-xs uppercase tracking-widest text-[#777777] font-mono">Navigation</span>
+              <span className="text-[11px] text-[#9fbdff] font-mono">Saimon Rana Magar</span>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -234,16 +167,20 @@ export const Navbar: React.FC<NavbarProps> = ({ activeSection: propActive }) => 
               ))}
             </div>
 
-            <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
+            <div className="pt-3 border-t border-white/10 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-[#777777] font-mono">Connect:</span>
+                <SocialLinks size="sm" />
+              </div>
               <a
                 href="#contact"
                 onClick={closeMenu}
-                className="w-full text-center py-2.5 rounded-full text-xs font-semibold bg-white text-black hover:bg-[#9fbdff] transition-colors"
+                className="w-full text-center py-2.5 rounded-full text-xs font-semibold bg-white text-black hover:bg-[#9fbdff] transition-colors font-heading"
               >
                 Let&apos;s Collaborate ↗
               </a>
-              <div className="text-center text-[11px] text-[#666666]">
-                Based in Nepal • Available for Worldwide Collaborations
+              <div className="text-center text-[11px] text-[#666666] font-mono">
+                Based in Nepal • Available Worldwide
               </div>
             </div>
           </motion.div>

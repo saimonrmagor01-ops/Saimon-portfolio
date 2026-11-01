@@ -5,12 +5,12 @@ import { motion, useSpring } from "framer-motion";
 
 export const CustomCursor: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [hoverState, setHoverState] = useState<"none" | "link" | "button" | "card">("none");
   const [isTouch, setIsTouch] = useState(true);
 
-  // Smooth springs for trailing circle
-  const springX = useSpring(0, { damping: 28, stiffness: 220, mass: 0.5 });
-  const springY = useSpring(0, { damping: 28, stiffness: 220, mass: 0.5 });
+  // Smooth springs for trailing ring
+  const springX = useSpring(0, { damping: 26, stiffness: 240, mass: 0.45 });
+  const springY = useSpring(0, { damping: 26, stiffness: 240, mass: 0.45 });
 
   useEffect(() => {
     // Only enable on desktop pointer devices
@@ -35,14 +35,20 @@ export const CustomCursor: React.FC = () => {
     const onMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      const isInteractive =
-        target.closest("a") ||
-        target.closest("button") ||
-        target.closest("[role='button']") ||
-        target.closest("input") ||
-        target.closest("textarea") ||
-        target.closest(".interactive");
-      setIsHovered(!!isInteractive);
+
+      const projectCard = target.closest(".project-card") || target.closest(".cinema-viewport-card") || target.closest("article");
+      const button = target.closest("button") || target.closest(".btn-main") || target.closest(".btn-secondary");
+      const link = target.closest("a") || target.closest("select") || target.closest("input");
+
+      if (projectCard) {
+        setHoverState("card");
+      } else if (button) {
+        setHoverState("button");
+      } else if (link) {
+        setHoverState("link");
+      } else {
+        setHoverState("none");
+      }
     };
 
     window.addEventListener("mousemove", onMouseMove);
@@ -60,11 +66,13 @@ export const CustomCursor: React.FC = () => {
 
   if (isTouch || !isVisible) return null;
 
+  const isHovered = hoverState !== "none";
+
   return (
     <>
-      {/* Outer ring */}
+      {/* Outer trailing ring with dynamic states */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[100] rounded-full border border-white/30 mix-blend-difference"
+        className="fixed top-0 left-0 pointer-events-none z-[100] rounded-full border mix-blend-difference"
         style={{
           x: springX,
           y: springY,
@@ -72,14 +80,31 @@ export const CustomCursor: React.FC = () => {
           translateY: "-50%",
         }}
         animate={{
-          width: isHovered ? 48 : 26,
-          height: isHovered ? 48 : 26,
-          borderColor: isHovered ? "rgba(159, 189, 255, 0.7)" : "rgba(255, 255, 255, 0.35)",
-          backgroundColor: isHovered ? "rgba(159, 189, 255, 0.08)" : "transparent",
+          width: hoverState === "card" ? 58 : hoverState === "button" ? 44 : isHovered ? 38 : 24,
+          height: hoverState === "card" ? 58 : hoverState === "button" ? 44 : isHovered ? 38 : 24,
+          borderColor:
+            hoverState === "card"
+              ? "rgba(159, 189, 255, 0.9)"
+              : isHovered
+              ? "rgba(255, 255, 255, 0.85)"
+              : "rgba(255, 255, 255, 0.35)",
+          backgroundColor:
+            hoverState === "card"
+              ? "rgba(159, 189, 255, 0.12)"
+              : isHovered
+              ? "rgba(255, 255, 255, 0.08)"
+              : "transparent",
         }}
-        transition={{ type: "spring", damping: 25, stiffness: 300, mass: 0.2 }}
-      />
-      {/* Inner dot */}
+        transition={{ type: "spring", damping: 24, stiffness: 320, mass: 0.2 }}
+      >
+        {hoverState === "card" && (
+          <span className="text-[9px] font-mono tracking-widest text-[#9fbdff] uppercase flex items-center justify-center h-full">
+            VIEW
+          </span>
+        )}
+      </motion.div>
+
+      {/* Center pinpoint dot */}
       <motion.div
         className="fixed top-0 left-0 pointer-events-none z-[100] rounded-full bg-white mix-blend-difference"
         style={{
@@ -89,11 +114,12 @@ export const CustomCursor: React.FC = () => {
           translateY: "-50%",
         }}
         animate={{
-          width: isHovered ? 6 : 4,
-          height: isHovered ? 6 : 4,
+          width: isHovered ? (hoverState === "card" ? 0 : 4) : 4,
+          height: isHovered ? (hoverState === "card" ? 0 : 4) : 4,
+          opacity: hoverState === "card" ? 0 : 1,
           backgroundColor: isHovered ? "#9fbdff" : "#ffffff",
         }}
-        transition={{ type: "spring", damping: 30, stiffness: 400 }}
+        transition={{ type: "spring", damping: 30, stiffness: 450 }}
       />
     </>
   );
