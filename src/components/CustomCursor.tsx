@@ -84,21 +84,21 @@ export const CustomCursor: React.FC = () => {
           height: hoverState === "card" ? 58 : hoverState === "button" ? 44 : isHovered ? 38 : 24,
           borderColor:
             hoverState === "card"
-              ? "rgba(159, 189, 255, 0.9)"
+              ? "rgba(37, 99, 235, 0.9)"
               : isHovered
-              ? "rgba(255, 255, 255, 0.85)"
+              ? "rgba(59, 130, 246, 0.85)"
               : "rgba(255, 255, 255, 0.35)",
           backgroundColor:
             hoverState === "card"
-              ? "rgba(159, 189, 255, 0.12)"
+              ? "rgba(37, 99, 235, 0.16)"
               : isHovered
-              ? "rgba(255, 255, 255, 0.08)"
+              ? "rgba(37, 99, 235, 0.08)"
               : "transparent",
         }}
         transition={{ type: "spring", damping: 24, stiffness: 320, mass: 0.2 }}
       >
         {hoverState === "card" && (
-          <span className="text-[9px] font-mono tracking-widest text-[#9fbdff] uppercase flex items-center justify-center h-full">
+          <span className="text-[9px] font-mono tracking-widest text-[#93C5FD] uppercase flex items-center justify-center h-full font-bold">
             VIEW
           </span>
         )}
@@ -117,7 +117,7 @@ export const CustomCursor: React.FC = () => {
           width: isHovered ? (hoverState === "card" ? 0 : 4) : 4,
           height: isHovered ? (hoverState === "card" ? 0 : 4) : 4,
           opacity: hoverState === "card" ? 0 : 1,
-          backgroundColor: isHovered ? "#9fbdff" : "#ffffff",
+          backgroundColor: isHovered ? "#3B82F6" : "#ffffff",
         }}
         transition={{ type: "spring", damping: 30, stiffness: 450 }}
       />

@@ -98,21 +98,21 @@ export const Contact: React.FC<ContactProps> = ({
   };
 
   return (
-    <section id="contact" className="py-28 px-4 sm:px-8 border-t border-white/[0.08] relative">
+    <section id="contact" className="py-28 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817]">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-8 border-b border-white/[0.06]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-8 border-b border-[#202A40]">
           <div>
-            <div className="text-[11px] font-mono tracking-widest text-[#9fbdff] uppercase flex items-center gap-2 mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101525] border border-[#202A40] text-xs font-medium text-[#2563EB] mb-3">
               <Mail size={12} />
               <span>08 / GET IN TOUCH</span>
             </div>
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
               Have an idea? <br />
-              <span className="text-[#888888] font-normal font-serif italic">Let&apos;s make it real.</span>
+              <span className="text-[#94A3B8] font-normal font-serif italic">Let&apos;s make it real.</span>
             </h2>
           </div>
-          <p className="max-w-md text-sm sm:text-base text-[#92928f] font-normal leading-relaxed">
+          <p className="max-w-md text-sm sm:text-base text-[#94A3B8] font-normal leading-relaxed">
             Open for creative collaborations, AI video production, web engineering, and custom automation projects.
           </p>
         </div>
@@ -121,20 +121,20 @@ export const Contact: React.FC<ContactProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           {/* Left Details Panel */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="p-6 sm:p-8 rounded-3xl border border-white/10 bg-[#09090c] space-y-6 shadow-xl relative overflow-hidden">
+            <div className="p-6 sm:p-8 rounded-3xl border border-[#202A40] bg-[#101525] space-y-6 shadow-xl relative overflow-hidden">
               <div
                 className="absolute -top-16 -right-16 w-48 h-48 rounded-full pointer-events-none radial-glow-blue opacity-50 blur-2xl"
                 aria-hidden="true"
               />
 
               <div className="space-y-2">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-[#9fbdff]">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#2563EB] font-bold">
                   DIRECT INQUIRY
                 </span>
                 <h3 className="text-2xl font-bold text-white tracking-tight font-heading">
                   Start a Conversation
                 </h3>
-                <p className="text-xs sm:text-sm text-[#8e8e93] leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
                   Whether you need a full cinematic video pipeline, a high-converting short-form edit, or a responsive web product like BudgetMandu — I&apos;m ready to collaborate.
                 </p>
               </div>
@@ -142,41 +142,41 @@ export const Contact: React.FC<ContactProps> = ({
               {/* Status Pills */}
               <div className="space-y-3 pt-2">
                 {/* Location */}
-                <div className="p-3.5 rounded-xl border border-white/[0.06] bg-white/[0.02] flex items-center justify-between text-xs">
-                  <span className="text-[#777777] flex items-center gap-2">
-                    <MapPin size={13} className="text-[#9fbdff]" />
+                <div className="p-3.5 rounded-xl border border-[#202A40] bg-[#080C1E] flex items-center justify-between text-xs">
+                  <span className="text-[#94A3B8] flex items-center gap-2">
+                    <MapPin size={13} className="text-[#2563EB]" />
                     <span>Location</span>
                   </span>
-                  <span className="text-white font-mono">Kathmandu, Nepal</span>
+                  <span className="text-white font-mono font-medium">Kathmandu, Nepal</span>
                 </div>
 
                 {/* Local Time */}
-                <div className="p-3.5 rounded-xl border border-white/[0.06] bg-white/[0.02] flex items-center justify-between text-xs">
-                  <span className="text-[#777777] flex items-center gap-2">
-                    <Clock size={13} className="text-[#9fbdff]" />
+                <div className="p-3.5 rounded-xl border border-[#202A40] bg-[#080C1E] flex items-center justify-between text-xs">
+                  <span className="text-[#94A3B8] flex items-center gap-2">
+                    <Clock size={13} className="text-[#2563EB]" />
                     <span>Nepal Time (NPT)</span>
                   </span>
-                  <span className="text-[#9fbdff] font-mono">{currentTimeNPT || "GMT+5:45"}</span>
+                  <span className="text-[#93C5FD] font-mono font-medium">{currentTimeNPT || "GMT+5:45"}</span>
                 </div>
 
                 {/* Response Rate */}
-                <div className="p-3.5 rounded-xl border border-white/[0.06] bg-white/[0.02] flex items-center justify-between text-xs">
-                  <span className="text-[#777777] flex items-center gap-2">
-                    <Sparkles size={13} className="text-[#9fbdff]" />
+                <div className="p-3.5 rounded-xl border border-[#202A40] bg-[#080C1E] flex items-center justify-between text-xs">
+                  <span className="text-[#94A3B8] flex items-center gap-2">
+                    <Sparkles size={13} className="text-[#2563EB]" />
                     <span>Response Time</span>
                   </span>
-                  <span className="text-white font-mono">Within 24 Hours</span>
+                  <span className="text-white font-mono font-medium">Within 24 Hours</span>
                 </div>
               </div>
 
               {/* Social Channels Callout */}
-              <div className="pt-2 border-t border-white/[0.06]">
-                <div className="text-[10px] font-mono uppercase tracking-wider text-[#666666] mb-2.5">
+              <div className="pt-2 border-t border-[#202A40]">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-[#64748B] mb-2.5">
                   Direct Channels
                 </div>
                 <div className="flex items-center justify-between">
                   <SocialLinks size="md" />
-                  <span className="text-[11px] font-mono text-[#888888]">Instant Chat</span>
+                  <span className="text-[11px] font-mono text-[#94A3B8]">Instant Chat</span>
                 </div>
               </div>
 
@@ -184,9 +184,9 @@ export const Contact: React.FC<ContactProps> = ({
               <div className="pt-2">
                 <a
                   href={`mailto:saimonranamagar@example.com?subject=Project%20Inquiry%20via%20Portfolio&body=Hi%20Saimon,%0A%0AI%20would%20like%20to%20discuss%20a%20project...`}
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full border border-white/20 bg-white/[0.04] text-white text-xs font-semibold uppercase tracking-wider hover:bg-white hover:text-black transition-all duration-200 font-heading"
+                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full border border-[#202A40] bg-[#080C1E] text-white text-xs font-semibold uppercase tracking-wider hover:border-[#2563EB] hover:bg-[#161D33] transition-all duration-200 font-heading"
                 >
-                  <Mail size={14} />
+                  <Mail size={14} className="text-[#2563EB]" />
                   <span>Open Direct Mail Client</span>
                   <ArrowUpRight size={13} />
                 </a>
@@ -196,7 +196,7 @@ export const Contact: React.FC<ContactProps> = ({
 
           {/* Right Interactive Form Panel */}
           <div className="lg:col-span-7">
-            <div className="p-6 sm:p-10 rounded-3xl border border-white/10 bg-[#0c0c10] shadow-2xl">
+            <div className="p-6 sm:p-10 rounded-3xl border border-[#202A40] bg-[#101525] shadow-2xl">
               <AnimatePresence mode="wait">
                 {status === "success" ? (
                   <motion.div
@@ -206,15 +206,15 @@ export const Contact: React.FC<ContactProps> = ({
                     exit={{ opacity: 0, scale: 0.95 }}
                     className="py-12 text-center space-y-5"
                   >
-                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 mx-auto">
+                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mx-auto">
                       <CheckCircle2 size={32} />
                     </div>
                     <div className="space-y-2">
                       <h3 className="text-2xl font-bold text-white tracking-tight font-heading">
                         Inquiry Received
                       </h3>
-                      <p className="text-xs sm:text-sm text-[#92928f] max-w-md mx-auto leading-relaxed">
-                        Thank you for reaching out, <span className="text-white font-medium">{formData.name}</span>. I have received your request regarding <span className="text-[#9fbdff]">{formData.service}</span> and will respond promptly.
+                      <p className="text-xs sm:text-sm text-[#94A3B8] max-w-md mx-auto leading-relaxed">
+                        Thank you for reaching out, <span className="text-white font-medium">{formData.name}</span>. I have received your request regarding <span className="text-[#93C5FD]">{formData.service}</span> and will respond promptly.
                       </p>
                     </div>
 
@@ -222,7 +222,7 @@ export const Contact: React.FC<ContactProps> = ({
                       <button
                         onClick={handleReset}
                         type="button"
-                        className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-medium border border-white/10 bg-white/[0.03] text-white hover:bg-white/10 transition-colors font-heading"
+                        className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-medium border border-[#202A40] bg-[#080C1E] text-white hover:border-[#2563EB] transition-colors font-heading"
                       >
                         <RefreshCw size={12} />
                         <span>Send Another Message</span>
@@ -231,11 +231,11 @@ export const Contact: React.FC<ContactProps> = ({
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-                    <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
-                      <span className="text-xs font-mono uppercase tracking-widest text-[#777777]">
+                    <div className="flex items-center justify-between pb-3 border-b border-[#202A40]">
+                      <span className="text-xs font-mono uppercase tracking-widest text-[#64748B]">
                         Project Inquiry Form
                       </span>
-                      <span className="text-[11px] font-mono text-[#9fbdff]">CONFIDENTIAL</span>
+                      <span className="text-[11px] font-mono text-[#2563EB] font-bold">CONFIDENTIAL</span>
                     </div>
 
                     {/* Name & Email Row */}
@@ -244,9 +244,9 @@ export const Contact: React.FC<ContactProps> = ({
                       <div className="space-y-1.5">
                         <label
                           htmlFor="name"
-                          className="block text-xs font-mono uppercase tracking-wider text-[#aaaaaa]"
+                          className="block text-xs font-mono uppercase tracking-wider text-[#CBD5E1]"
                         >
-                          Your Name <span className="text-[#9fbdff]">*</span>
+                          Your Name <span className="text-[#2563EB]">*</span>
                         </label>
                         <input
                           id="name"
@@ -257,10 +257,10 @@ export const Contact: React.FC<ContactProps> = ({
                             if (errors.name) setErrors({ ...errors, name: "" });
                           }}
                           placeholder="e.g. Maya Shrestha"
-                          className={`w-full px-4 py-3 rounded-xl border bg-[#08080a] text-sm text-white placeholder-[#555555] transition-colors focus:outline-none ${
+                          className={`w-full px-4 py-3 rounded-xl border bg-[#080C1E] text-sm text-white placeholder-[#64748B] transition-colors focus:outline-none ${
                             errors.name
                               ? "border-red-500/60 focus:border-red-500"
-                              : "border-white/10 focus:border-[#9fbdff]"
+                              : "border-[#202A40] focus:border-[#2563EB]"
                           }`}
                         />
                         {errors.name && (
@@ -275,9 +275,9 @@ export const Contact: React.FC<ContactProps> = ({
                       <div className="space-y-1.5">
                         <label
                           htmlFor="email"
-                          className="block text-xs font-mono uppercase tracking-wider text-[#aaaaaa]"
+                          className="block text-xs font-mono uppercase tracking-wider text-[#CBD5E1]"
                         >
-                          Your Email <span className="text-[#9fbdff]">*</span>
+                          Your Email <span className="text-[#2563EB]">*</span>
                         </label>
                         <input
                           id="email"
@@ -288,10 +288,10 @@ export const Contact: React.FC<ContactProps> = ({
                             if (errors.email) setErrors({ ...errors, email: "" });
                           }}
                           placeholder="e.g. maya@example.com"
-                          className={`w-full px-4 py-3 rounded-xl border bg-[#08080a] text-sm text-white placeholder-[#555555] transition-colors focus:outline-none ${
+                          className={`w-full px-4 py-3 rounded-xl border bg-[#080C1E] text-sm text-white placeholder-[#64748B] transition-colors focus:outline-none ${
                             errors.email
                               ? "border-red-500/60 focus:border-red-500"
-                              : "border-white/10 focus:border-[#9fbdff]"
+                              : "border-[#202A40] focus:border-[#2563EB]"
                           }`}
                         />
                         {errors.email && (
@@ -307,7 +307,7 @@ export const Contact: React.FC<ContactProps> = ({
                     <div className="space-y-1.5">
                       <label
                         htmlFor="service"
-                        className="block text-xs font-mono uppercase tracking-wider text-[#aaaaaa]"
+                        className="block text-xs font-mono uppercase tracking-wider text-[#CBD5E1]"
                       >
                         Target Service
                       </label>
@@ -318,10 +318,10 @@ export const Contact: React.FC<ContactProps> = ({
                           setFormData({ ...formData, service: e.target.value });
                           if (onServiceChange) onServiceChange(e.target.value);
                         }}
-                        className="w-full px-4 py-3 rounded-xl border border-white/10 bg-[#08080a] text-sm text-white focus:outline-none focus:border-[#9fbdff] transition-colors"
+                        className="w-full px-4 py-3 rounded-xl border border-[#202A40] bg-[#080C1E] text-sm text-white focus:outline-none focus:border-[#2563EB] transition-colors"
                       >
                         {services.map((s) => (
-                          <option key={s.id} value={s.title} className="bg-[#0c0c10] text-white">
+                          <option key={s.id} value={s.title} className="bg-[#101525] text-white">
                             {s.title} ({s.category})
                           </option>
                         ))}
@@ -332,7 +332,7 @@ export const Contact: React.FC<ContactProps> = ({
                     <div className="space-y-1.5">
                       <label
                         htmlFor="timeline"
-                        className="block text-xs font-mono uppercase tracking-wider text-[#aaaaaa]"
+                        className="block text-xs font-mono uppercase tracking-wider text-[#CBD5E1]"
                       >
                         Desired Timeline
                       </label>
@@ -340,15 +340,15 @@ export const Contact: React.FC<ContactProps> = ({
                         id="timeline"
                         value={formData.timeline}
                         onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-white/10 bg-[#08080a] text-sm text-white focus:outline-none focus:border-[#9fbdff] transition-colors"
+                        className="w-full px-4 py-3 rounded-xl border border-[#202A40] bg-[#080C1E] text-sm text-white focus:outline-none focus:border-[#2563EB] transition-colors"
                       >
-                        <option value="Urgent (Within 1 week)" className="bg-[#0c0c10] text-white">
+                        <option value="Urgent (Within 1 week)" className="bg-[#101525] text-white">
                           Urgent (Within 1 week)
                         </option>
-                        <option value="Standard (1-3 weeks)" className="bg-[#0c0c10] text-white">
+                        <option value="Standard (1-3 weeks)" className="bg-[#101525] text-white">
                           Standard (1-3 weeks)
                         </option>
-                        <option value="Long-term partnership" className="bg-[#0c0c10] text-white">
+                        <option value="Long-term partnership" className="bg-[#101525] text-white">
                           Long-term partnership
                         </option>
                       </select>
@@ -358,9 +358,9 @@ export const Contact: React.FC<ContactProps> = ({
                     <div className="space-y-1.5">
                       <label
                         htmlFor="message"
-                        className="block text-xs font-mono uppercase tracking-wider text-[#aaaaaa]"
+                        className="block text-xs font-mono uppercase tracking-wider text-[#CBD5E1]"
                       >
-                        Project Details <span className="text-[#9fbdff]">*</span>
+                        Project Details <span className="text-[#2563EB]">*</span>
                       </label>
                       <textarea
                         id="message"
@@ -371,10 +371,10 @@ export const Contact: React.FC<ContactProps> = ({
                           if (errors.message) setErrors({ ...errors, message: "" });
                         }}
                         placeholder="Tell me about your project, goals, and any reference styles or technical parameters..."
-                        className={`w-full px-4 py-3 rounded-xl border bg-[#08080a] text-sm text-white placeholder-[#555555] transition-colors focus:outline-none resize-none ${
+                        className={`w-full px-4 py-3 rounded-xl border bg-[#080C1E] text-sm text-white placeholder-[#64748B] transition-colors focus:outline-none resize-none ${
                           errors.message
                             ? "border-red-500/60 focus:border-red-500"
-                            : "border-white/10 focus:border-[#9fbdff]"
+                            : "border-[#202A40] focus:border-[#2563EB]"
                         }`}
                       />
                       {errors.message && (
@@ -389,7 +389,7 @@ export const Contact: React.FC<ContactProps> = ({
                     <button
                       type="submit"
                       disabled={status === "submitting"}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-[#9fbdff] disabled:opacity-50 transition-all duration-200 font-heading"
+                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#2563EB] text-white font-semibold text-xs uppercase tracking-wider hover:bg-[#1D4ED8] disabled:opacity-50 transition-all duration-200 font-heading shadow-[0_4px_20px_rgba(37,99,235,0.4)]"
                     >
                       {status === "submitting" ? (
                         <>

@@ -14,6 +14,7 @@ import { Services } from "@/components/Services";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
 import { MusicPlayer } from "@/components/MusicPlayer";
+import { WelcomePopup } from "@/components/WelcomePopup";
 
 export default function Home() {
   const [selectedService, setSelectedService] = useState<string>("");
@@ -23,7 +24,10 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050505] text-[#f5f5f5] selection:bg-[#9fbdff] selection:text-[#050505]">
+    <div className="relative min-h-screen bg-[#050817] text-[#f8fafc] selection:bg-[#2563eb] selection:text-white">
+      {/* Cinematic Animated Welcome Popup (Once per session) */}
+      <WelcomePopup />
+
       {/* Desktop Custom Animated Cursor */}
       <CustomCursor />
 

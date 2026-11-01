@@ -105,7 +105,7 @@ export const SocialLinks: React.FC<SocialLinksProps> = ({
             onClick={(e) => handleClick(e, item.name, item.url)}
             onMouseEnter={() => setActiveTooltip(item.id)}
             onMouseLeave={() => setActiveTooltip(null)}
-            className={`inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-[#a0a0a0] transition-all duration-200 hover:scale-105 hover:bg-white/[0.08] hover:text-white ${iconSizes[size]} ${item.hoverColor}`}
+            className={`inline-flex items-center justify-center rounded-full border border-[#202A40] bg-[#080C1E] text-[#94A3B8] transition-all duration-200 hover:scale-105 hover:bg-[#161D33] hover:text-white ${iconSizes[size]} ${item.hoverColor}`}
             aria-label={`Saimon Rana Magar on ${item.name}`}
           >
             {item.icon}
@@ -113,9 +113,9 @@ export const SocialLinks: React.FC<SocialLinksProps> = ({
 
           {/* Minimal Tooltip */}
           {activeTooltip === item.id && (
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 rounded bg-[#16161c] border border-white/10 text-[10px] font-mono text-white pointer-events-none whitespace-nowrap shadow-xl z-50 animate-fadeIn">
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-[#101525] border border-[#202A40] text-[10px] font-mono text-white pointer-events-none whitespace-nowrap shadow-xl z-50 animate-fadeIn">
               {item.name}
-              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#16161c]" />
+              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#101525]" />
             </div>
           )}
 

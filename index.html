@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <meta name="theme-color" content="#050505">
+  <meta name="theme-color" content="#050817">
   <meta name="description" content="Saimon Rana Magar — Digital Creator & Developer. AI Filmmaker, Content Creator, and Web Developer based in Nepal. Exploring the intersection of visual cinema and web engineering.">
   <meta name="keywords" content="Saimon Rana Magar, Digital Creator, Developer, AI Filmmaker, Content Creator, Web Developer, Nepal, BudgetMandu, Google Flow, Adobe Premiere Pro, CapCut, Next.js">
   <meta name="author" content="Saimon Rana Magar">
@@ -29,18 +29,18 @@
 
   <style>
     :root {
-      --bg: #050505;
-      --panel: #0b0b0f;
-      --panel-elevated: #111116;
-      --panel-card: #0e0e12;
-      --border: #1e1e24;
-      --border-light: #2c2c34;
-      --border-highlight: rgba(159, 189, 255, 0.4);
-      --text: #f5f5f5;
-      --muted: #92928f;
-      --muted-dark: #666668;
-      --accent: #9fbdff;
-      --accent-glow: rgba(159, 189, 255, 0.15);
+      --bg: #050817;
+      --panel: #101525;
+      --panel-elevated: #161D33;
+      --panel-card: #101525;
+      --border: #202A40;
+      --border-light: #2B3752;
+      --border-highlight: rgba(37, 99, 235, 0.5);
+      --text: #F8FAFC;
+      --muted: #94A3B8;
+      --muted-dark: #64748B;
+      --accent: #2563EB;
+      --accent-glow: rgba(37, 99, 235, 0.25);
       --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
@@ -1157,20 +1157,25 @@
       font-family: var(--font-heading);
     }
 
-    /* Skills Grid */
+    /* Skills Grid (5-column layout matching reference screenshot) */
     .skills-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
     }
     .skill-card {
-      padding: 24px;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      background: #0c0c10;
+      padding: 20px;
+      border-radius: 18px;
+      border: 1px solid #202A40;
+      background: #101525;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      transition: all 0.3s ease;
+    }
+    .skill-card:hover {
+      border-color: #2563EB;
+      box-shadow: 0 10px 30px rgba(37, 99, 235, 0.18);
     }
     .skill-cat-title {
       font-size: 18px;
@@ -2965,9 +2970,9 @@ export const MetricCard: React.FC&lt;MetricProps&gt; = ({ label, value, detail }
     const titleEl = document.getElementById('musicTitle');
     const artistEl = document.getElementById('musicArtist');
 
-    // Load initial track
+    // Load initial track (No forced autoplay)
     bgAudio.src = playlist[currentTrackIdx].src;
-    bgAudio.preload = 'auto';
+    bgAudio.preload = 'metadata';
 
     // Check saved mute state
     const savedMute = localStorage.getItem('saimon_portfolio_mute');
@@ -2986,39 +2991,6 @@ export const MetricCard: React.FC&lt;MetricProps&gt; = ({ label, value, detail }
         waveBars.classList.remove('playing');
       }
     }
-
-    // Autoplay attempt with fallback on first user interaction
-    function triggerAutoplay() {
-      const playPromise = bgAudio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setAudioPlayingUI(true);
-          })
-          .catch(() => {
-            const startOnInteraction = () => {
-              if (bgAudio.paused) {
-                bgAudio.play().then(() => setAudioPlayingUI(true)).catch(() => {});
-              }
-              cleanup();
-            };
-            const cleanup = () => {
-              window.removeEventListener('pointerdown', startOnInteraction);
-              window.removeEventListener('click', startOnInteraction);
-              window.removeEventListener('scroll', startOnInteraction);
-              window.removeEventListener('keydown', startOnInteraction);
-              window.removeEventListener('touchstart', startOnInteraction);
-            };
-            window.addEventListener('pointerdown', startOnInteraction, { once: true, passive: true });
-            window.addEventListener('click', startOnInteraction, { once: true, passive: true });
-            window.addEventListener('scroll', startOnInteraction, { once: true, passive: true });
-            window.addEventListener('keydown', startOnInteraction, { once: true, passive: true });
-            window.addEventListener('touchstart', startOnInteraction, { once: true, passive: true });
-          });
-      }
-    }
-
-    triggerAutoplay();
 
     playBtn.addEventListener('click', () => {
       if (bgAudio.paused) {
@@ -3495,6 +3467,76 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
         document.getElementById('formSuccess').style.display = 'block';
       }, 700);
     }
+
+    // Welcome Popup Controller (Once per session)
+    function checkWelcomePopup() {
+      try {
+        if (!sessionStorage.getItem('saimon_welcome_shown')) {
+          setTimeout(() => {
+            const pop = document.getElementById('welcomePopup');
+            if (pop) pop.style.display = 'flex';
+          }, 400);
+        }
+      } catch(e) {}
+    }
+
+    function closeWelcomePopup() {
+      const pop = document.getElementById('welcomePopup');
+      if (pop) pop.style.display = 'none';
+      try { sessionStorage.setItem('saimon_welcome_shown', 'true'); } catch(e) {}
+    }
+
+    function handleSocialPopupClick(platform, link) {
+      if (link.startsWith('[ADD_')) {
+        alert(`The ${platform} profile link is configured in src/data/socials.ts`);
+        return;
+      }
+      window.open(link, '_blank');
+    }
+
+    checkWelcomePopup();
+  </script>
+
+  <!-- Welcome Popup Modal (Requirement 1, 2, 3) -->
+  <div id="welcomePopup" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(5,8,23,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:16px;">
+    <div style="position:relative; width:100%; max-width:480px; background:#101525; border:1px solid #202A40; border-radius:24px; padding:32px 24px; text-align:center; box-shadow:0 25px 80px rgba(5,8,23,0.95); overflow:hidden;">
+      <div style="position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:260px; height:260px; border-radius:50%; background:radial-gradient(circle, rgba(37,99,235,0.3) 0%, transparent 70%); pointer-events:none;"></div>
+      <button onclick="closeWelcomePopup()" type="button" style="position:absolute; top:16px; right:16px; width:34px; height:34px; border-radius:50%; background:#080C1E; border:1px solid #202A40; color:#94A3B8; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px;">✕</button>
+      
+      <div style="display:inline-block; padding:4px 12px; border-radius:999px; background:#080C1E; border:1px solid #202A40; font-family:var(--font-mono); font-size:10px; color:#2563EB; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px;">
+        ✨ WELCOME TO MY CREATIVE SPACE
+      </div>
+
+      <div style="position:relative; width:110px; height:110px; margin:0 auto 16px; border-radius:18px; background:#080C1E; border:1px solid #202A40; padding:6px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+        <img src="picture/Crowned Confidence in Monochrome.png" alt="Saimon Rana Magar" style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 12px rgba(37,99,235,0.5));">
+      </div>
+
+      <h2 style="font-size:24px; font-weight:800; color:#ffffff; font-family:var(--font-heading); margin-bottom:4px;">Saimon Rana Magar</h2>
+      <div style="font-size:14px; font-weight:600; color:#2563EB; margin-bottom:8px;">Digital Creator &amp; Developer</div>
+      <p style="font-size:12.5px; color:#94A3B8; max-width:340px; margin:0 auto 20px; line-height:1.5;">
+        AI Filmmaking, Creative Content Production &amp; Web Technology. Based in Nepal.
+      </p>
+
+      <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-bottom:20px;">
+        <a href="javascript:void(0)" onclick="handleSocialPopupClick('WhatsApp', '[ADD_WHATSAPP_LINK]')" style="text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px; border-radius:12px; background:#080C1E; border:1px solid #202A40; color:#94A3B8; transition:all 0.2s;">
+          <span style="font-size:18px;">💬</span>
+          <span style="font-size:11px; font-weight:600; color:#CBD5E1;">WhatsApp</span>
+        </a>
+        <a href="javascript:void(0)" onclick="handleSocialPopupClick('Instagram', '[ADD_INSTAGRAM_URL]')" style="text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px; border-radius:12px; background:#080C1E; border:1px solid #202A40; color:#94A3B8; transition:all 0.2s;">
+          <span style="font-size:18px;">📸</span>
+          <span style="font-size:11px; font-weight:600; color:#CBD5E1;">Instagram</span>
+        </a>
+        <a href="javascript:void(0)" onclick="handleSocialPopupClick('Discord', '[ADD_DISCORD_PROFILE_OR_INVITE]')" style="text-decoration:none; display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px; border-radius:12px; background:#080C1E; border:1px solid #202A40; color:#94A3B8; transition:all 0.2s;">
+          <span style="font-size:18px;">🎮</span>
+          <span style="font-size:11px; font-weight:600; color:#CBD5E1;">Discord</span>
+        </a>
+      </div>
+
+      <button onclick="closeWelcomePopup()" type="button" style="width:100%; padding:14px; border-radius:12px; background:#2563EB; border:none; color:#ffffff; font-weight:600; font-size:13px; cursor:pointer; box-shadow:0 4px 20px rgba(37,99,235,0.4); font-family:var(--font-heading);">
+        Explore Portfolio →
+      </button>
+    </div>
+  </div>
   </script>
 </body>
 </html>

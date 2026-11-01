@@ -2,127 +2,150 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Briefcase, GraduationCap, Calendar, MapPin, CheckCircle2 } from "lucide-react";
+import { Briefcase, Calendar, MapPin, CheckCircle2, GraduationCap, Building2 } from "lucide-react";
 
 export const Experience: React.FC = () => {
+  const techPills = [
+    "Content Strategy",
+    "Digital Media",
+    "Premiere Pro",
+    "CapCut",
+    "Python Automation",
+    "Discord Bots",
+    "Next.js",
+  ];
+
   return (
-    <section id="experience" className="py-28 px-4 sm:px-8 border-t border-white/[0.08] relative">
-      <div className="max-w-6xl mx-auto">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-8 border-b border-white/[0.06]">
-          <div>
-            <div className="text-[11px] font-mono tracking-widest text-[#9fbdff] uppercase flex items-center gap-2 mb-3">
-              <Briefcase size={12} />
-              <span>06 / PROFESSIONAL JOURNEY</span>
-            </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight">
-              Experience &amp; <br />
-              <span className="text-[#888888] font-normal font-serif italic">Background.</span>
-            </h2>
+    <section id="experience" className="py-24 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817]">
+      <div className="max-w-5xl mx-auto">
+        {/* Section Header (Reference Screenshot Style) */}
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#101525] border border-[#202A40] text-xs font-medium text-[#2563EB] mb-4 shadow-sm">
+            <Briefcase size={12} className="text-[#2563EB]" />
+            <span>WORK HISTORY</span>
           </div>
-          <p className="max-w-md text-sm sm:text-base text-[#92928f] font-normal leading-relaxed">
-            A transparent overview of confirmed professional experience and foundational academic focus.
+
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white font-heading">
+            Professional Experience
+          </h2>
+
+          <p className="text-sm sm:text-base text-[#94A3B8] mt-3 leading-relaxed">
+            A showcase of my professional journey and the skills I&apos;ve developed along the way.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Work Experience */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="text-xs font-mono uppercase tracking-widest text-[#777777] mb-2 flex items-center gap-2">
-              <Briefcase size={13} className="text-[#9fbdff]" />
-              <span>Work Experience</span>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="p-6 sm:p-8 rounded-2xl border border-white/[0.08] bg-[#0c0c0f] hover:border-white/20 transition-all space-y-4"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-white/[0.06]">
+        {/* Experience Cards Stack (Exact Reference Screenshot Layout) */}
+        <div className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="p-6 sm:p-8 rounded-2xl border border-[#202A40] bg-[#101525] hover:border-[#2563EB] hover:shadow-[0_10px_35px_rgba(37,99,235,0.15)] transition-all duration-300 space-y-5 group"
+          >
+            {/* Top Row: Icon + Title + Meta Badges */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#202A40]">
+              <div className="flex items-start sm:items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-[#080C1E] border border-[#202A40] text-[#2563EB] flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:border-[#2563EB] transition-all">
+                  <Building2 size={22} />
+                </div>
                 <div>
-                  <span className="text-[10px] font-mono text-[#9fbdff] uppercase tracking-wider px-2 py-0.5 rounded bg-white/[0.03] border border-white/5">
-                    COMMUNICATIONS
-                  </span>
-                  <h3 className="text-xl font-bold text-white mt-1">
+                  <h3 className="text-xl font-bold text-white font-heading group-hover:text-[#2563EB] transition-colors">
                     Digital Communications Assistant
                   </h3>
-                </div>
-                <div className="text-xs font-mono text-[#888888] flex items-center gap-1.5 shrink-0">
-                  <Calendar size={13} />
-                  <span>JAN 2025 — JUN 2026</span>
-                </div>
-              </div>
-
-              <p className="text-sm text-[#a3a3a3] leading-relaxed">
-                Supported digital communication, content coordination, and organizational media presentation. Contributed to clear audience engagement, digital material curation, and practical communication workflows.
-              </p>
-
-              <div className="space-y-2 pt-2">
-                <div className="text-[11px] font-mono uppercase tracking-wider text-[#777777]">
-                  Key Responsibilities
-                </div>
-                <div className="space-y-1.5 text-xs text-[#8e8e93]">
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 size={13} className="text-[#9fbdff] mt-0.5 shrink-0" />
-                    <span>Digital communication channels coordination and audience messaging</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 size={13} className="text-[#9fbdff] mt-0.5 shrink-0" />
-                    <span>Media presentation, content formatting, and digital asset organization</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <CheckCircle2 size={13} className="text-[#9fbdff] mt-0.5 shrink-0" />
-                    <span>Assisting with cross-platform digital material scheduling and consistency</span>
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-[#94A3B8] mt-1 font-mono">
+                    <span>Digital Media &amp; Communications</span>
+                    <span>•</span>
+                    <span className="flex items-center gap-1 text-[#2563EB]">
+                      <MapPin size={11} />
+                      Nepal
+                    </span>
                   </div>
                 </div>
               </div>
-            </motion.div>
-          </div>
 
-          {/* Education & Continuous Learning */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="text-xs font-mono uppercase tracking-widest text-[#777777] mb-2 flex items-center gap-2">
-              <GraduationCap size={13} className="text-[#9fbdff]" />
-              <span>Academic Foundation</span>
+              {/* Status & Date Badges */}
+              <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                <span className="px-2.5 py-1 rounded-full text-[11px] font-mono font-medium bg-[#2563EB]/15 text-[#93C5FD] border border-[#2563EB]/30">
+                  Full-Time
+                </span>
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono text-[#94A3B8] bg-[#080C1E] border border-[#202A40]">
+                  <Calendar size={12} className="text-[#2563EB]" />
+                  <span>Jan 2025 – Jun 2026</span>
+                </span>
+              </div>
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="p-6 sm:p-8 rounded-2xl border border-white/[0.08] bg-[#0c0c0f] space-y-4"
-            >
-              <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
-                <span className="text-[10px] font-mono text-[#9fbdff] uppercase tracking-wider">
-                  STUDIES &amp; PURSUIT
+            {/* Description */}
+            <p className="text-sm text-[#CBD5E1] leading-relaxed">
+              Leading digital communications and multimedia asset curation, coordinating outreach campaigns, and streamlining cross-platform digital material scheduling and consistency.
+            </p>
+
+            {/* Key Responsibilities */}
+            <div className="space-y-2 pt-1">
+              <div className="text-xs font-mono uppercase tracking-wider text-[#64748B]">
+                Key Responsibilities &amp; Impact
+              </div>
+              <div className="space-y-1.5 text-xs text-[#94A3B8]">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 size={13} className="text-[#2563EB] mt-0.5 shrink-0" />
+                  <span>Coordinated digital communication channels and multi-platform messaging strategies</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 size={13} className="text-[#2563EB] mt-0.5 shrink-0" />
+                  <span>Curated media presentation materials, visual storytelling assets, and campaign formatting</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 size={13} className="text-[#2563EB] mt-0.5 shrink-0" />
+                  <span>Streamlined digital distribution calendars and ensured cross-format brand alignment</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Tech Tags Row (Exact Reference Screenshot Style) */}
+            <div className="pt-3 border-t border-[#202A40] flex flex-wrap items-center gap-2">
+              {techPills.map((tech, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 rounded-lg bg-[#080C1E] border border-[#202A40] text-xs font-mono text-[#94A3B8] hover:border-[#2563EB] hover:text-white transition-colors"
+                >
+                  {tech}
                 </span>
-                <span className="text-xs font-mono text-[#777777] flex items-center gap-1">
-                  <MapPin size={11} />
-                  <span>Nepal</span>
-                </span>
-              </div>
+              ))}
+            </div>
+          </motion.div>
 
-              <div>
-                <h3 className="text-lg font-bold text-white">
-                  Computer Science &amp; Digital Media
-                </h3>
-                <p className="text-xs text-[#888888] mt-1">
-                  Foundational Studies &amp; Self-Directed Engineering
-                </p>
+          {/* Academic Foundation Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="p-6 sm:p-7 rounded-2xl border border-[#202A40] bg-[#101525] hover:border-[#2563EB] transition-all space-y-4"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#202A40]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#080C1E] border border-[#202A40] text-[#2563EB] flex items-center justify-center shrink-0">
+                  <GraduationCap size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white font-heading">
+                    Academic Foundation &amp; Self-Directed Engineering
+                  </h3>
+                  <span className="text-xs text-[#94A3B8] font-mono">
+                    Continuous Learning in Computer Science &amp; AI Media
+                  </span>
+                </div>
               </div>
+              <span className="px-3 py-1 rounded-full text-xs font-mono text-[#94A3B8] bg-[#080C1E] border border-[#202A40] self-start sm:self-center">
+                Ongoing
+              </span>
+            </div>
 
-              <p className="text-xs sm:text-sm text-[#8e8e93] leading-relaxed">
-                Focused on modern software engineering paradigms, algorithm logic in Python and JavaScript, alongside independent mastery of generative AI media pipelines and digital cinematography.
-              </p>
-
-              <div className="p-3.5 rounded-xl border border-white/[0.06] bg-white/[0.02] text-[11px] font-mono text-[#777777]">
-                Verified academic records and references available upon confirmed request.
-              </div>
-            </motion.div>
-          </div>
+            <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
+              Committed to independent, project-based mastery across modern full-stack web architectures, Python automation scripts, and generative AI filmmaking pipelines.
+            </p>
+          </motion.div>
         </div>
       </div>
     </section>

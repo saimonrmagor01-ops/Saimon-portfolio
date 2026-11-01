@@ -10,16 +10,16 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="py-16 px-4 sm:px-8 border-t border-white/[0.08] bg-[#030304] relative">
+    <footer className="py-16 px-4 sm:px-8 border-t border-[#202A40] bg-[#050817] relative">
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Top Footer Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-white/[0.06]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-[#202A40]">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-white font-bold tracking-widest text-sm font-heading">
-              <span className="w-2 h-2 rounded-full bg-[#9fbdff]" />
+              <span className="w-2 h-2 rounded-full bg-[#2563EB]" />
               <span>SAIMON RANA MAGAR</span>
             </div>
-            <p className="text-xs text-[#777777]">
+            <p className="text-xs text-[#94A3B8]">
               Digital Creator &amp; Developer • AI Filmmaker &amp; Web Engineer
             </p>
           </div>
@@ -29,11 +29,11 @@ export const Footer: React.FC = () => {
             <button
               onClick={scrollToTop}
               type="button"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/[0.02] text-xs font-mono text-[#888888] hover:text-white hover:border-white/20 transition-all font-heading"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#202A40] bg-[#101525] text-xs font-mono text-[#94A3B8] hover:text-white hover:border-[#2563EB] transition-all font-heading"
               aria-label="Back to top"
             >
               <span>Back to top</span>
-              <ArrowUp size={12} />
+              <ArrowUp size={12} className="text-[#2563EB]" />
             </button>
           </div>
         </div>
@@ -41,10 +41,10 @@ export const Footer: React.FC = () => {
         {/* Links & Information Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-xs">
           <div className="space-y-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-[#555555]">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#64748B]">
               Navigation
             </span>
-            <ul className="space-y-2 text-[#8e8e93]">
+            <ul className="space-y-2 text-[#94A3B8]">
               <li>
                 <a href="#home" className="hover:text-white transition-colors">
                   Home
@@ -69,10 +69,10 @@ export const Footer: React.FC = () => {
           </div>
 
           <div className="space-y-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-[#555555]">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#64748B]">
               Work &amp; Skills
             </span>
-            <ul className="space-y-2 text-[#8e8e93]">
+            <ul className="space-y-2 text-[#94A3B8]">
               <li>
                 <a href="#projects" className="hover:text-white transition-colors">
                   Featured Projects
@@ -97,10 +97,10 @@ export const Footer: React.FC = () => {
           </div>
 
           <div className="space-y-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-[#555555]">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#64748B]">
               Core Tools
             </span>
-            <ul className="space-y-2 text-[#8e8e93]">
+            <ul className="space-y-2 text-[#94A3B8]">
               <li>Google Flow</li>
               <li>Adobe Premiere Pro</li>
               <li>CapCut</li>
@@ -110,13 +110,13 @@ export const Footer: React.FC = () => {
           </div>
 
           <div className="space-y-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-[#555555]">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#64748B]">
               Location &amp; Channels
             </span>
-            <p className="text-[#8e8e93] leading-relaxed">
+            <p className="text-[#94A3B8] leading-relaxed">
               Based in Kathmandu, Nepal. Collaborating with creative minds and tech innovators globally.
             </p>
-            <div className="pt-1 text-[#9fbdff] font-mono flex items-center gap-1.5">
+            <div className="pt-1 text-[#2563EB] font-mono flex items-center gap-1.5 font-medium">
               <Globe size={11} />
               <span>NPT (GMT+5:45)</span>
             </div>
@@ -124,12 +124,12 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Credits */}
-        <div className="pt-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[#666666]">
+        <div className="pt-8 border-t border-[#202A40] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[#64748B]">
           <div>
             &copy; {new Date().getFullYear()} Saimon Rana Magar. All rights reserved.
           </div>
-          <div className="text-center sm:text-right text-[#555555]">
-            Designed with intention. Built for what&apos;s next.
+          <div className="text-center sm:text-right text-[#64748B]">
+            Deep Navy Theme • Refined with Intention.
           </div>
         </div>
       </div>

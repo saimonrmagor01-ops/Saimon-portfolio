@@ -135,27 +135,27 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
   };
 
   return (
-    <section id="development-studio" className="py-28 px-4 sm:px-8 border-t border-white/[0.08] relative">
+    <section id="development-studio" className="py-28 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817]">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-8 border-b border-white/[0.06]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-8 border-b border-[#202A40]">
           <div>
-            <div className="text-[11px] font-mono tracking-widest text-[#9fbdff] uppercase flex items-center gap-2 mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101525] border border-[#202A40] text-xs font-medium text-[#2563EB] mb-3">
               <Terminal size={12} />
               <span>03 / DEVELOPMENT STUDIO</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
               Engineering &amp; <br />
-              <span className="text-[#888888] font-normal font-serif italic">Digital Products.</span>
+              <span className="text-[#94A3B8] font-normal font-serif italic">Digital Products.</span>
             </h2>
           </div>
-          <p className="max-w-md text-sm sm:text-base text-[#92928f] font-normal leading-relaxed">
+          <p className="max-w-md text-sm sm:text-base text-[#94A3B8] font-normal leading-relaxed">
             Crafting responsive web applications, Python community bot engines, and digital automations built on clean architectures and practical performance.
           </p>
         </div>
 
         {/* Tab Selection */}
-        <div className="flex flex-wrap items-center gap-2 mb-8 p-1.5 rounded-2xl bg-[#09090b] border border-white/10 w-fit">
+        <div className="flex flex-wrap items-center gap-2 mb-8 p-1.5 rounded-2xl bg-[#101525] border border-[#202A40] w-fit">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isSelected = activeTab.id === tab.id;
@@ -166,8 +166,8 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
                 type="button"
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                   isSelected
-                    ? "bg-white text-black font-semibold shadow-sm"
-                    : "text-[#888888] hover:text-white hover:bg-white/5"
+                    ? "bg-[#2563EB] text-white font-semibold shadow-[0_0_15px_rgba(37,99,235,0.4)]"
+                    : "text-[#94A3B8] hover:text-white hover:bg-[#161D33]"
                 }`}
               >
                 <Icon size={14} />
@@ -182,25 +182,25 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
           {/* Left: Overview & Highlights */}
           <div className="lg:col-span-5 space-y-6">
             <div>
-              <div className="text-[11px] font-mono text-[#9fbdff] uppercase tracking-wider mb-1">
+              <div className="text-[11px] font-mono text-[#2563EB] uppercase tracking-wider mb-1 font-bold">
                 Capability Overview
               </div>
-              <h3 className="text-2xl font-bold text-white tracking-tight">{activeTab.title}</h3>
-              <p className="text-xs sm:text-sm text-[#92928f] mt-2 leading-relaxed">
+              <h3 className="text-2xl font-bold text-white tracking-tight font-heading">{activeTab.title}</h3>
+              <p className="text-xs sm:text-sm text-[#94A3B8] mt-2 leading-relaxed">
                 {activeTab.subtitle}
               </p>
             </div>
 
             {/* Verified Tech Badges */}
             <div className="space-y-2">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-[#666666]">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-[#64748B]">
                 Verified Technologies
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {activeTab.techs.map((tech) => (
                   <span
                     key={tech}
-                    className="px-3 py-1 rounded-full text-xs font-mono border border-white/10 bg-white/[0.03] text-white"
+                    className="px-3 py-1 rounded-full text-xs font-mono border border-[#202A40] bg-[#101525] text-white"
                   >
                     {tech}
                   </span>
@@ -210,13 +210,13 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
 
             {/* Architecture Highlights */}
             <div className="space-y-3 pt-2">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-[#666666]">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-[#64748B]">
                 Key Engineering Tenets
               </div>
               <div className="space-y-2.5">
                 {activeTab.highlights.map((highlight, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-xs text-[#a0a0a0]">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#9fbdff] mt-1.5 shrink-0" />
+                  <div key={idx} className="flex items-start gap-2.5 text-xs text-[#CBD5E1]">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB] mt-1.5 shrink-0" />
                     <span>{highlight}</span>
                   </div>
                 ))}
@@ -226,14 +226,14 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
 
           {/* Right: Code Viewer */}
           <div className="lg:col-span-7">
-            <div className="rounded-2xl border border-white/10 bg-[#09090d] shadow-2xl overflow-hidden">
+            <div className="rounded-2xl border border-[#202A40] bg-[#101525] shadow-2xl overflow-hidden">
               {/* Code Header Bar */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08] bg-[#070709]">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#202A40] bg-[#080C1E]">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#333333]" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#333333]" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#333333]" />
-                  <span className="text-[11px] font-mono text-[#888888] ml-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#202A40]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#202A40]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#202A40]" />
+                  <span className="text-[11px] font-mono text-[#94A3B8] ml-2">
                     {activeTab.id}.{activeTab.language === "python" ? "py" : "tsx"}
                   </span>
                 </div>
@@ -241,25 +241,25 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
                 <button
                   onClick={handleCopy}
                   type="button"
-                  className="flex items-center gap-1.5 text-[11px] font-mono text-[#aaaaaa] hover:text-white px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/10 transition-colors"
+                  className="flex items-center gap-1.5 text-[11px] font-mono text-[#94A3B8] hover:text-white px-2.5 py-1 rounded-md bg-[#161D33] border border-[#202A40] transition-colors"
                   aria-label="Copy code snippet"
                 >
-                  {copied ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
+                  {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
                   <span>{copied ? "Copied" : "Copy"}</span>
                 </button>
               </div>
 
               {/* Code Pre Block */}
-              <div className="p-4 sm:p-5 overflow-x-auto text-[11px] sm:text-xs font-mono text-[#d4d4d4] leading-relaxed max-h-[380px]">
-                <pre className="selection:bg-white/20">
+              <div className="p-4 sm:p-5 overflow-x-auto text-[11px] sm:text-xs font-mono text-[#CBD5E1] leading-relaxed max-h-[380px] bg-[#080C1E]/50">
+                <pre className="selection:bg-[#2563EB]/40">
                   <code>{activeTab.codeSnippet}</code>
                 </pre>
               </div>
 
               {/* Terminal Footer */}
-              <div className="px-4 py-2.5 border-t border-white/[0.08] bg-[#060608] flex items-center justify-between text-[10px] font-mono text-[#666666]">
+              <div className="px-4 py-2.5 border-t border-[#202A40] bg-[#080C1E] flex items-center justify-between text-[10px] font-mono text-[#64748B]">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                   <span>SYNTAX VERIFIED • ZERO RUNTIME BLOAT</span>
                 </span>
                 <span>UTF-8</span>

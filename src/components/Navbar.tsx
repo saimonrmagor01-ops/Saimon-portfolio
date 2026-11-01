@@ -1,8 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { 
+  ArrowUpRight, Menu, X, 
+  Home, User, Briefcase, Film, Code, FolderGit2, Wrench, Mail 
+} from "lucide-react";
 import { SocialLinks } from "./SocialLinks";
 
 interface NavbarProps {
@@ -14,17 +18,16 @@ export const Navbar: React.FC<NavbarProps> = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Nav items
+  // Nav items with icons matching reference layout
   const navItems = [
-    { label: "Home", href: "#home", id: "home" },
-    { label: "About", href: "#about", id: "about" },
-    { label: "Creative", href: "#creative-studio", id: "creative-studio" },
-    { label: "Development", href: "#development-studio", id: "development-studio" },
-    { label: "Projects", href: "#projects", id: "projects" },
-    { label: "Skills", href: "#skills", id: "skills" },
-    { label: "Experience", href: "#experience", id: "experience" },
-    { label: "Services", href: "#services", id: "services" },
-    { label: "Contact", href: "#contact", id: "contact" },
+    { label: "Home", href: "#home", id: "home", icon: Home },
+    { label: "About", href: "#about", id: "about", icon: User },
+    { label: "Experience", href: "#experience", id: "experience", icon: Briefcase },
+    { label: "Creative", href: "#creative-studio", id: "creative-studio", icon: Film },
+    { label: "Dev", href: "#development-studio", id: "development-studio", icon: Code },
+    { label: "Projects", href: "#projects", id: "projects", icon: FolderGit2 },
+    { label: "Skills", href: "#skills", id: "skills", icon: Wrench },
+    { label: "Contact", href: "#contact", id: "contact", icon: Mail },
   ];
 
   // Scroll listener for sticky background & active section
@@ -53,50 +56,63 @@ export const Navbar: React.FC<NavbarProps> = () => {
   return (
     <>
       <header
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 sm:py-4 px-4 sm:px-8 flex justify-center"
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 sm:py-4 px-3 sm:px-6 flex justify-center"
       >
         <div
-          className={`w-full max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 py-2.5 sm:py-3 rounded-full border transition-all duration-300 ${
+          className={`w-full max-w-7xl mx-auto flex items-center justify-between px-3 sm:px-5 py-2 sm:py-2.5 rounded-full border transition-all duration-300 ${
             isScrolled
-              ? "bg-[#09090b]/85 backdrop-blur-xl border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
-              : "bg-[#09090b]/60 backdrop-blur-md border-white/[0.06]"
+              ? "bg-[#101525]/90 backdrop-blur-xl border-[#202A40] shadow-[0_12px_40px_rgba(5,8,23,0.8)]"
+              : "bg-[#101525]/70 backdrop-blur-md border-[#202A40]/80"
           }`}
         >
-          {/* Brand */}
+          {/* Brand with illustrated avatar and live green dot (Reference Style) */}
           <a
             href="#home"
-            className="flex items-center gap-2.5 group focus-visible:ring-1 focus-visible:ring-accent-blue rounded-full"
+            className="flex items-center gap-2.5 group focus-visible:ring-1 focus-visible:ring-[#2563EB] rounded-full shrink-0"
             aria-label="Saimon Rana Magar Home"
           >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9fbdff] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9fbdff]"></span>
-            </span>
-            <div className="flex items-baseline gap-1.5 font-bold tracking-wider text-xs sm:text-sm text-white font-heading">
-              <span>SAIMON</span>
-              <span className="text-[#686868] font-normal tracking-normal text-[11px] hidden sm:inline font-sans">
-                / PORTFOLIO
-              </span>
+            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-[#080C1E] border border-[#202A40] flex items-center justify-center p-0.5">
+              <Image
+                src="/portrait.png"
+                alt="Saimon Avatar"
+                width={32}
+                height={32}
+                className="w-full h-full object-contain sticker-outline"
+              />
+            </div>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5 font-bold tracking-tight text-xs sm:text-sm text-white font-heading">
+                <span>Saimon Rana Magar</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] text-[#94A3B8]">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                </span>
+                <span className="hidden sm:inline">Digital Creator &amp; Dev</span>
+              </div>
             </div>
           </a>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 text-xs font-medium text-[#92928f]">
+          {/* Desktop Nav Links (Reference Screenshot Pill Style) */}
+          <nav className="hidden xl:flex items-center gap-1 px-3 py-1 rounded-full bg-[#080C1E]/80 border border-[#202A40]/80 text-xs font-medium text-[#94A3B8]">
             {navItems.map((item) => {
               const isActive = activeSection === item.id;
+              const Icon = item.icon;
               return (
                 <a
                   key={item.id}
                   href={item.href}
-                  className={`relative px-3 py-1.5 rounded-full transition-colors duration-200 hover:text-white ${
-                    isActive ? "text-white font-semibold" : "text-[#8e8e93]"
+                  className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors duration-200 hover:text-white ${
+                    isActive ? "text-white font-semibold" : "text-[#94A3B8]"
                   }`}
                 >
-                  {item.label}
+                  <Icon size={12} className={isActive ? "text-[#2563EB]" : "text-[#64748B]"} />
+                  <span>{item.label}</span>
                   {isActive && (
                     <motion.div
                       layoutId="nav-pill"
-                      className="absolute inset-0 bg-white/[0.08] rounded-full border border-white/[0.12] -z-10"
+                      className="absolute inset-0 bg-[#2563EB]/15 rounded-full border border-[#2563EB]/40 -z-10"
                       transition={{ type: "spring", stiffness: 350, damping: 30 }}
                     />
                   )}
@@ -108,14 +124,14 @@ export const Navbar: React.FC<NavbarProps> = () => {
           {/* Actions: Social Icons & Contact CTA */}
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Header Social Icons */}
-            <div className="hidden sm:block">
+            <div className="hidden md:block">
               <SocialLinks size="sm" />
             </div>
 
-            {/* Direct CTA */}
+            {/* Direct CTA (Reference Accent Blue) */}
             <a
               href="#contact"
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-white text-black hover:bg-[#9fbdff] hover:text-black transition-all duration-200 font-heading"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200 font-heading shadow-[0_0_15px_rgba(37,99,235,0.35)] shrink-0"
             >
               <span>Let&apos;s Talk</span>
               <ArrowUpRight size={13} />
@@ -125,7 +141,7 @@ export const Navbar: React.FC<NavbarProps> = () => {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               type="button"
-              className="lg:hidden p-2 text-white hover:text-[#9fbdff] transition-colors"
+              className="xl:hidden p-2 text-white hover:text-[#2563EB] transition-colors"
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -142,44 +158,48 @@ export const Navbar: React.FC<NavbarProps> = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-4 top-20 z-40 bg-[#0e0e12]/95 backdrop-blur-2xl border border-white/10 rounded-2xl p-6 shadow-2xl lg:hidden flex flex-col gap-4"
+            className="fixed inset-x-4 top-20 z-40 bg-[#101525]/95 backdrop-blur-2xl border border-[#202A40] rounded-2xl p-6 shadow-2xl xl:hidden flex flex-col gap-4"
           >
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <span className="text-xs uppercase tracking-widest text-[#777777] font-mono">Navigation</span>
-              <span className="text-[11px] text-[#9fbdff] font-mono">Saimon Rana Magar</span>
+            <div className="flex items-center justify-between pb-3 border-b border-[#202A40]">
+              <span className="text-xs uppercase tracking-widest text-[#64748B] font-mono">Navigation</span>
+              <span className="text-[11px] text-[#2563EB] font-mono font-medium">Saimon Rana Magar</span>
             </div>
 
-            <div className="flex flex-col gap-2">
-              {navItems.map((item) => (
-                <a
-                  key={item.id}
-                  href={item.href}
-                  onClick={closeMenu}
-                  className={`text-sm py-2 px-3 rounded-lg transition-colors flex items-center justify-between ${
-                    activeSection === item.id
-                      ? "bg-white/10 text-white font-medium"
-                      : "text-[#a0a0a0] hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  <span>{item.label}</span>
-                  <span className="text-[10px] text-[#555555]">↗</span>
-                </a>
-              ))}
+            <div className="grid grid-cols-2 gap-2">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeSection === item.id;
+                return (
+                  <a
+                    key={item.id}
+                    href={item.href}
+                    onClick={closeMenu}
+                    className={`text-xs py-2 px-3 rounded-lg transition-colors flex items-center gap-2 ${
+                      isActive
+                        ? "bg-[#2563EB]/20 border border-[#2563EB]/40 text-white font-medium"
+                        : "text-[#94A3B8] hover:text-white hover:bg-[#161D33]"
+                    }`}
+                  >
+                    <Icon size={14} className={isActive ? "text-[#2563EB]" : "text-[#64748B]"} />
+                    <span>{item.label}</span>
+                  </a>
+                );
+              })}
             </div>
 
-            <div className="pt-3 border-t border-white/10 flex flex-col gap-3">
+            <div className="pt-3 border-t border-[#202A40] flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-[#777777] font-mono">Connect:</span>
+                <span className="text-xs text-[#94A3B8] font-mono">Direct Connect:</span>
                 <SocialLinks size="sm" />
               </div>
               <a
                 href="#contact"
                 onClick={closeMenu}
-                className="w-full text-center py-2.5 rounded-full text-xs font-semibold bg-white text-black hover:bg-[#9fbdff] transition-colors font-heading"
+                className="w-full text-center py-2.5 rounded-full text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors font-heading shadow-[0_0_15px_rgba(37,99,235,0.4)]"
               >
                 Let&apos;s Collaborate ↗
               </a>
-              <div className="text-center text-[11px] text-[#666666] font-mono">
+              <div className="text-center text-[11px] text-[#64748B] font-mono">
                 Based in Nepal • Available Worldwide
               </div>
             </div>

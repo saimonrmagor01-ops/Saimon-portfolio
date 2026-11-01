@@ -34,7 +34,7 @@ export const MusicPlayer: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentTrack = PLAYLIST[currentTrackIndex];
 
-  // Initialize Audio with Autoplay
+  // Initialize Audio (No forced autoplay)
   useEffect(() => {
     const savedMute = localStorage.getItem("saimon_portfolio_mute");
     const initialMute = savedMute === "true";
@@ -44,7 +44,7 @@ export const MusicPlayer: React.FC = () => {
 
     const audio = new Audio();
     audio.src = currentTrack.src;
-    audio.preload = "auto";
+    audio.preload = "metadata";
     audio.volume = initialMute ? 0 : volume;
 
     const onTimeUpdate = () => {
@@ -67,45 +67,6 @@ export const MusicPlayer: React.FC = () => {
     audio.addEventListener("ended", onEnded);
 
     audioRef.current = audio;
-
-    // Autoplay attempt with seamless fallback to first user interaction
-    const attemptAutoplay = () => {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch(() => {
-            // Browser blocked un-interacted autoplay: start on first touch, click, scroll or key
-            const startOnInteraction = () => {
-              if (audioRef.current && audioRef.current.paused) {
-                audioRef.current
-                  .play()
-                  .then(() => setIsPlaying(true))
-                  .catch(() => {});
-              }
-              cleanupListeners();
-            };
-
-            const cleanupListeners = () => {
-              window.removeEventListener("pointerdown", startOnInteraction);
-              window.removeEventListener("click", startOnInteraction);
-              window.removeEventListener("scroll", startOnInteraction);
-              window.removeEventListener("keydown", startOnInteraction);
-              window.removeEventListener("touchstart", startOnInteraction);
-            };
-
-            window.addEventListener("pointerdown", startOnInteraction, { once: true, passive: true });
-            window.addEventListener("click", startOnInteraction, { once: true, passive: true });
-            window.addEventListener("scroll", startOnInteraction, { once: true, passive: true });
-            window.addEventListener("keydown", startOnInteraction, { once: true, passive: true });
-            window.addEventListener("touchstart", startOnInteraction, { once: true, passive: true });
-          });
-      }
-    };
-
-    attemptAutoplay();
 
     return () => {
       audio.pause();
@@ -183,7 +144,7 @@ export const MusicPlayer: React.FC = () => {
       className="fixed bottom-5 right-5 z-40 transition-all duration-300"
     >
       <div
-        className={`glass-panel rounded-full p-2 border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.7)] flex items-center gap-3 transition-all ${
+        className={`bg-[#101525]/90 backdrop-blur-xl rounded-full p-2 border border-[#202A40] shadow-[0_12px_40px_rgba(5,8,23,0.9)] flex items-center gap-3 transition-all ${
           isExpanded ? "pr-4" : "pr-3"
         }`}
       >
@@ -191,7 +152,7 @@ export const MusicPlayer: React.FC = () => {
         <button
           onClick={togglePlay}
           type="button"
-          className="w-9 h-9 rounded-full bg-white text-black flex items-center justify-center hover:bg-[#9fbdff] transition-all hover:scale-105 shrink-0"
+          className="w-9 h-9 rounded-full bg-[#2563EB] text-white flex items-center justify-center hover:bg-[#1D4ED8] transition-all hover:scale-105 shrink-0 shadow-[0_0_15px_rgba(37,99,235,0.4)]"
           title={isPlaying ? "Pause soundtrack" : "Play soundtrack"}
           aria-label={isPlaying ? "Pause soundtrack" : "Play soundtrack"}
         >
@@ -205,22 +166,22 @@ export const MusicPlayer: React.FC = () => {
           title="Click to view player details"
         >
           <span
-            className={`w-0.5 rounded-full bg-[#9fbdff] transition-all duration-300 ${
+            className={`w-0.5 rounded-full bg-[#2563EB] transition-all duration-300 ${
               isPlaying ? "h-4 animate-pulse" : "h-1.5 opacity-40"
             }`}
           />
           <span
-            className={`w-0.5 rounded-full bg-[#9fbdff] transition-all duration-300 ${
+            className={`w-0.5 rounded-full bg-[#2563EB] transition-all duration-300 ${
               isPlaying ? "h-6 animate-pulse delay-75" : "h-2.5 opacity-40"
             }`}
           />
           <span
-            className={`w-0.5 rounded-full bg-[#9fbdff] transition-all duration-300 ${
+            className={`w-0.5 rounded-full bg-[#2563EB] transition-all duration-300 ${
               isPlaying ? "h-3 animate-pulse delay-150" : "h-1.5 opacity-40"
             }`}
           />
           <span
-            className={`w-0.5 rounded-full bg-[#9fbdff] transition-all duration-300 ${
+            className={`w-0.5 rounded-full bg-[#2563EB] transition-all duration-300 ${
               isPlaying ? "h-5 animate-pulse delay-100" : "h-2 opacity-40"
             }`}
           />
@@ -235,7 +196,7 @@ export const MusicPlayer: React.FC = () => {
             <div className="text-[11px] font-semibold text-white truncate tracking-tight">
               {currentTrack.title}
             </div>
-            <div className="text-[10px] text-[#777777] truncate font-mono">
+            <div className="text-[10px] text-[#94A3B8] truncate font-mono">
               {isPlaying ? currentTrack.artist : "Soundtrack"}
             </div>
           </div>
@@ -243,12 +204,12 @@ export const MusicPlayer: React.FC = () => {
 
         {/* Extended Controls (when expanded or on desktop) */}
         {isExpanded && (
-          <div className="flex items-center gap-2 pl-2 border-l border-white/10">
+          <div className="flex items-center gap-2 pl-2 border-l border-[#202A40]">
             {/* Skip to Next Track */}
             <button
               onClick={nextTrack}
               type="button"
-              className="p-1.5 rounded-full text-[#888888] hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-full text-[#94A3B8] hover:text-white hover:bg-white/5 transition-colors"
               title="Next Track"
               aria-label="Next track"
             >
@@ -259,7 +220,7 @@ export const MusicPlayer: React.FC = () => {
             <button
               onClick={toggleMute}
               type="button"
-              className="p-1.5 rounded-full text-[#888888] hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-full text-[#94A3B8] hover:text-white hover:bg-white/5 transition-colors"
               title={isMuted ? "Unmute" : "Mute"}
               aria-label={isMuted ? "Unmute" : "Mute"}
             >
@@ -274,7 +235,7 @@ export const MusicPlayer: React.FC = () => {
               step="0.05"
               value={isMuted ? 0 : volume}
               onChange={handleVolumeChange}
-              className="w-14 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[#9fbdff]"
+              className="w-14 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-[#2563EB]"
               title={`Volume: ${Math.round(volume * 100)}%`}
               aria-label="Volume slider"
             />
