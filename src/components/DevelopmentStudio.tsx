@@ -43,12 +43,12 @@ interface MetricProps {
 
 export const MetricCard: React.FC<MetricProps> = ({ label, value, detail }) => {
   return (
-    <div className="p-5 rounded-2xl border border-white/10 bg-[#09090b] hover:border-white/20 transition-all">
-      <span className="text-[10px] font-mono uppercase tracking-widest text-[#9fbdff]">
+    <div className="p-5 rounded-2xl border border-[#202A40] bg-[#101525] hover:border-[#2563EB] transition-all">
+      <span className="text-[10px] font-mono uppercase tracking-widest text-[#2563EB]">
         {label}
       </span>
       <div className="text-2xl font-bold text-white mt-1">{value}</div>
-      <p className="text-xs text-[#8e8e93] mt-0.5">{detail}</p>
+      <p className="text-xs text-[#94A3B8] mt-0.5">{detail}</p>
     </div>
   );
 };`,
@@ -81,7 +81,7 @@ class CommunityEngine(commands.Cog):
         embed = discord.Embed(
             title="Sentinel Community Status",
             description="All operational nodes running at optimal latency.",
-            color=0x9FBDFF
+            color=0x2563EB
         )
         embed.add_field(name="Latency", value=f"{round(self.bot.latency * 1000)}ms", inline=True)
         embed.set_footer(text="Engineered for Nepal & Global Communities")

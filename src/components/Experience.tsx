@@ -36,7 +36,7 @@ export const Experience: React.FC = () => {
         </div>
 
         {/* Animated Professional Journey Timeline */}
-        <div className="relative pl-6 sm:pl-10 space-y-8">
+        <div className="relative pl-7 sm:pl-10 space-y-8">
           {/* Vertical Glowing Timeline Bar */}
           <div
             className="absolute left-2.5 sm:left-4 top-4 bottom-8 w-[2px] bg-gradient-to-b from-[#2563EB] via-[#38BDF8]/60 to-[#202A40]"
@@ -47,7 +47,7 @@ export const Experience: React.FC = () => {
           <div className="relative">
             {/* Timeline Pulsing Node Beacon */}
             <div
-              className="absolute -left-[21px] sm:-left-[31px] top-6 w-5 h-5 rounded-full bg-[#101525] border-2 border-[#2563EB] flex items-center justify-center shadow-[0_0_12px_rgba(37,99,235,0.8)] z-10"
+              className="absolute -left-[23px] sm:-left-[31px] top-6 w-5 h-5 rounded-full bg-[#101525] border-2 border-[#2563EB] flex items-center justify-center shadow-[0_0_12px_rgba(37,99,235,0.8)] z-10"
               aria-hidden="true"
             >
               <div className="w-2 h-2 rounded-full bg-[#2563EB] animate-pulse" />
@@ -143,7 +143,7 @@ export const Experience: React.FC = () => {
           <div className="relative">
             {/* Timeline Pulsing Node Beacon */}
             <div
-              className="absolute -left-[21px] sm:-left-[31px] top-6 w-5 h-5 rounded-full bg-[#101525] border-2 border-[#38BDF8]/60 flex items-center justify-center z-10"
+              className="absolute -left-[23px] sm:-left-[31px] top-6 w-5 h-5 rounded-full bg-[#101525] border-2 border-[#38BDF8]/60 flex items-center justify-center z-10"
               aria-hidden="true"
             >
               <div className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />

@@ -86,7 +86,7 @@ export const About: React.FC = () => {
                 </div>
 
                 {/* Portrait Bottom Caption & Metadata */}
-                <div className="mt-4 pt-3 border-t border-[#202A40] flex items-center justify-between text-xs">
+                <div className="mt-4 pt-3 border-t border-[#202A40] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                   <div>
                     <div className="text-white font-bold tracking-wider font-heading text-sm">
                       SAIMON RANA MAGAR

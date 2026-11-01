@@ -96,7 +96,7 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({ isOpen, onClose })
 
           <div className="flex items-center gap-3">
             {/* Aspect Ratio Switcher */}
-            <div className="hidden md:flex items-center gap-1 p-1 rounded-xl bg-[#101525] border border-[#202A40]">
+            <div className="hidden sm:flex items-center gap-1 p-1 rounded-xl bg-[#101525] border border-[#202A40]">
               {(["2.39:1", "16:9", "9:16"] as const).map((ratio) => (
                 <button
                   key={ratio}
@@ -116,7 +116,7 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({ isOpen, onClose })
             <button
               onClick={onClose}
               type="button"
-              className="p-2 rounded-full bg-[#101525] border border-[#202A40] text-white hover:border-[#2563EB] hover:bg-[#161D33] transition-colors"
+              className="w-9 h-9 rounded-full bg-[#101525] border border-[#202A40] text-white hover:border-[#2563EB] hover:bg-[#161D33] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
               aria-label="Close showreel"
             >
               <X size={18} />

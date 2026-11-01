@@ -99,7 +99,7 @@ export const WelcomePopup: React.FC = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 15 }}
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-lg rounded-3xl bg-[#101525] border border-[#202A40] p-6 sm:p-8 shadow-[0_25px_80px_rgba(5,8,23,0.95)] z-10 overflow-hidden text-center"
+            className="relative w-full max-w-lg rounded-3xl bg-[#101525] border border-[#202A40] p-6 sm:p-8 shadow-[0_25px_80px_rgba(5,8,23,0.95)] z-10 overflow-y-auto max-h-[90vh] text-center"
           >
             {/* Cinematic Radial Ambient Glow */}
             <div

@@ -61,7 +61,7 @@ export const Hero: React.FC = () => {
 
         {/* Master Editorial Typography with Character/Word Mask Reveal */}
         <div className="space-y-2 mb-8">
-          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[100px] font-extrabold tracking-tightest leading-[0.94] text-white font-heading">
+          <h1 className="text-4xl xs:text-5xl sm:text-7xl md:text-8xl lg:text-[100px] font-extrabold tracking-tightest leading-[0.94] text-white font-heading break-words">
             <AnimatedHeading
               text="Creative mind."
               tag="span"

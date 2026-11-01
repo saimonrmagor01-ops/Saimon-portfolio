@@ -98,7 +98,7 @@ export const Services: React.FC<ServicesProps> = ({ onSelectService }) => {
                 <button
                   type="button"
                   onClick={() => handleInquiry(service.title)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-white group-hover:text-[#9fbdff] group-hover:bg-white/[0.05] transition-all"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-white group-hover:text-[#38BDF8] group-hover:bg-white/[0.05] transition-all min-h-[36px]"
                 >
                   <span>Inquire</span>
                   <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />

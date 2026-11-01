@@ -133,21 +133,21 @@ export const Navbar: React.FC<NavbarProps> = () => {
             <Magnetic strength={0.25}>
               <a
                 href="#contact"
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200 font-heading shadow-[0_0_15px_rgba(37,99,235,0.35)] shrink-0"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200 font-heading shadow-[0_0_15px_rgba(37,99,235,0.35)] shrink-0 min-h-[36px]"
               >
                 <span>Let&apos;s Talk</span>
                 <ArrowUpRight size={13} />
               </a>
             </Magnetic>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button with WCAG Touch Target */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               type="button"
-              className="xl:hidden p-2 text-white hover:text-[#2563EB] transition-colors"
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              className="xl:hidden w-9 h-9 rounded-full flex items-center justify-center border border-[#202A40] bg-[#080C1E] text-white hover:text-[#2563EB] hover:border-[#2563EB] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             >
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </div>

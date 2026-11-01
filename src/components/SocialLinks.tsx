@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { SOCIAL_LINKS } from "@/data/socials";
+import { SOCIAL_LINKS, isSocialConfigured } from "@/data/socials";
 
 interface SocialLinksProps {
   className?: string;
@@ -15,9 +15,10 @@ export const SocialLinks: React.FC<SocialLinksProps> = ({
   showLabel = false,
 }) => {
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
 
   const iconSizes = {
-    sm: "w-7 h-7 text-xs",
+    sm: "w-8 h-8 text-xs",
     md: "w-9 h-9 text-sm",
     lg: "w-11 h-11 text-base",
   };
@@ -88,42 +89,54 @@ export const SocialLinks: React.FC<SocialLinksProps> = ({
   ];
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, name: string, url: string) => {
-    if (url.startsWith("[ADD_")) {
+    if (!isSocialConfigured(url)) {
       e.preventDefault();
-      alert(`The ${name} profile link is currently being configured.`);
+      setNoticeMessage(`${name} link configured in src/data/socials.ts`);
+      setTimeout(() => setNoticeMessage(null), 3000);
     }
   };
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      {socials.map((item) => (
-        <div key={item.id} className="relative">
-          <a
-            href={item.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => handleClick(e, item.name, item.url)}
-            onMouseEnter={() => setActiveTooltip(item.id)}
-            onMouseLeave={() => setActiveTooltip(null)}
-            className={`inline-flex items-center justify-center rounded-full border border-[#202A40] bg-[#080C1E] text-[#94A3B8] transition-all duration-200 hover:scale-105 hover:bg-[#161D33] hover:text-white ${iconSizes[size]} ${item.hoverColor}`}
-            aria-label={`Saimon Rana Magar on ${item.name}`}
-          >
-            {item.icon}
-          </a>
+    <div className={`relative flex items-center gap-2 ${className}`}>
+      {socials.map((item) => {
+        const configured = isSocialConfigured(item.url);
+        return (
+          <div key={item.id} className="relative">
+            <a
+              href={configured ? item.url : "#"}
+              target={configured ? "_blank" : undefined}
+              rel={configured ? "noopener noreferrer" : undefined}
+              onClick={(e) => handleClick(e, item.name, item.url)}
+              onMouseEnter={() => setActiveTooltip(item.id)}
+              onMouseLeave={() => setActiveTooltip(null)}
+              className={`inline-flex items-center justify-center rounded-full border border-[#202A40] bg-[#080C1E] text-[#94A3B8] transition-all duration-200 hover:scale-105 hover:bg-[#161D33] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] ${iconSizes[size]} ${item.hoverColor}`}
+              aria-label={`Saimon Rana Magar on ${item.name}`}
+            >
+              {item.icon}
+            </a>
 
-          {/* Minimal Tooltip */}
-          {activeTooltip === item.id && (
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-[#101525] border border-[#202A40] text-[10px] font-mono text-white pointer-events-none whitespace-nowrap shadow-xl z-50 animate-fadeIn">
-              {item.name}
-              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#101525]" />
-            </div>
-          )}
+            {/* Tooltip */}
+            {activeTooltip === item.id && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1 rounded-lg bg-[#101525] border border-[#202A40] text-[10px] font-mono text-white pointer-events-none whitespace-nowrap shadow-xl z-50">
+                {item.name}
+                {!configured && " (Pending)"}
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#101525]" />
+              </div>
+            )}
 
-          {showLabel && (
-            <span className="text-xs text-[#8e8e93] font-medium ml-2">{item.name}</span>
-          )}
+            {showLabel && (
+              <span className="text-xs text-[#94A3B8] font-medium ml-2">{item.name}</span>
+            )}
+          </div>
+        );
+      })}
+
+      {/* Floating non-blocking notice for unconfigured links */}
+      {noticeMessage && (
+        <div className="absolute top-full left-0 mt-2 px-3 py-1.5 rounded-lg bg-[#101525] border border-[#2563EB]/50 text-[10px] font-mono text-[#93C5FD] whitespace-nowrap shadow-2xl z-50 animate-fadeIn">
+          {noticeMessage}
         </div>
-      ))}
+      )}
     </div>
   );
 };

@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Send, CheckCircle2, AlertCircle, Sparkles, MapPin, Clock, ArrowUpRight, RefreshCw } from "lucide-react";
+import { Mail, Send, CheckCircle2, AlertCircle, Sparkles, MapPin, Clock, ArrowUpRight, RefreshCw, Copy, Check } from "lucide-react";
 import { services } from "@/data/services";
 import { SocialLinks } from "./SocialLinks";
+import { CONTACT_CONFIG } from "@/data/socials";
 
 interface ContactProps {
   selectedService?: string;
@@ -24,8 +25,15 @@ export const Contact: React.FC<ContactProps> = ({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "submitting" | "prepared">("idle");
   const [currentTimeNPT, setCurrentTimeNPT] = useState("");
+  const [isCopied, setIsCopied] = useState(false);
+
+  const isEmailConfigured = Boolean(
+    CONTACT_CONFIG.EMAIL &&
+    !CONTACT_CONFIG.EMAIL.startsWith("[ADD_") &&
+    CONTACT_CONFIG.EMAIL.includes("@")
+  );
 
   // Keep selectedService in sync if passed from props
   useEffect(() => {
@@ -73,16 +81,55 @@ export const Contact: React.FC<ContactProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
+  const getFormattedBrief = () => {
+    return `Hello Saimon,
+
+I would like to discuss a project with you:
+
+• Name: ${formData.name}
+• Client Email: ${formData.email}
+• Service Focus: ${formData.service}
+• Desired Timeline: ${formData.timeline}
+
+Project Brief:
+${formData.message}
+
+---
+Dispatched via saimon-portfolio contact channel`;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
     setStatus("submitting");
 
-    // Simulate realistic asynchronous submission
+    // Construct genuine mailto link with structured inquiry data
+    const subject = encodeURIComponent(`Project Inquiry: ${formData.service} — ${formData.name}`);
+    const body = encodeURIComponent(getFormattedBrief());
+    const recipient = isEmailConfigured ? CONTACT_CONFIG.EMAIL : "";
+    const mailtoUrl = `mailto:${recipient}?subject=${subject}&body=${body}`;
+
+    // Open user's default email client
+    try {
+      window.location.href = mailtoUrl;
+    } catch {
+      // safe fallback
+    }
+
     setTimeout(() => {
-      setStatus("success");
-    }, 800);
+      setStatus("prepared");
+    }, 400);
+  };
+
+  const handleCopyBrief = () => {
+    try {
+      navigator.clipboard.writeText(getFormattedBrief());
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2500);
+    } catch {
+      // fallback
+    }
   };
 
   const handleReset = () => {
@@ -95,19 +142,20 @@ export const Contact: React.FC<ContactProps> = ({
     });
     setErrors({});
     setStatus("idle");
+    setIsCopied(false);
   };
 
   return (
-    <section id="contact" className="py-28 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817]">
+    <section id="contact" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817]">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-8 border-b border-[#202A40]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 pb-8 border-b border-[#202A40]">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101525] border border-[#202A40] text-xs font-medium text-[#2563EB] mb-3">
               <Mail size={12} />
               <span>08 / GET IN TOUCH</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
               Have an idea? <br />
               <span className="text-[#94A3B8] font-normal font-serif italic">Let&apos;s make it real.</span>
             </h2>
@@ -118,7 +166,7 @@ export const Contact: React.FC<ContactProps> = ({
         </div>
 
         {/* Contact Layout Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* Left Details Panel */}
           <div className="lg:col-span-5 space-y-6">
             <div className="p-6 sm:p-8 rounded-3xl border border-[#202A40] bg-[#101525] space-y-6 shadow-xl relative overflow-hidden">
@@ -147,7 +195,7 @@ export const Contact: React.FC<ContactProps> = ({
                     <MapPin size={13} className="text-[#2563EB]" />
                     <span>Location</span>
                   </span>
-                  <span className="text-white font-mono font-medium">Kathmandu, Nepal</span>
+                  <span className="text-white font-mono font-medium">{CONTACT_CONFIG.LOCATION}</span>
                 </div>
 
                 {/* Local Time */}
@@ -165,7 +213,7 @@ export const Contact: React.FC<ContactProps> = ({
                     <Sparkles size={13} className="text-[#2563EB]" />
                     <span>Response Time</span>
                   </span>
-                  <span className="text-white font-mono font-medium">Within 24 Hours</span>
+                  <span className="text-white font-mono font-medium">{CONTACT_CONFIG.RESPONSE_TIME}</span>
                 </div>
               </div>
 
@@ -176,20 +224,25 @@ export const Contact: React.FC<ContactProps> = ({
                 </div>
                 <div className="flex items-center justify-between">
                   <SocialLinks size="md" />
-                  <span className="text-[11px] font-mono text-[#94A3B8]">Instant Chat</span>
+                  <span className="text-[11px] font-mono text-[#94A3B8]">Instant Connect</span>
                 </div>
               </div>
 
               {/* Email direct action */}
               <div className="pt-2">
                 <a
-                  href={`mailto:saimonranamagar@example.com?subject=Project%20Inquiry%20via%20Portfolio&body=Hi%20Saimon,%0A%0AI%20would%20like%20to%20discuss%20a%20project...`}
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full border border-[#202A40] bg-[#080C1E] text-white text-xs font-semibold uppercase tracking-wider hover:border-[#2563EB] hover:bg-[#161D33] transition-all duration-200 font-heading"
+                  href={isEmailConfigured ? `mailto:${CONTACT_CONFIG.EMAIL}?subject=Project%20Inquiry%20via%20Portfolio` : "#contact"}
+                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full border border-[#202A40] bg-[#080C1E] text-white text-xs font-semibold uppercase tracking-wider hover:border-[#2563EB] hover:bg-[#161D33] transition-all duration-200 font-heading min-h-[44px]"
                 >
                   <Mail size={14} className="text-[#2563EB]" />
-                  <span>Open Direct Mail Client</span>
+                  <span>{isEmailConfigured ? "Open Direct Mail Client" : "Email Inquiries"}</span>
                   <ArrowUpRight size={13} />
                 </a>
+                {!isEmailConfigured && (
+                  <p className="text-[10px] font-mono text-[#64748B] text-center mt-1.5">
+                    Direct email placeholder configured in src/data/socials.ts
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -198,34 +251,51 @@ export const Contact: React.FC<ContactProps> = ({
           <div className="lg:col-span-7">
             <div className="p-6 sm:p-10 rounded-3xl border border-[#202A40] bg-[#101525] shadow-2xl">
               <AnimatePresence mode="wait">
-                {status === "success" ? (
+                {status === "prepared" ? (
                   <motion.div
-                    key="success"
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    key="prepared"
+                    initial={{ opacity: 0, scale: 0.96 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="py-12 text-center space-y-5"
+                    exit={{ opacity: 0, scale: 0.96 }}
+                    className="py-8 text-center space-y-6"
                   >
-                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mx-auto">
+                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-[#2563EB]/15 border border-[#2563EB]/40 text-[#38BDF8] mx-auto">
                       <CheckCircle2 size={32} />
                     </div>
                     <div className="space-y-2">
                       <h3 className="text-2xl font-bold text-white tracking-tight font-heading">
-                        Inquiry Received
+                        Inquiry Prepared
                       </h3>
                       <p className="text-xs sm:text-sm text-[#94A3B8] max-w-md mx-auto leading-relaxed">
-                        Thank you for reaching out, <span className="text-white font-medium">{formData.name}</span>. I have received your request regarding <span className="text-[#93C5FD]">{formData.service}</span> and will respond promptly.
+                        Your project brief has been formatted and opened in your email application. If your mail client didn&apos;t launch automatically, you can copy the inquiry brief below.
                       </p>
                     </div>
 
-                    <div className="pt-4 flex items-center justify-center gap-3">
+                    {/* Formatted Preview Box */}
+                    <div className="text-left p-4 rounded-xl border border-[#202A40] bg-[#080C1E] text-xs font-mono text-[#CBD5E1] space-y-1 max-h-40 overflow-y-auto">
+                      <div className="text-[#2563EB] font-bold">PROJECT BRIEF SUMMARY:</div>
+                      <div>From: {formData.name} ({formData.email})</div>
+                      <div>Discipline: {formData.service} • Timeline: {formData.timeline}</div>
+                      <div className="text-[#94A3B8] pt-1 truncate">&quot;{formData.message}&quot;</div>
+                    </div>
+
+                    <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                      <button
+                        onClick={handleCopyBrief}
+                        type="button"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-medium border border-[#2563EB] bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all font-heading min-h-[40px]"
+                      >
+                        {isCopied ? <Check size={14} /> : <Copy size={14} />}
+                        <span>{isCopied ? "Copied to Clipboard!" : "Copy Inquiry Brief"}</span>
+                      </button>
+
                       <button
                         onClick={handleReset}
                         type="button"
-                        className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-medium border border-[#202A40] bg-[#080C1E] text-white hover:border-[#2563EB] transition-colors font-heading"
+                        className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-medium border border-[#202A40] bg-[#080C1E] text-[#94A3B8] hover:text-white hover:border-[#2563EB] transition-colors font-heading min-h-[40px]"
                       >
                         <RefreshCw size={12} />
-                        <span>Send Another Message</span>
+                        <span>Edit / Start Over</span>
                       </button>
                     </div>
                   </motion.div>
@@ -235,7 +305,7 @@ export const Contact: React.FC<ContactProps> = ({
                       <span className="text-xs font-mono uppercase tracking-widest text-[#64748B]">
                         Project Inquiry Form
                       </span>
-                      <span className="text-[11px] font-mono text-[#2563EB] font-bold">CONFIDENTIAL</span>
+                      <span className="text-[11px] font-mono text-[#2563EB] font-bold">DIRECT DISPATCH</span>
                     </div>
 
                     {/* Name & Email Row */}
@@ -256,8 +326,8 @@ export const Contact: React.FC<ContactProps> = ({
                             setFormData({ ...formData, name: e.target.value });
                             if (errors.name) setErrors({ ...errors, name: "" });
                           }}
-                          placeholder="e.g. Maya Shrestha"
-                          className={`w-full px-4 py-3 rounded-xl border bg-[#080C1E] text-sm text-white placeholder-[#64748B] transition-colors focus:outline-none ${
+                          placeholder="e.g. Alex Chen"
+                          className={`w-full px-4 py-3 rounded-xl border bg-[#080C1E] text-sm text-white placeholder-[#64748B] transition-colors focus:outline-none min-h-[44px] ${
                             errors.name
                               ? "border-red-500/60 focus:border-red-500"
                               : "border-[#202A40] focus:border-[#2563EB]"
@@ -277,7 +347,7 @@ export const Contact: React.FC<ContactProps> = ({
                           htmlFor="email"
                           className="block text-xs font-mono uppercase tracking-wider text-[#CBD5E1]"
                         >
-                          Your Email <span className="text-[#2563EB]">*</span>
+                          Email Address <span className="text-[#2563EB]">*</span>
                         </label>
                         <input
                           id="email"
@@ -287,8 +357,8 @@ export const Contact: React.FC<ContactProps> = ({
                             setFormData({ ...formData, email: e.target.value });
                             if (errors.email) setErrors({ ...errors, email: "" });
                           }}
-                          placeholder="e.g. maya@example.com"
-                          className={`w-full px-4 py-3 rounded-xl border bg-[#080C1E] text-sm text-white placeholder-[#64748B] transition-colors focus:outline-none ${
+                          placeholder="alex@company.com"
+                          className={`w-full px-4 py-3 rounded-xl border bg-[#080C1E] text-sm text-white placeholder-[#64748B] transition-colors focus:outline-none min-h-[44px] ${
                             errors.email
                               ? "border-red-500/60 focus:border-red-500"
                               : "border-[#202A40] focus:border-[#2563EB]"
@@ -303,58 +373,64 @@ export const Contact: React.FC<ContactProps> = ({
                       </div>
                     </div>
 
-                    {/* Service Selection */}
-                    <div className="space-y-1.5">
-                      <label
-                        htmlFor="service"
-                        className="block text-xs font-mono uppercase tracking-wider text-[#CBD5E1]"
-                      >
-                        Target Service
-                      </label>
-                      <select
-                        id="service"
-                        value={formData.service}
-                        onChange={(e) => {
-                          setFormData({ ...formData, service: e.target.value });
-                          if (onServiceChange) onServiceChange(e.target.value);
-                        }}
-                        className="w-full px-4 py-3 rounded-xl border border-[#202A40] bg-[#080C1E] text-sm text-white focus:outline-none focus:border-[#2563EB] transition-colors"
-                      >
-                        {services.map((s) => (
-                          <option key={s.id} value={s.title} className="bg-[#101525] text-white">
-                            {s.title} ({s.category})
+                    {/* Service & Timeline Row */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      {/* Service Selection */}
+                      <div className="space-y-1.5">
+                        <label
+                          htmlFor="service"
+                          className="block text-xs font-mono uppercase tracking-wider text-[#CBD5E1]"
+                        >
+                          Area of Focus
+                        </label>
+                        <select
+                          id="service"
+                          value={formData.service}
+                          onChange={(e) => {
+                            setFormData({ ...formData, service: e.target.value });
+                            if (onServiceChange) onServiceChange(e.target.value);
+                          }}
+                          className="w-full px-4 py-3 rounded-xl border border-[#202A40] bg-[#080C1E] text-sm text-white focus:outline-none focus:border-[#2563EB] min-h-[44px]"
+                        >
+                          {services.map((s) => (
+                            <option key={s.id} value={s.title} className="bg-[#101525] text-white">
+                              {s.title}
+                            </option>
+                          ))}
+                          <option value="General Collaboration" className="bg-[#101525] text-white">
+                            General Creative / Tech Collaboration
                           </option>
-                        ))}
-                      </select>
+                        </select>
+                      </div>
+
+                      {/* Timeline */}
+                      <div className="space-y-1.5">
+                        <label
+                          htmlFor="timeline"
+                          className="block text-xs font-mono uppercase tracking-wider text-[#CBD5E1]"
+                        >
+                          Desired Timeline
+                        </label>
+                        <select
+                          id="timeline"
+                          value={formData.timeline}
+                          onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
+                          className="w-full px-4 py-3 rounded-xl border border-[#202A40] bg-[#080C1E] text-sm text-white focus:outline-none focus:border-[#2563EB] min-h-[44px]"
+                        >
+                          <option value="Urgent (Under 1 week)" className="bg-[#101525] text-white">
+                            Urgent (Under 1 week)
+                          </option>
+                          <option value="Standard (1-3 weeks)" className="bg-[#101525] text-white">
+                            Standard (1-3 weeks)
+                          </option>
+                          <option value="Flexible (1+ month)" className="bg-[#101525] text-white">
+                            Flexible (1+ month)
+                          </option>
+                        </select>
+                      </div>
                     </div>
 
-                    {/* Timeline */}
-                    <div className="space-y-1.5">
-                      <label
-                        htmlFor="timeline"
-                        className="block text-xs font-mono uppercase tracking-wider text-[#CBD5E1]"
-                      >
-                        Desired Timeline
-                      </label>
-                      <select
-                        id="timeline"
-                        value={formData.timeline}
-                        onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl border border-[#202A40] bg-[#080C1E] text-sm text-white focus:outline-none focus:border-[#2563EB] transition-colors"
-                      >
-                        <option value="Urgent (Within 1 week)" className="bg-[#101525] text-white">
-                          Urgent (Within 1 week)
-                        </option>
-                        <option value="Standard (1-3 weeks)" className="bg-[#101525] text-white">
-                          Standard (1-3 weeks)
-                        </option>
-                        <option value="Long-term partnership" className="bg-[#101525] text-white">
-                          Long-term partnership
-                        </option>
-                      </select>
-                    </div>
-
-                    {/* Message Field */}
+                    {/* Message Area */}
                     <div className="space-y-1.5">
                       <label
                         htmlFor="message"
@@ -389,17 +465,17 @@ export const Contact: React.FC<ContactProps> = ({
                     <button
                       type="submit"
                       disabled={status === "submitting"}
-                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#2563EB] text-white font-semibold text-xs uppercase tracking-wider hover:bg-[#1D4ED8] disabled:opacity-50 transition-all duration-200 font-heading shadow-[0_4px_20px_rgba(37,99,235,0.4)]"
+                      className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#2563EB] text-white font-semibold text-xs uppercase tracking-wider hover:bg-[#1D4ED8] disabled:opacity-50 transition-all duration-200 font-heading shadow-[0_4px_20px_rgba(37,99,235,0.4)] min-h-[44px]"
                     >
                       {status === "submitting" ? (
                         <>
                           <RefreshCw size={14} className="animate-spin" />
-                          <span>Transmitting Inquiry...</span>
+                          <span>Opening Mail Client...</span>
                         </>
                       ) : (
                         <>
                           <Send size={14} />
-                          <span>Submit Project Inquiry</span>
+                          <span>Dispatch Project Inquiry</span>
                         </>
                       )}
                     </button>

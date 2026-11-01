@@ -31,7 +31,12 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) 
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={project.title}
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+      >
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -50,7 +55,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) 
           className="relative w-full max-w-3xl rounded-3xl border border-[#202A40] bg-[#101525] shadow-[0_25px_80px_rgba(5,8,23,0.95)] overflow-hidden z-10 max-h-[90vh] flex flex-col my-auto"
         >
           {/* Header Bar */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[#202A40] bg-[#080C1E] sticky top-0 z-20">
+          <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-[#202A40] bg-[#080C1E] sticky top-0 z-20">
             <div className="flex items-center gap-3">
               <span className="text-[11px] font-mono text-[#93C5FD] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#2563EB]/15 border border-[#2563EB]/30">
                 {project.category}
@@ -64,7 +69,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({ project, onClose }) 
             <button
               onClick={onClose}
               type="button"
-              className="p-1.5 rounded-full text-[#94A3B8] hover:text-white hover:bg-white/10 transition-colors"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
               aria-label="Close project modal"
             >
               <X size={18} />
