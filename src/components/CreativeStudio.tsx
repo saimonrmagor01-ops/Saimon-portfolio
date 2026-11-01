@@ -13,7 +13,7 @@ interface CreativePiece {
   id: string;
   title: string;
   tagline: string;
-  category: "AI Cinema" | "Video Editing" | "Commercial" | "Visual Lab";
+  category: string;
   videoSrc: string;
   aspectRatio: "2.39:1" | "16:9" | "9:16";
   tools: string[];
@@ -22,51 +22,55 @@ interface CreativePiece {
   description: string;
   duration: string;
   highlightTag: string;
+  toolLabel: string;
 }
 
 export const CreativeStudio: React.FC = () => {
   const pieces: CreativePiece[] = [
     {
-      id: "echoes",
-      title: "Echoes of Tomorrow",
-      tagline: "Generative Speculative Cinema & Monologue",
-      category: "AI Cinema",
+      id: "intro",
+      title: "Introduction",
+      tagline: "AI-Generated Personal Introduction",
+      category: "Google Flow",
+      toolLabel: "Google Flow",
       videoSrc: "/videos/intro.mp4",
       aspectRatio: "2.39:1",
-      tools: ["Google Flow", "Adobe Premiere Pro", "Anamorphic Pipeline"],
+      tools: ["Google Flow"],
       themeColor: "#38bdf8",
       gradient: "radial-gradient(ellipse at center, rgba(56, 189, 248, 0.28), rgba(6, 10, 18, 0.98))",
-      description: "Generative AI filmmaking exploring synthetic human narrative in a dark atmospheric studio. Features prompt-architected shot continuity, cinematic key-to-fill ratios, and emotional vocal pacing.",
+      description: "A cinematic introduction presenting who I am, my creative identity, and my vision through AI-generated visuals.",
       duration: "00:10",
-      highlightTag: "FEATURED AI CINEMA",
+      highlightTag: "01 • GOOGLE FLOW",
     },
     {
-      id: "kinetic",
-      title: "Kinetic Velocity Reel",
-      tagline: "High-Retention Timeline & Multi-Track Editing",
-      category: "Video Editing",
+      id: "work",
+      title: "My Work",
+      tagline: "AI-Assisted Creative Showcase",
+      category: "Google Gemini AI",
+      toolLabel: "Google Gemini AI",
       videoSrc: "/videos/work.mp4",
       aspectRatio: "16:9",
-      tools: ["Adobe Premiere Pro", "CapCut", "Audio Mastering"],
-      themeColor: "#c084fc",
-      gradient: "radial-gradient(ellipse at center, rgba(192, 132, 252, 0.28), rgba(16, 7, 24, 0.98))",
-      description: "Hands-on video editing workflow displaying multi-track timeline trimming, color grading, speed ramps, and frame-accurate audio waveform synchronization.",
+      tools: ["Google Gemini AI"],
+      themeColor: "#818cf8",
+      gradient: "radial-gradient(ellipse at center, rgba(129, 140, 248, 0.28), rgba(12, 10, 24, 0.98))",
+      description: "A showcase of my creative work, ideas, and projects developed with the assistance of Google Gemini AI.",
       duration: "00:10",
-      highlightTag: "FEATURED VIDEO EDIT",
+      highlightTag: "02 • GOOGLE GEMINI AI",
     },
     {
-      id: "aura",
-      title: "Digital Studio Workflow",
-      tagline: "Creative Architecture & Visual Production",
-      category: "Commercial",
+      id: "overview",
+      title: "Creative Overview",
+      tagline: "AI-Assisted Video Editing & Storytelling",
+      category: "ChatGPT",
+      toolLabel: "ChatGPT",
       videoSrc: "/videos/vid 3.mp4",
       aspectRatio: "16:9",
-      tools: ["Google Flow", "Adobe Premiere Pro", "Creative Direction"],
-      themeColor: "#fb7185",
-      gradient: "radial-gradient(ellipse at center, rgba(251, 113, 133, 0.25), rgba(20, 8, 12, 0.98))",
-      description: "Professional digital studio execution: generative prompt structuring, model inference, and real-time visual curation for commercial media campaigns.",
+      tools: ["ChatGPT"],
+      themeColor: "#34d399",
+      gradient: "radial-gradient(ellipse at center, rgba(52, 211, 153, 0.25), rgba(6, 18, 14, 0.98))",
+      description: "The final presentation bringing my skills, creative process, and capabilities together through structured storytelling and editing.",
       duration: "00:10",
-      highlightTag: "STUDIO WORKFLOW",
+      highlightTag: "03 • CHATGPT",
     },
   ];
 
@@ -196,7 +200,7 @@ export const CreativeStudio: React.FC = () => {
             </h2>
           </div>
           <p className="max-w-md text-sm sm:text-base text-[#94A3B8] font-normal leading-relaxed">
-            A dedicated showcase for generative cinema, high-retention short-form video editing, and visual storytelling powered by Google Flow, Premiere Pro, and CapCut.
+            A three-stage showcase of AI video generation, creative ideation, and digital storytelling created with Google Flow, Google Gemini AI, and ChatGPT.
           </p>
         </div>
 
@@ -316,7 +320,7 @@ export const CreativeStudio: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[#38BDF8] hidden sm:inline">PIPELINE:</span>
+                      <span className="text-[#38BDF8] hidden sm:inline">TOOL:</span>
                       <span className="truncate max-w-[200px]">{activePiece.tools.join(" • ")}</span>
                     </div>
                   </div>
@@ -345,13 +349,12 @@ export const CreativeStudio: React.FC = () => {
           {/* Piece Selector List */}
           <div className="lg:col-span-4 space-y-3">
             <div className="text-xs font-mono uppercase tracking-widest text-[#64748B] mb-2 flex items-center justify-between">
-              <span>Select Film Piece</span>
-              <span>{pieces.length} Production Pieces</span>
+              <span>Production Pieces</span>
+              <span>{pieces.length} Stages</span>
             </div>
 
-            {pieces.map((piece) => {
+            {pieces.map((piece, idx) => {
               const isSelected = activePiece.id === piece.id;
-              const isVideoEditing = piece.category === "Video Editing";
               return (
                 <button
                   key={piece.id}
@@ -367,16 +370,14 @@ export const CreativeStudio: React.FC = () => {
                 >
                   <div className="flex items-center justify-between">
                     <span
-                      className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded font-bold flex items-center gap-1 ${
+                      className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded font-bold flex items-center gap-1.5 ${
                         isSelected
                           ? "bg-[#2563EB]/25 text-[#93C5FD]"
-                          : isVideoEditing
-                          ? "bg-[#c084fc]/15 text-[#c084fc]"
                           : "bg-[#080C1E] text-[#94A3B8]"
                       }`}
                     >
-                      {isVideoEditing && <Scissors size={10} />}
-                      <span>{piece.category}</span>
+                      <Sparkles size={10} className="text-[#38BDF8]" />
+                      <span>0{idx + 1} • {piece.toolLabel}</span>
                     </span>
                     <span className="text-[11px] font-mono text-[#64748B] flex items-center gap-1">
                       <Play size={10} />
@@ -391,24 +392,39 @@ export const CreativeStudio: React.FC = () => {
               );
             })}
 
-            {/* Creative Process Box */}
+            {/* Production Pipeline Box */}
             <div className="p-5 rounded-xl border border-[#202A40] bg-[#101525] space-y-3 mt-4">
               <div className="text-xs font-mono uppercase tracking-wider text-[#2563EB] flex items-center gap-1.5 font-bold">
                 <Sliders size={12} />
                 <span>Production Pipeline</span>
               </div>
-              <ul className="text-xs text-[#94A3B8] space-y-2">
-                <li className="flex items-start gap-2">
-                  <span className="text-white font-mono font-bold">01.</span>
-                  <span>Concept &amp; Prompt Architecture in Google Flow</span>
+              <ul className="text-xs text-[#94A3B8] space-y-3">
+                <li className="flex items-start gap-2.5">
+                  <span className="text-white font-mono font-bold text-xs mt-0.5">01.</span>
+                  <div>
+                    <span className="text-white font-semibold">Google Flow</span>
+                    <p className="text-[#94A3B8] text-[11px] mt-0.5 leading-snug">
+                      Visual Generation — AI-generated personal introduction and cinematic visuals.
+                    </p>
+                  </div>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-white font-mono font-bold">02.</span>
-                  <span>Timeline Editing &amp; Rhythm Sync in Premiere Pro</span>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-white font-mono font-bold text-xs mt-0.5">02.</span>
+                  <div>
+                    <span className="text-white font-semibold">Google Gemini AI</span>
+                    <p className="text-[#94A3B8] text-[11px] mt-0.5 leading-snug">
+                      Creative Ideation — AI-assisted creative showcase, project concepts, and development.
+                    </p>
+                  </div>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-white font-mono font-bold">03.</span>
-                  <span>Short-form kinetic refinement &amp; captions in CapCut</span>
+                <li className="flex items-start gap-2.5">
+                  <span className="text-white font-mono font-bold text-xs mt-0.5">03.</span>
+                  <div>
+                    <span className="text-white font-semibold">ChatGPT</span>
+                    <p className="text-[#94A3B8] text-[11px] mt-0.5 leading-snug">
+                      Editing &amp; Storytelling — AI-assisted video editing structure, narrative flow, and presentation.
+                    </p>
+                  </div>
                 </li>
               </ul>
             </div>
@@ -420,7 +436,7 @@ export const CreativeStudio: React.FC = () => {
       <ShowreelModal
         isOpen={isShowreelModalOpen}
         onClose={() => setIsShowreelModalOpen(false)}
-        initialVideoId={activePiece.id === "kinetic" ? "video-editing" : activePiece.id === "echoes" ? "ai-cinema" : "creative-workflow"}
+        initialVideoId={activePiece.id}
       />
     </section>
   );

@@ -22,33 +22,33 @@ export interface ShowreelVideo {
 export const SHOWREEL_PLAYLIST: ShowreelVideo[] = [
   {
     id: "intro",
-    title: "01 — INTRODUCTION",
-    category: "Introduction",
+    title: "Introduction",
+    category: "Google Flow",
     src: "/videos/intro.mp4",
-    description: "Introduces Saimon Rana Magar, creative direction, and digital artistry.",
+    description: "A cinematic introduction presenting who I am, my creative identity, and my vision through AI-generated visuals.",
     durationLabel: "00:10",
-    tagline: "Saimon Rana Magar — Introduction",
-    pipeline: ["AI Persona", "Creative Direction", "Visual Storytelling"],
+    tagline: "AI-Generated Personal Introduction",
+    pipeline: ["Google Flow"],
   },
   {
     id: "work",
-    title: "02 — SELECTED WORK",
-    category: "Selected Work",
+    title: "My Work",
+    category: "Google Gemini AI",
     src: "/videos/work.mp4",
-    description: "Curated showcase of creative work, video editing, and dynamic pacing.",
+    description: "A showcase of my creative work, ideas, and projects developed with the assistance of Google Gemini AI.",
     durationLabel: "00:10",
-    tagline: "Creative Work & Project Showcase",
-    pipeline: ["Video Editing", "Cinematography", "Motion Design"],
+    tagline: "AI-Assisted Creative Showcase",
+    pipeline: ["Google Gemini AI"],
   },
   {
     id: "overview",
-    title: "03 — WHAT I DO",
-    category: "Capabilities & Skills",
+    title: "Creative Overview",
+    category: "ChatGPT",
     src: "/videos/vid 3.mp4",
-    description: "Complete overview of skills, services, workflow, and capabilities.",
+    description: "The final presentation bringing my skills, creative process, and capabilities together through structured storytelling and editing.",
     durationLabel: "00:10",
-    tagline: "Skills, Services & Capabilities",
-    pipeline: ["AI Filmmaking", "Full-Stack Dev", "Production Pipeline"],
+    tagline: "AI-Assisted Video Editing & Storytelling",
+    pipeline: ["ChatGPT"],
   },
 ];
 
@@ -319,7 +319,7 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
 
               {/* Big Center Play Trigger (Visible when paused) */}
               {!isPlaying && (
-                <div className="my-auto text-center pointer-events-auto">
+                <div className="my-auto text-center pointer-events-auto px-4">
                   <button
                     onClick={togglePlay}
                     type="button"
@@ -328,12 +328,15 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
                   >
                     <Play size={28} className="translate-x-1" />
                   </button>
-                  <div className="text-sm sm:text-base font-bold text-white tracking-wide font-heading mt-3">
+                  <div className="text-base sm:text-xl font-bold text-white tracking-wide font-heading mt-3">
                     {activeVideo.title}
                   </div>
-                  <div className="text-xs font-mono text-[#94A3B8] mt-1">
+                  <div className="text-xs sm:text-sm font-medium text-[#93C5FD] mt-0.5">
                     {activeVideo.tagline}
                   </div>
+                  <p className="text-xs text-[#CBD5E1]/90 max-w-lg mx-auto mt-2 leading-relaxed drop-shadow">
+                    {activeVideo.description}
+                  </p>
                 </div>
               )}
 
