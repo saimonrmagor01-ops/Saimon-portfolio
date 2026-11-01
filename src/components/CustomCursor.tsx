@@ -36,11 +36,18 @@ export const CustomCursor: React.FC = () => {
       const target = e.target as HTMLElement | null;
       if (!target) return;
 
-      const projectCard = target.closest(".project-card") || target.closest(".cinema-viewport-card") || target.closest("article");
+      const isServiceCard = Boolean(target.closest(".service-card"));
+      const projectCard = !isServiceCard && (target.closest(".project-card") || target.closest(".cinema-viewport-card") || target.closest("article"));
       const button = target.closest("button") || target.closest(".btn-main") || target.closest(".btn-secondary");
       const link = target.closest("a") || target.closest("select") || target.closest("input");
 
-      if (projectCard) {
+      if (isServiceCard) {
+        if (button || link) {
+          setHoverState("button");
+        } else {
+          setHoverState("link");
+        }
+      } else if (projectCard) {
         setHoverState("card");
       } else if (button) {
         setHoverState("button");

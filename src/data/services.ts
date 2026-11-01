@@ -7,6 +7,8 @@ export interface Service {
   deliverables: string[];
   tools: string[];
   inquiryCode: string;
+  relatedProjectId?: string;
+  keyOutcome?: string;
 }
 
 export const services: Service[] = [
@@ -24,6 +26,8 @@ export const services: Service[] = [
     ],
     tools: ["Google Flow", "Generative Pipelines", "Premiere Pro"],
     inquiryCode: "AI Video Production",
+    relatedProjectId: "flow-motion-ads",
+    keyOutcome: "Cinematic commercial and artistic video sequences built with multimodal generative pipelines.",
   },
   {
     id: "cinematic-ai-filmmaking",
@@ -39,6 +43,8 @@ export const services: Service[] = [
     ],
     tools: ["Google Flow", "Premiere Pro", "Sound Curation"],
     inquiryCode: "Cinematic AI Filmmaking",
+    relatedProjectId: "aether-chronicles",
+    keyOutcome: "Long-form and short-form speculative cinema with shot continuity and custom sound architecture.",
   },
   {
     id: "short-form-video-editing",
@@ -54,6 +60,8 @@ export const services: Service[] = [
     ],
     tools: ["Adobe Premiere Pro", "CapCut"],
     inquiryCode: "Short-form Video Editing",
+    relatedProjectId: "pulse-edits",
+    keyOutcome: "High-retention 9:16 vertical motion content engineered for maximum social viewer hold rate.",
   },
   {
     id: "social-media-content",
@@ -69,6 +77,8 @@ export const services: Service[] = [
     ],
     tools: ["Premiere Pro", "CapCut", "Digital Strategy"],
     inquiryCode: "Social Media Content Production",
+    relatedProjectId: "pulse-edits",
+    keyOutcome: "Multi-platform serialized video cutdowns preserving brand tone across Instagram, YouTube, and TikTok.",
   },
   {
     id: "website-development",
@@ -84,6 +94,8 @@ export const services: Service[] = [
     ],
     tools: ["Next.js", "TypeScript", "Tailwind CSS", "JavaScript"],
     inquiryCode: "Website Development",
+    relatedProjectId: "budgetmandu",
+    keyOutcome: "Fast, responsive web applications engineered with Next.js, accessible markup, and smooth UX.",
   },
   {
     id: "discord-bot-development",
@@ -99,6 +111,8 @@ export const services: Service[] = [
     ],
     tools: ["Python", "discord.py", "REST APIs"],
     inquiryCode: "Discord Bot Development",
+    relatedProjectId: "sentinel-bot",
+    keyOutcome: "Asynchronous Python bot architecture with modular cogs, slash commands, and server moderation.",
   },
   {
     id: "digital-automation",
@@ -114,5 +128,7 @@ export const services: Service[] = [
     ],
     tools: ["Python", "Webhooks", "Workflow Logic"],
     inquiryCode: "Digital Automation",
+    relatedProjectId: "sentinel-bot",
+    keyOutcome: "Streamlined data flow and automated tasks linking APIs, webhooks, and Python scripts.",
   },
 ];
