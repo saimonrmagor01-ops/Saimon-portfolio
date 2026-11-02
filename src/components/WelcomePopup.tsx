@@ -6,38 +6,28 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, Sparkles } from "lucide-react";
 import { SOCIAL_LINKS } from "@/data/socials";
 
-// Module-level lifecycle flag: ensures the popup only displays once per fresh visit/reload
-// and NEVER re-triggers during internal navigation, re-renders, or section hopping.
 let hasDismissedInCurrentVisit = false;
 
 export const WelcomePopup: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [placeholderNotice, setPlaceholderNotice] = useState<string | null>(null);
 
   useEffect(() => {
-    // 1. Clean up outdated permanent flags from previous builds
     try {
       localStorage.removeItem("saimon_welcome_shown");
       localStorage.removeItem("saimon_popup_closed");
-      localStorage.removeItem("saimon_welcome_dismissed");
       sessionStorage.removeItem("saimon_welcome_shown");
-    } catch {
-      // Safe fallback if storage is restricted
-    }
+    } catch {}
 
-    // 2. Only show if not already dismissed in this visit
     if (hasDismissedInCurrentVisit) {
       return;
     }
 
-    // Smooth entrance timer (allows initial DOM & font paint)
     const timer = setTimeout(() => {
       if (!hasDismissedInCurrentVisit) {
         setIsOpen(true);
       }
-    }, 600);
+    }, 700);
 
-    // ESC key listener for accessibility
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         handleClose();
@@ -58,20 +48,10 @@ export const WelcomePopup: React.FC = () => {
 
   const handleExplore = () => {
     handleClose();
-    // Smooth scroll to the hero or about section
     const target = document.getElementById("about") || document.getElementById("home");
     if (target) {
       target.scrollIntoView({ behavior: "smooth" });
     }
-  };
-
-  const handleSocialClick = (platform: string, url: string) => {
-    if (url.startsWith("[ADD_")) {
-      setPlaceholderNotice(`${platform} link is configured in src/data/socials.ts`);
-      setTimeout(() => setPlaceholderNotice(null), 3500);
-      return;
-    }
-    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -95,40 +75,30 @@ export const WelcomePopup: React.FC = () => {
 
           {/* Modal Container */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            initial={{ opacity: 0, scale: 0.94, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: 15 }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-lg rounded-3xl bg-[#101525] border border-[#202A40] p-6 sm:p-8 shadow-[0_25px_80px_rgba(5,8,23,0.95)] z-10 overflow-y-auto max-h-[90vh] text-center"
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-lg rounded-3xl bg-[#0D1224] border border-[#1C2438] p-6 sm:p-8 shadow-2xl z-10 overflow-y-auto max-h-[90vh] text-center"
           >
-            {/* Cinematic Radial Ambient Glow */}
-            <div
-              className="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full radial-glow-blue opacity-80 blur-3xl pointer-events-none"
-              aria-hidden="true"
-            />
-            <div
-              className="absolute -bottom-24 -right-24 w-60 h-60 rounded-full radial-glow-subtle opacity-50 blur-3xl pointer-events-none"
-              aria-hidden="true"
-            />
-
             {/* Close Button */}
             <button
               onClick={handleClose}
               type="button"
-              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 rounded-full bg-[#080C1E] border border-[#202A40] text-[#94A3B8] hover:text-white hover:border-[#2563EB] flex items-center justify-center transition-colors"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 w-9 h-9 rounded-full bg-[#070B18] border border-[#1C2438] text-[#94A3B8] hover:text-white hover:border-[#2563EB] flex items-center justify-center transition-colors"
               aria-label="Close welcome popup"
             >
               <X size={16} />
             </button>
 
-            {/* Badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#080C1E] border border-[#202A40] text-[11px] font-mono text-[#2563EB] tracking-wider uppercase mb-5">
-              <Sparkles size={12} className="text-[#2563EB]" />
-              <span>WELCOME TO MY CREATIVE SPACE</span>
+            {/* Top Eyebrow */}
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#070B18] border border-[#1C2438] text-[11px] font-mono text-[#38BDF8] tracking-wider uppercase mb-5">
+              <Sparkles size={12} className="text-[#38BDF8]" />
+              <span>Personal Creative Portfolio</span>
             </div>
 
             {/* Portrait Frame */}
-            <div className="relative w-28 h-28 sm:w-32 sm:h-32 mx-auto rounded-2xl bg-[#080C1E] border border-[#202A40] p-1.5 shadow-2xl mb-4 group">
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 mx-auto rounded-2xl bg-[#070B18] border border-[#1C2438] p-1.5 shadow-xl mb-4 group">
               <div className="relative w-full h-full rounded-xl overflow-hidden bg-[#050817] flex items-center justify-center">
                 <Image
                   src="/saimon-avatar.png"
@@ -139,44 +109,27 @@ export const WelcomePopup: React.FC = () => {
                   className="w-full h-full object-cover select-none transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
-
-              {/* Viewfinder corner accents */}
-              <div className="absolute top-1.5 left-1.5 w-2.5 h-2.5 border-t border-l border-[#2563EB]" />
-              <div className="absolute top-1.5 right-1.5 w-2.5 h-2.5 border-t border-r border-[#2563EB]" />
-              <div className="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 border-b border-l border-[#2563EB]" />
-              <div className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 border-b border-r border-[#2563EB]" />
             </div>
 
-            {/* Personal Identity */}
+            {/* Personal Greeting */}
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-heading tracking-tight">
               Saimon Rana Magar
             </h2>
-            <div className="text-sm sm:text-base font-semibold text-[#2563EB] tracking-wide mt-1">
-              Digital Creator &amp; Developer
+            <div className="text-sm font-semibold text-[#38BDF8] mt-0.5">
+              Digital Creator, AI Filmmaker &amp; Web Developer
             </div>
             <p className="text-xs sm:text-sm text-[#94A3B8] max-w-sm mx-auto mt-2 leading-relaxed">
-              AI Filmmaking, Creative Content Production &amp; Web Technology. Based in Nepal.
+              Based in Kathmandu, Nepal. Welcome to my creative portfolio exploring AI cinema, video editing, and modern web applications.
             </p>
 
-            {/* Social Link Notice if unconfigured */}
-            {placeholderNotice && (
-              <motion.div
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="my-3 py-1.5 px-3 rounded-lg bg-[#2563EB]/10 border border-[#2563EB]/30 text-xs font-mono text-[#93C5FD]"
-              >
-                {placeholderNotice}
-              </motion.div>
-            )}
-
-            {/* Three Direct Contact Buttons */}
+            {/* Direct Channels */}
             <div className="grid grid-cols-3 gap-2.5 my-6">
-              {/* WhatsApp */}
-              <button
-                type="button"
-                onClick={() => handleSocialClick("WhatsApp", SOCIAL_LINKS.WHATSAPP_URL)}
-                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#080C1E] border border-[#202A40] text-[#94A3B8] hover:text-[#25D366] hover:border-[#25D366]/40 hover:bg-[#25D366]/10 transition-all group"
-                title="Direct message on WhatsApp"
+              <a
+                href={SOCIAL_LINKS.WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#070B18] border border-[#1C2438] text-[#94A3B8] hover:text-[#25D366] hover:border-[#25D366]/40 transition-all group"
+                title="Message on WhatsApp"
               >
                 <div className="w-8 h-8 rounded-lg bg-[#25D366]/10 text-[#25D366] flex items-center justify-center transition-transform group-hover:scale-110">
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -184,14 +137,14 @@ export const WelcomePopup: React.FC = () => {
                   </svg>
                 </div>
                 <span className="text-xs font-semibold">WhatsApp</span>
-              </button>
+              </a>
 
-              {/* Instagram */}
-              <button
-                type="button"
-                onClick={() => handleSocialClick("Instagram", SOCIAL_LINKS.INSTAGRAM_URL)}
-                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#080C1E] border border-[#202A40] text-[#94A3B8] hover:text-[#E4405F] hover:border-[#E4405F]/40 hover:bg-[#E4405F]/10 transition-all group"
-                title="Connect on Instagram"
+              <a
+                href={SOCIAL_LINKS.INSTAGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#070B18] border border-[#1C2438] text-[#94A3B8] hover:text-[#E4405F] hover:border-[#E4405F]/40 transition-all group"
+                title="Message on Instagram"
               >
                 <div className="w-8 h-8 rounded-lg bg-[#E4405F]/10 text-[#E4405F] flex items-center justify-center transition-transform group-hover:scale-110">
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -199,14 +152,14 @@ export const WelcomePopup: React.FC = () => {
                   </svg>
                 </div>
                 <span className="text-xs font-semibold">Instagram</span>
-              </button>
+              </a>
 
-              {/* Discord */}
-              <button
-                type="button"
-                onClick={() => handleSocialClick("Discord", SOCIAL_LINKS.DISCORD_URL)}
-                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#080C1E] border border-[#202A40] text-[#94A3B8] hover:text-[#5865F2] hover:border-[#5865F2]/40 hover:bg-[#5865F2]/10 transition-all group"
-                title="Join on Discord"
+              <a
+                href={SOCIAL_LINKS.DISCORD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl bg-[#070B18] border border-[#1C2438] text-[#94A3B8] hover:text-[#5865F2] hover:border-[#5865F2]/40 transition-all group"
+                title="Connect on Discord"
               >
                 <div className="w-8 h-8 rounded-lg bg-[#5865F2]/10 text-[#5865F2] flex items-center justify-center transition-transform group-hover:scale-110">
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -214,17 +167,17 @@ export const WelcomePopup: React.FC = () => {
                   </svg>
                 </div>
                 <span className="text-xs font-semibold">Discord</span>
-              </button>
+              </a>
             </div>
 
-            {/* Explore Portfolio Action Button */}
+            {/* Explore Button */}
             <button
               onClick={handleExplore}
               type="button"
-              className="w-full py-3.5 px-6 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-[0_4px_25px_rgba(37,99,235,0.4)] hover:shadow-[0_4px_30px_rgba(37,99,235,0.6)] group"
+              className="w-full py-3.5 px-6 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-md font-heading"
             >
-              <span>Explore Portfolio</span>
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              <span>Explore Selected Work</span>
+              <ArrowRight size={16} />
             </button>
           </motion.div>
         </div>

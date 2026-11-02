@@ -20,19 +20,12 @@ export interface DirectContactConfig {
   };
 }
 
-/**
- * DIRECT CONTACT CONFIGURATION
- * 
- * Supply your genuine links/handles below.
- * Leave as empty string "" or "[ADD_...]" until provided.
- * The UI automatically verifies configuration and will never publish broken placeholder links.
- */
 export const DIRECT_CONTACT_CONFIG: DirectContactConfig = {
   instagram: {
     handle: "@shymoneyyyyyy",
     url: "https://www.instagram.com/shymoneyyyyyy?exln=ZWkyazFmZ2QzdnI5",
-    cta: "Message me on Instagram",
-    description: "Direct messaging for creative collaborations, video direction, and visual inquiries.",
+    cta: "Message on Instagram",
+    description: "Direct messaging for filmmaking experiments, video direction, and creative collaborations.",
     color: "#E4405F",
     accentBg: "rgba(228, 64, 95, 0.12)",
     borderHover: "rgba(228, 64, 95, 0.5)",
@@ -40,8 +33,8 @@ export const DIRECT_CONTACT_CONFIG: DirectContactConfig = {
   whatsapp: {
     handle: "+977 9869113247",
     url: "https://wa.me/9779869113247",
-    cta: "Let’s discuss your project",
-    description: "Instant chat and voice messaging for rapid project discussions and timeline estimates.",
+    cta: "Chat on WhatsApp",
+    description: "Direct chat for quick questions, project discussions, and availability.",
     color: "#25D366",
     accentBg: "rgba(37, 211, 102, 0.12)",
     borderHover: "rgba(37, 211, 102, 0.5)",
@@ -50,8 +43,8 @@ export const DIRECT_CONTACT_CONFIG: DirectContactConfig = {
     username: "1385452498931945627",
     handle: "1385452498931945627",
     url: "https://discordapp.com/users/1385452498931945627",
-    cta: "Connect with me on Discord",
-    description: "Real-time communication for bot development, web engineering, and asset reviews.",
+    cta: "Connect on Discord",
+    description: "Real-time chat for bot development, web projects, and technical discussions.",
     color: "#5865F2",
     accentBg: "rgba(88, 101, 242, 0.12)",
     borderHover: "rgba(88, 101, 242, 0.5)",
@@ -59,8 +52,8 @@ export const DIRECT_CONTACT_CONFIG: DirectContactConfig = {
   meta: {
     location: "Kathmandu, Nepal",
     timezone: "Asia/Kathmandu (NPT, GMT+5:45)",
-    responseTime: "Within 24 Hours",
-    availability: "Available for select freelance & commissions",
+    responseTime: "Usually within 24 hours",
+    availability: "Available for select freelance & creative projects",
   },
 };
 

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,15 +6,15 @@
 
 :root {
   --bg: #050817;
-  --panel: #101525;
-  --panel-elevated: #161d33;
-  --panel-card: #101525;
-  --border: #202a40;
-  --border-light: #2b3752;
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --accent: #2563eb;
-  --accent-glow: rgba(37, 99, 235, 0.25);
+  --panel: #0D1224;
+  --panel-elevated: #131930;
+  --panel-card: #0D1224;
+  --border: #1C2438;
+  --border-light: #25314D;
+  --text: #F5F7FF;
+  --muted: #94A3B8;
+  --accent: #2563EB;
+  --accent-glow: rgba(37, 99, 235, 0.2);
 }
 
 @layer base {
@@ -45,6 +45,7 @@
 
   h1, h2, h3, h4 {
     font-family: 'Space Grotesk', -apple-system, sans-serif;
+    letter-spacing: -0.03em;
   }
 
   ::selection {
@@ -61,7 +62,7 @@
     background: #050817;
   }
   ::-webkit-scrollbar-thumb {
-    background: #202a40;
+    background: #1C2438;
     border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
@@ -82,25 +83,12 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* Grid background accent */
+/* Subtle Editorial Grid */
 .editorial-grid {
-  background-size: 64px 64px;
+  background-size: 80px 80px;
   background-image: 
-    linear-gradient(to right, rgba(32, 42, 64, 0.25) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(32, 42, 64, 0.25) 1px, transparent 1px);
-}
-
-/* White sticker outline effect for the profile portrait */
-.sticker-outline {
-  filter: drop-shadow(0 0 1px #ffffff) drop-shadow(0 0 2px #ffffff) drop-shadow(0 0 18px rgba(37, 99, 235, 0.45));
-}
-
-/* Glassmorphism panel with navy tint */
-.glass-panel {
-  background: rgba(16, 21, 37, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid #202a40;
+    linear-gradient(to right, rgba(28, 36, 56, 0.35) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(28, 36, 56, 0.35) 1px, transparent 1px);
 }
 
 /* Focus-visible ring */
@@ -113,25 +101,24 @@ select:focus-visible {
   outline-offset: 3px;
 }
 
-/* Radial ambient glows */
+/* Radial ambient lighting */
 .radial-glow-blue {
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.22) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, transparent 70%);
 }
 
 .radial-glow-subtle {
-  background: radial-gradient(circle, rgba(32, 42, 64, 0.35) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(28, 36, 56, 0.4) 0%, transparent 70%);
 }
 
-/* Card hover glow */
-.navy-card {
-  background-color: #101525;
-  border: 1px solid #202a40;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+/* Refined Editorial Surface */
+.editorial-card {
+  background-color: #0D1224;
+  border: 1px solid #1C2438;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
 }
 
-.navy-card:hover {
-  border-color: #2563eb;
-  box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.25);
+.editorial-card:hover {
+  border-color: #2563EB;
 }
 
 /* Reduced motion accessibility */

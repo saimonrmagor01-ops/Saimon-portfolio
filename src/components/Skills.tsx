@@ -1,208 +1,12 @@
 "use client";
 
-import React, { useState, useRef, useEffect, MouseEvent } from "react";
-import { motion, AnimatePresence, useSpring } from "framer-motion";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Film, Scissors, Sparkles, Code2, Bot, Wrench, CheckCircle2, 
-  ArrowUpRight, X, ExternalLink, Layers, Terminal 
+  Film, Scissors, Code2, Bot, Wrench, 
+  ArrowUpRight, X, Terminal, ChevronRight 
 } from "lucide-react";
 import { skillCategories, SkillCategory, SkillItem } from "@/data/skills";
-
-// 3D Layered Perspective Skill Card Component
-interface LayeredSkillCardProps {
-  category: SkillCategory;
-  catIndex: number;
-  activeSkillName: string | null;
-  onSelectSkill: (skill: SkillItem, categoryTitle: string, triggerEl: HTMLElement) => void;
-}
-
-const LayeredSkillCard: React.FC<LayeredSkillCardProps> = ({
-  category,
-  catIndex,
-  activeSkillName,
-  onSelectSkill,
-}) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [glare, setGlare] = useState({ x: 50, y: 50, opacity: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-
-  // Controlled springs limited to ~5-6 degrees max tilt for refined studio feel
-  const rotateX = useSpring(0, { damping: 24, stiffness: 260, mass: 0.3 });
-  const rotateY = useSpring(0, { damping: 24, stiffness: 260, mass: 0.3 });
-  const translateY = useSpring(0, { damping: 24, stiffness: 260, mass: 0.3 });
-
-  const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    // Check for touch / reduced motion
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
-
-    // Max tilt ~5.5 degrees
-    const maxTilt = 5.5;
-    const rX = (0.5 - y) * (maxTilt * 2);
-    const rY = (x - 0.5) * (maxTilt * 2);
-
-    rotateX.set(rX);
-    rotateY.set(rY);
-    translateY.set(-4); // subtle 4px lift
-
-    setGlare({
-      x: x * 100,
-      y: y * 100,
-      opacity: 0.28,
-    });
-  };
-
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    rotateX.set(0);
-    rotateY.set(0);
-    translateY.set(0);
-    setGlare((prev) => ({ ...prev, opacity: 0 }));
-  };
-
-  const getCategoryIcon = (id: string) => {
-    switch (id) {
-      case "creative":
-        return Film;
-      case "editing":
-        return Scissors;
-      case "ai":
-        return Sparkles;
-      case "development":
-        return Code2;
-      case "other":
-      default:
-        return Bot;
-    }
-  };
-
-  const getCategoryShortTitle = (id: string, fallback: string) => {
-    switch (id) {
-      case "development":
-        return "Frontend & Web";
-      case "ai":
-        return "Generative AI";
-      case "creative":
-        return "AI Filmmaking";
-      case "editing":
-        return "Video & Post";
-      case "other":
-        return "Bots & Automation";
-      default:
-        return fallback;
-    }
-  };
-
-  const Icon = getCategoryIcon(category.id);
-  const shortTitle = getCategoryShortTitle(category.id, category.title);
-
-  return (
-    <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      style={{ perspective: 1000 }}
-      className="h-full relative rounded-2xl"
-    >
-      <motion.div
-        style={{
-          rotateX,
-          rotateY,
-          y: translateY,
-          transformStyle: "preserve-3d",
-        }}
-        className={`h-full p-5 rounded-2xl border transition-colors duration-200 bg-[#101525] flex flex-col justify-between relative overflow-hidden group select-none ${
-          isHovered
-            ? "border-[#2563EB]/80 bg-[#12192d] shadow-[0_20px_50px_rgba(37,99,235,0.22)]"
-            : "border-[#202A40] shadow-md"
-        }`}
-      >
-        {/* Soft Blue Pointer-Following Highlight Layer */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none transition-opacity duration-300 z-10 rounded-2xl"
-          style={{
-            opacity: glare.opacity,
-            background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(37, 99, 235, 0.32) 0%, rgba(56, 189, 248, 0.12) 35%, transparent 70%)`,
-          }}
-        />
-
-        {/* Card Content with 3D Depth Layering */}
-        <div style={{ transformStyle: "preserve-3d" }}>
-          {/* Header Row with Elevated Icon and Title (translateZ) */}
-          <div
-            className="flex items-center gap-3 mb-5 pb-4 border-b border-[#202A40]"
-            style={{ transform: "translateZ(18px)" }}
-          >
-            {/* Elevated Icon Box */}
-            <div
-              style={{ transform: "translateZ(14px)" }}
-              className="w-10 h-10 rounded-xl bg-[#080C1E] border border-[#202A40] text-[#2563EB] flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 group-hover:border-[#2563EB] shadow-sm"
-            >
-              <Icon size={18} />
-            </div>
-
-            {/* Elevated Heading Layer */}
-            <div style={{ transform: "translateZ(10px)" }}>
-              <h3 className="text-sm font-bold text-white font-heading group-hover:text-[#2563EB] transition-colors">
-                {shortTitle}
-              </h3>
-              <span className="text-[10px] font-mono text-[#64748B] uppercase tracking-wider block">
-                CAT / 0{catIndex + 1}
-              </span>
-            </div>
-          </div>
-
-          {/* Bullet Points List with Tap/Click Interaction */}
-          <ul className="space-y-2.5 relative z-20">
-            {category.skills.map((skill, sIdx) => {
-              const isSelected = activeSkillName === skill.name;
-              return (
-                <li key={sIdx}>
-                  <button
-                    type="button"
-                    onClick={(e) => onSelectSkill(skill, shortTitle, e.currentTarget)}
-                    className={`w-full text-left flex items-start gap-2 text-xs leading-snug p-1.5 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#2563EB] ${
-                      isSelected
-                        ? "bg-[#2563EB]/20 text-white border border-[#2563EB]/50"
-                        : "text-[#94A3B8] hover:bg-white/[0.04] hover:text-white"
-                    }`}
-                    title={`Click to view how I apply ${skill.name}`}
-                    aria-label={`Explore details for skill: ${skill.name}`}
-                  >
-                    <span className="text-[#2563EB] font-bold select-none text-sm leading-none mt-0.5">•</span>
-                    <div className="flex-1 flex items-center justify-between gap-1">
-                      <span className="font-medium">{skill.name}</span>
-                      <ArrowUpRight size={11} className="opacity-0 group-hover:opacity-60 transition-opacity shrink-0" />
-                    </div>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-
-        {/* Footer Meta Row */}
-        <div
-          style={{ transform: "translateZ(12px)" }}
-          className="pt-4 mt-5 border-t border-[#202A40] text-[10px] font-mono text-[#64748B] flex items-center justify-between relative z-20"
-        >
-          <span>VERIFIED TOOLKIT</span>
-          <span className="text-[#38BDF8] font-medium">{category.skills.length} TOOLS</span>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
 
 export const Skills: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
@@ -211,16 +15,15 @@ export const Skills: React.FC = () => {
     categoryTitle: string;
   } | null>(null);
 
-  const originatingTriggerRef = useRef<HTMLElement | null>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const detailPanelRef = useRef<HTMLDivElement>(null);
 
   const filterTabs = [
-    { id: "all", label: "All Disciplines" },
-    { id: "creative", label: "AI Cinema" },
-    { id: "editing", label: "Post-Production" },
-    { id: "ai", label: "Generative AI" },
-    { id: "development", label: "Web Engineering" },
-    { id: "other", label: "Automation" },
+    { id: "all", label: "All Skills" },
+    { id: "ai-filmmaking", label: "AI Filmmaking" },
+    { id: "video-editing", label: "Video Editing" },
+    { id: "web-dev", label: "Web Development" },
+    { id: "python-automation", label: "Python & Automation" },
+    { id: "creative-tools", label: "Creative Tools" },
   ];
 
   const filteredCategories =
@@ -228,24 +31,34 @@ export const Skills: React.FC = () => {
       ? skillCategories
       : skillCategories.filter((c) => c.id === selectedFilter);
 
-  const handleSelectSkill = (skill: SkillItem, categoryTitle: string, triggerEl: HTMLElement) => {
-    originatingTriggerRef.current = triggerEl;
+  const getCategoryIcon = (id: string) => {
+    switch (id) {
+      case "ai-filmmaking":
+        return Film;
+      case "video-editing":
+        return Scissors;
+      case "web-dev":
+        return Code2;
+      case "python-automation":
+        return Bot;
+      case "creative-tools":
+      default:
+        return Wrench;
+    }
+  };
+
+  const handleSelectSkill = (skill: SkillItem, categoryTitle: string) => {
     setActiveSkill({ skill, categoryTitle });
-  };
-
-  const handleClosePanel = () => {
-    setActiveSkill(null);
-    // Restore keyboard focus to the originating skill button
     setTimeout(() => {
-      originatingTriggerRef.current?.focus();
-    }, 50);
+      detailPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 100);
   };
 
-  // Keyboard Escape listener
+  // Close on Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && activeSkill) {
-        handleClosePanel();
+        setActiveSkill(null);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -253,26 +66,27 @@ export const Skills: React.FC = () => {
   }, [activeSkill]);
 
   return (
-    <section id="skills" className="py-24 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817]">
-      <div className="max-w-7xl mx-auto">
+    <section id="skills" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-[#1C2438] relative bg-[#050817]">
+      <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#101525] border border-[#202A40] text-xs font-medium text-[#2563EB] mb-4 shadow-sm">
-            <Wrench size={12} className="text-[#2563EB]" />
-            <span>SKILLS &amp; EXPERTISE</span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-8 border-b border-[#1C2438]">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D1224] border border-[#1C2438] text-xs font-medium text-[#2563EB] mb-3">
+              <Wrench size={12} />
+              <span>05 / SKILLS &amp; EXPERTISE</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
+              Practical Skills &amp; <br />
+              <span className="text-[#94A3B8] font-normal font-serif italic">Creative Tools.</span>
+            </h2>
           </div>
-
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white font-heading">
-            Skills &amp; Expertise
-          </h2>
-
-          <p className="text-sm sm:text-base text-[#94A3B8] mt-3 leading-relaxed">
-            Technologies and tools I use to build scalable web applications, automation bots and cinematic workflows.
+          <p className="max-w-md text-sm sm:text-base text-[#94A3B8] font-normal leading-relaxed">
+            The creative tools, programming frameworks, and video production software I use across real projects.
           </p>
         </div>
 
-        {/* Interactive Capability Filter Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-12">
+        {/* Filter Pills */}
+        <div className="flex flex-wrap items-center gap-2 mb-10">
           {filterTabs.map((tab) => {
             const isActive = selectedFilter === tab.id;
             return (
@@ -282,8 +96,8 @@ export const Skills: React.FC = () => {
                 type="button"
                 className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all duration-200 min-h-[36px] ${
                   isActive
-                    ? "bg-[#2563EB] text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] border border-[#2563EB]"
-                    : "bg-[#101525] text-[#94A3B8] border border-[#202A40] hover:border-[#2563EB]/60 hover:text-white"
+                    ? "bg-[#2563EB] text-white font-medium shadow-md border border-[#2563EB]"
+                    : "bg-[#0D1224] text-[#94A3B8] border border-[#1C2438] hover:border-[#2563EB]/60 hover:text-white"
                 }`}
               >
                 {tab.label}
@@ -292,57 +106,92 @@ export const Skills: React.FC = () => {
           })}
         </div>
 
-        {/* 5-Column Grid with AnimatePresence & Layout Transitions */}
-        <motion.div
-          layout
-          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className={`grid gap-4 lg:gap-5 items-stretch transition-all ${
+        {/* Categories Grid */}
+        <div
+          className={`grid gap-6 items-stretch ${
             filteredCategories.length === 1
               ? "grid-cols-1 max-w-xl mx-auto"
-              : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5"
+              : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
           }`}
         >
-          <AnimatePresence mode="popLayout">
-            {filteredCategories.map((category, catIdx) => (
-              <motion.div
+          {filteredCategories.map((category, catIdx) => {
+            const Icon = getCategoryIcon(category.id);
+            return (
+              <div
                 key={category.id}
-                layout
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ duration: 0.3, delay: catIdx * 0.04 }}
-                className="h-full"
+                className="p-6 rounded-2xl border border-[#1C2438] bg-[#0D1224] hover:border-[#2563EB]/70 transition-all duration-300 flex flex-col justify-between shadow-lg"
               >
-                <LayeredSkillCard
-                  category={category}
-                  catIndex={catIdx}
-                  activeSkillName={activeSkill?.skill.name ?? null}
-                  onSelectSkill={handleSelectSkill}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
+                <div>
+                  {/* Category Header */}
+                  <div className="flex items-center gap-3 mb-4 pb-4 border-b border-[#1C2438]">
+                    <div className="w-10 h-10 rounded-xl bg-[#070B18] border border-[#1C2438] text-[#2563EB] flex items-center justify-center shrink-0">
+                      <Icon size={18} />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white font-heading">
+                        {category.title}
+                      </h3>
+                      <span className="text-[10px] font-mono text-[#94A3B8] uppercase tracking-wider block">
+                        Category 0{catIdx + 1}
+                      </span>
+                    </div>
+                  </div>
 
-        {/* Expanded Skill Detail Panel (Appears smoothly below grid while keeping layout stable) */}
+                  <p className="text-xs text-[#94A3B8] mb-5 leading-relaxed">
+                    {category.subtitle}
+                  </p>
+
+                  {/* Skills List */}
+                  <ul className="space-y-2">
+                    {category.skills.map((skill, sIdx) => {
+                      const isSelected = activeSkill?.skill.name === skill.name;
+                      return (
+                        <li key={sIdx}>
+                          <button
+                            type="button"
+                            onClick={() => handleSelectSkill(skill, category.title)}
+                            className={`w-full text-left p-2.5 rounded-xl text-xs transition-all flex items-center justify-between gap-2 group ${
+                              isSelected
+                                ? "bg-[#2563EB]/20 text-white border border-[#2563EB]/50"
+                                : "text-[#CBD5E1] bg-[#070B18] border border-[#1C2438] hover:border-[#2563EB]/50 hover:text-white"
+                            }`}
+                            aria-label={`View implementation details for ${skill.name}`}
+                          >
+                            <span className="font-medium truncate">{skill.name}</span>
+                            <ChevronRight
+                              size={13}
+                              className={`shrink-0 transition-transform ${
+                                isSelected ? "text-[#38BDF8] rotate-90" : "text-[#64748B] group-hover:text-white group-hover:translate-x-0.5"
+                              }`}
+                            />
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+
+                <div className="pt-4 mt-5 border-t border-[#1C2438] text-[10px] font-mono text-[#94A3B8] flex items-center justify-between">
+                  <span>Production Ready</span>
+                  <span className="text-[#38BDF8]">{category.skills.length} Capabilities</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Selected Skill Detail Callout */}
         <AnimatePresence>
           {activeSkill && (
             <motion.div
-              ref={panelRef}
+              ref={detailPanelRef}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 12 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-8 max-w-3xl mx-auto p-5 sm:p-7 rounded-2xl border border-[#2563EB]/50 bg-[#101525] shadow-[0_18px_50px_rgba(37,99,235,0.22)] relative overflow-hidden"
+              transition={{ duration: 0.25 }}
+              className="mt-8 p-6 sm:p-7 rounded-2xl border border-[#2563EB]/50 bg-[#0D1224] shadow-2xl relative overflow-hidden"
             >
-              {/* Radial subtle ambient lighting */}
-              <div
-                className="absolute -top-20 -right-20 w-52 h-52 rounded-full pointer-events-none radial-glow-blue opacity-50 blur-3xl"
-                aria-hidden="true"
-              />
-
-              {/* Panel Top Meta & Close Button */}
-              <div className="flex items-center justify-between pb-4 border-b border-[#202A40]">
+              <div className="flex items-center justify-between pb-4 border-b border-[#1C2438]">
                 <div className="flex items-center gap-2 text-xs font-mono">
                   <span className="px-2.5 py-0.5 rounded-full bg-[#2563EB]/15 border border-[#2563EB]/30 text-[#38BDF8] font-bold">
                     {activeSkill.categoryTitle}
@@ -352,17 +201,16 @@ export const Skills: React.FC = () => {
                 </div>
 
                 <button
-                  onClick={handleClosePanel}
+                  onClick={() => setActiveSkill(null)}
                   type="button"
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-white/10 border border-[#202A40] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#2563EB]"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-white hover:bg-white/10 transition-colors"
                   aria-label="Close skill details"
                 >
                   <X size={15} />
                 </button>
               </div>
 
-              {/* Panel Body: Genuine Application Explanation */}
-              <div className="py-4 space-y-3">
+              <div className="py-4 space-y-2">
                 <div className="text-xs font-mono uppercase tracking-wider text-[#2563EB] flex items-center gap-1.5 font-bold">
                   <Terminal size={13} />
                   <span>Practical Implementation</span>
@@ -371,25 +219,20 @@ export const Skills: React.FC = () => {
                   {activeSkill.skill.howIUseIt}
                 </p>
                 <p className="text-xs text-[#94A3B8] leading-relaxed">
-                  {activeSkill.skill.description}
+                  {activeSkill.skill.summary}
                 </p>
               </div>
 
-              {/* Related Existing Project Link (If applicable) */}
               {activeSkill.skill.relatedProjectId && (
-                <div className="pt-3 border-t border-[#202A40] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="text-xs text-[#94A3B8] flex items-center gap-1.5 font-mono">
-                    <span>Applied in build:</span>
-                    <span className="text-white font-bold">{activeSkill.skill.relatedProjectTitle}</span>
-                  </div>
-
+                <div className="pt-3 border-t border-[#1C2438] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono text-[#94A3B8]">
+                  <span>Applied in: <strong className="text-white">{activeSkill.skill.relatedProjectTitle}</strong></span>
                   <a
                     href="#projects"
-                    onClick={handleClosePanel}
-                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold bg-[#2563EB] hover:bg-[#1D4ED8] text-white transition-colors self-start sm:self-center font-heading shadow-sm"
+                    onClick={() => setActiveSkill(null)}
+                    className="inline-flex items-center gap-1 text-[#38BDF8] hover:text-white transition-colors"
                   >
-                    <span>View Project in Archive</span>
-                    <ArrowUpRight size={13} />
+                    <span>View Project</span>
+                    <ArrowUpRight size={12} />
                   </a>
                 </div>
               )}

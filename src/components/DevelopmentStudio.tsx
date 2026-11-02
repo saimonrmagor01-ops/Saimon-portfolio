@@ -1,19 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion } from "framer-motion";
-import { Code, Terminal, Bot, Cpu, Check, Copy, ExternalLink, Sparkles } from "lucide-react";
+import { Code, Terminal, Bot, Cpu, Check, Copy, ExternalLink } from "lucide-react";
 
 interface TechTab {
   id: string;
   label: string;
   icon: React.ElementType;
   title: string;
-  subtitle: string;
+  summary: string;
+  realProject: string;
+  realProjectLink: string;
   techs: string[];
+  capabilities: string[];
   codeSnippet: string;
   language: string;
-  highlights: string[];
+  filename: string;
 }
 
 export const DevelopmentStudio: React.FC = () => {
@@ -23,105 +25,138 @@ export const DevelopmentStudio: React.FC = () => {
       label: "Next.js & Frontend",
       icon: Code,
       title: "Responsive Web Engineering",
-      subtitle: "Component-driven architectures with Next.js, TypeScript, and Tailwind CSS",
-      techs: ["Next.js (App Router)", "TypeScript", "Tailwind CSS", "JavaScript ES6+", "HTML5/CSS3"],
-      highlights: [
-        "Semantic HTML structure for search engine visibility and accessibility",
-        "Mobile-first responsive layouts tested across iOS, Android, tablet, and desktop",
-        "Optimized client/server rendering ensuring instant load times with zero layout shift",
-        "Clean component separation allowing frictionless maintenance and scalability",
+      summary: "Building fast, mobile-friendly web storefronts and modern web applications with Next.js App Router, TypeScript, and Tailwind CSS.",
+      realProject: "Applied in BudgetMandu — Nepal Digital Marketplace",
+      realProjectLink: "https://www.budgetmandu.com",
+      techs: ["Next.js (App Router)", "TypeScript", "React", "Tailwind CSS", "Vercel"],
+      capabilities: [
+        "Component-driven architecture with clean separation of client and server concerns",
+        "Mobile-first responsive design tested for fast loading on 3G/4G connections",
+        "Dynamic local pricing calculation and live search filtering without page reloads",
+        "Semantic HTML with proper heading hierarchies, focus styles, and accessibility attributes",
       ],
       language: "typescript",
-      codeSnippet: `// Example: Clean Modular UI Component Pattern
-import React from 'react';
-
-interface MetricProps {
-  label: string;
-  value: string;
-  detail: string;
+      filename: "catalog-filter.ts",
+      codeSnippet: `// Practical catalog filtering & local NPR formatting utility
+export interface Product {
+  id: string;
+  title: string;
+  category: string;
+  priceNPR: number;
+  inStock: boolean;
 }
 
-export const MetricCard: React.FC<MetricProps> = ({ label, value, detail }) => {
-  return (
-    <div className="p-5 rounded-2xl border border-[#202A40] bg-[#101525] hover:border-[#2563EB] transition-all">
-      <span className="text-[10px] font-mono uppercase tracking-widest text-[#2563EB]">
-        {label}
-      </span>
-      <div className="text-2xl font-bold text-white mt-1">{value}</div>
-      <p className="text-xs text-[#94A3B8] mt-0.5">{detail}</p>
-    </div>
-  );
-};`,
+export function filterCatalog(
+  items: Product[],
+  category: string,
+  searchQuery: string
+): Product[] {
+  const query = searchQuery.trim().toLowerCase();
+  
+  return items.filter((item) => {
+    const matchesCategory = category === "All" || item.category === category;
+    const matchesQuery = !query || item.title.toLowerCase().includes(query);
+    return matchesCategory && matchesQuery && item.inStock;
+  });
+}
+
+export function formatNPR(amount: number): string {
+  return new Intl.NumberFormat("ne-NP", {
+    style: "currency",
+    currency: "NPR",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}`,
     },
     {
       id: "discord-bots",
       label: "Python Discord Engine",
       icon: Bot,
       title: "Asynchronous Discord Bot Architecture",
-      subtitle: "Custom community moderation, slash commands, and automated server utilities",
-      techs: ["Python 3.11+", "discord.py", "Asyncio", "REST APIs"],
-      highlights: [
+      summary: "Custom community moderation, slash commands, and automated server utilities built on discord.py with non-blocking event loops.",
+      realProject: "Applied in Sentinel Discord Engine",
+      realProjectLink: "#projects",
+      techs: ["Python 3.11", "discord.py", "AsyncIO", "REST APIs"],
+      capabilities: [
         "Modular Cogs architecture organizing moderation, utility, and analytics commands",
         "Asynchronous event listeners handling member joins, message filtering, and logging",
         "Interactive Discord UI components including buttons, modal popups, and select menus",
         "Environment variable secret protection and resilient API rate-limit management",
       ],
       language: "python",
-      codeSnippet: `# Example: Async Discord Cog with Modern Slash Commands
+      filename: "moderation_cog.py",
+      codeSnippet: `# Async Discord Cog with slash command integration
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-class CommunityEngine(commands.Cog):
+class Moderation(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="status", description="Query live server health and metrics")
-    async def status_check(self, interaction: discord.Interaction):
+    @app_commands.command(
+        name="serverinfo", 
+        description="Display community server statistics and health"
+    )
+    async def server_info(self, interaction: discord.Interaction):
+        guild = interaction.guild
+        if not guild:
+            await interaction.response.send_message("Must be run inside a server.", ephemeral=True)
+            return
+
         embed = discord.Embed(
-            title="Sentinel Community Status",
-            description="All operational nodes running at optimal latency.",
+            title=guild.name,
+            description=f"Members: {guild.member_count} | Roles: {len(guild.roles)}",
             color=0x2563EB
         )
-        embed.add_field(name="Latency", value=f"{round(self.bot.latency * 1000)}ms", inline=True)
-        embed.set_footer(text="Engineered for Nepal & Global Communities")
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        embed.set_footer(text=f"Latency: {round(self.bot.latency * 1000)}ms")
+        await interaction.response.send_message(embed=embed)
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(CommunityEngine(bot))`,
+    await bot.add_cog(Moderation(bot))`,
     },
     {
       id: "automation",
-      label: "Digital Automation",
+      label: "Scripting & Automations",
       icon: Cpu,
-      title: "Workflow & Data Automation",
-      subtitle: "Connecting services and automating repetitive digital processes",
+      title: "Workflow & Notification Scripts",
+      summary: "Lightweight automation scripts connecting web forms to notification channels, parsing files, and eliminating repetitive operations.",
+      realProject: "Applied in Portfolio and Client Inquiry Pipelines",
+      realProjectLink: "#contact",
       techs: ["Python Scripting", "Webhooks", "JSON/REST APIs", "Automation Pipelines"],
-      highlights: [
-        "Automated data parsing and daily summary dispatches to Discord/Telegram",
-        "Webhook triggers linking web form submissions directly to notification channels",
-        "File organization and batch asset renaming scripts saving creative hours",
-        "Zero-dependency lightweight Python utility scripts for maximum reliability",
+      capabilities: [
+        "Webhook notification pipelines dispatching inquiry alerts to Discord and Telegram",
+        "Automated JSON and data parsing scripts for local catalog updates",
+        "Zero-dependency lightweight Python scripts designed for reliable execution",
+        "Form submission validation and rate-limit guard rails",
       ],
       language: "python",
-      codeSnippet: `# Example: Automated Webhook Dispatch Pipeline
+      filename: "webhook_alert.py",
+      codeSnippet: `# Lightweight webhook alert dispatch for form submissions
 import os
 import requests
 from datetime import datetime
 
-def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
-    webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
+def send_inquiry_notification(client_name: str, inquiry_topic: str) -> bool:
+    webhook_url = os.getenv("DISCORD_INQUIRY_WEBHOOK")
+    if not webhook_url:
+        return False
+
     payload = {
-        "content": "⚡ **New Portfolio Inquiry Received**",
+        "content": f"**New Project Inquiry** from **{client_name}**",
         "embeds": [{
-            "title": f"Inquiry from {client_name}",
-            "description": f"Target Service: [{service_inquiry}]",
-            "color": 0x9FBDFF,
-            "timestamp": datetime.utcnow().isoformat()
+            "title": "Topic: " + inquiry_topic,
+            "color": 0x2563EB,
+            "timestamp": datetime.utcnow().isoformat(),
+            "footer": {"text": "Portfolio Dispatch Service"}
         }]
     }
-    response = requests.post(webhook_url, json=payload, timeout=8)
-    return response.status_code == 204`,
+
+    try:
+        res = requests.post(webhook_url, json=payload, timeout=6)
+        return res.status_code == 204
+    except requests.RequestException:
+        return False`,
     },
   ];
 
@@ -135,27 +170,27 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
   };
 
   return (
-    <section id="development-studio" className="py-28 px-4 sm:px-8 border-t border-[#202A40] relative bg-[#050817]">
+    <section id="development-studio" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-[#1C2438] relative bg-[#050817]">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 pb-8 border-b border-[#202A40]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 pb-8 border-b border-[#1C2438]">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#101525] border border-[#202A40] text-xs font-medium text-[#2563EB] mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D1224] border border-[#1C2438] text-xs font-medium text-[#2563EB] mb-3">
               <Terminal size={12} />
               <span>03 / DEVELOPMENT STUDIO</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
               Engineering &amp; <br />
-              <span className="text-[#94A3B8] font-normal font-serif italic">Digital Products.</span>
+              <span className="text-[#94A3B8] font-normal font-serif italic">Practical Software.</span>
             </h2>
           </div>
           <p className="max-w-md text-sm sm:text-base text-[#94A3B8] font-normal leading-relaxed">
-            Crafting responsive web applications, Python community bot engines, and digital automations built on clean architectures and practical performance.
+            I write clean, maintainable code for responsive web applications, community automation bots, and lightweight script pipelines.
           </p>
         </div>
 
         {/* Tab Selection */}
-        <div className="flex flex-wrap items-center gap-2 mb-8 p-1.5 rounded-2xl bg-[#101525] border border-[#202A40] w-fit">
+        <div className="flex flex-wrap items-center gap-2 mb-8 p-1 rounded-2xl bg-[#0D1224] border border-[#1C2438] w-fit">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isSelected = activeTab.id === tab.id;
@@ -166,8 +201,8 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
                 type="button"
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium transition-all ${
                   isSelected
-                    ? "bg-[#2563EB] text-white font-semibold shadow-[0_0_15px_rgba(37,99,235,0.4)]"
-                    : "text-[#94A3B8] hover:text-white hover:bg-[#161D33]"
+                    ? "bg-[#2563EB] text-white font-semibold shadow-md"
+                    : "text-[#94A3B8] hover:text-white hover:bg-[#131930]"
                 }`}
               >
                 <Icon size={14} />
@@ -179,28 +214,54 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
 
         {/* Tab Content Body */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left: Overview & Highlights */}
+          {/* Left: Overview & Architecture Highlights */}
           <div className="lg:col-span-5 space-y-6">
             <div>
               <div className="text-[11px] font-mono text-[#2563EB] uppercase tracking-wider mb-1 font-bold">
-                Capability Overview
+                Technical Focus
               </div>
-              <h3 className="text-2xl font-bold text-white tracking-tight font-heading">{activeTab.title}</h3>
-              <p className="text-xs sm:text-sm text-[#94A3B8] mt-2 leading-relaxed">
-                {activeTab.subtitle}
+              <h3 className="text-2xl font-bold text-white tracking-tight font-heading">
+                {activeTab.title}
+              </h3>
+              <p className="text-sm text-[#94A3B8] mt-2 leading-relaxed">
+                {activeTab.summary}
               </p>
             </div>
 
-            {/* Verified Tech Badges */}
+            {/* Real Project Context Pill */}
+            <div className="p-3.5 rounded-xl border border-[#1C2438] bg-[#070B18] text-xs font-mono text-[#CBD5E1] flex items-center justify-between">
+              <span className="truncate pr-2">{activeTab.realProject}</span>
+              {activeTab.realProjectLink.startsWith("http") ? (
+                <a
+                  href={activeTab.realProjectLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#38BDF8] hover:text-white flex items-center gap-1 shrink-0 transition-colors"
+                >
+                  <span>Visit</span>
+                  <ExternalLink size={12} />
+                </a>
+              ) : (
+                <a
+                  href={activeTab.realProjectLink}
+                  className="text-[#38BDF8] hover:text-white flex items-center gap-1 shrink-0 transition-colors"
+                >
+                  <span>View</span>
+                  <ExternalLink size={12} />
+                </a>
+              )}
+            </div>
+
+            {/* Technologies */}
             <div className="space-y-2">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-[#64748B]">
-                Verified Technologies
+              <div className="text-[10px] font-mono uppercase tracking-widest text-[#94A3B8]">
+                Technologies &amp; Frameworks
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {activeTab.techs.map((tech) => (
                   <span
                     key={tech}
-                    className="px-3 py-1 rounded-full text-xs font-mono border border-[#202A40] bg-[#101525] text-white"
+                    className="px-3 py-1 rounded-full text-xs font-mono border border-[#1C2438] bg-[#070B18] text-white"
                   >
                     {tech}
                   </span>
@@ -208,16 +269,16 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
               </div>
             </div>
 
-            {/* Architecture Highlights */}
-            <div className="space-y-3 pt-2">
-              <div className="text-[10px] font-mono uppercase tracking-widest text-[#64748B]">
-                Key Engineering Tenets
+            {/* Practical Capabilities */}
+            <div className="space-y-2.5 pt-2">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-[#94A3B8]">
+                Practical Capabilities
               </div>
-              <div className="space-y-2.5">
-                {activeTab.highlights.map((highlight, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 text-xs text-[#CBD5E1]">
+              <div className="space-y-2">
+                {activeTab.capabilities.map((item, idx) => (
+                  <div key={idx} className="flex items-start gap-2.5 text-xs text-[#CBD5E1] leading-relaxed">
                     <div className="w-1.5 h-1.5 rounded-full bg-[#2563EB] mt-1.5 shrink-0" />
-                    <span>{highlight}</span>
+                    <span>{item}</span>
                   </div>
                 ))}
               </div>
@@ -226,22 +287,22 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
 
           {/* Right: Code Viewer */}
           <div className="lg:col-span-7">
-            <div className="rounded-2xl border border-[#202A40] bg-[#101525] shadow-2xl overflow-hidden">
-              {/* Code Header Bar */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[#202A40] bg-[#080C1E]">
+            <div className="rounded-2xl border border-[#1C2438] bg-[#0D1224] shadow-2xl overflow-hidden">
+              {/* Header Bar */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#1C2438] bg-[#070B18]">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#202A40]" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#202A40]" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#202A40]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#1C2438]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#1C2438]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#1C2438]" />
                   <span className="text-[11px] font-mono text-[#94A3B8] ml-2">
-                    {activeTab.id}.{activeTab.language === "python" ? "py" : "tsx"}
+                    {activeTab.filename}
                   </span>
                 </div>
 
                 <button
                   onClick={handleCopy}
                   type="button"
-                  className="flex items-center gap-1.5 text-[11px] font-mono text-[#94A3B8] hover:text-white px-2.5 py-1 rounded-md bg-[#161D33] border border-[#202A40] transition-colors"
+                  className="flex items-center gap-1.5 text-[11px] font-mono text-[#94A3B8] hover:text-white px-2.5 py-1 rounded-md bg-[#131930] border border-[#1C2438] transition-colors"
                   aria-label="Copy code snippet"
                 >
                   {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
@@ -249,20 +310,17 @@ def dispatch_project_alert(client_name: str, service_inquiry: str) -> bool:
                 </button>
               </div>
 
-              {/* Code Pre Block */}
-              <div className="p-4 sm:p-5 overflow-x-auto text-[11px] sm:text-xs font-mono text-[#CBD5E1] leading-relaxed max-h-[380px] bg-[#080C1E]/50">
+              {/* Code Snippet Pre Block */}
+              <div className="p-4 sm:p-5 overflow-x-auto text-[11px] sm:text-xs font-mono text-[#CBD5E1] leading-relaxed max-h-[380px] bg-[#070B18]/60">
                 <pre className="selection:bg-[#2563EB]/40">
                   <code>{activeTab.codeSnippet}</code>
                 </pre>
               </div>
 
-              {/* Terminal Footer */}
-              <div className="px-4 py-2.5 border-t border-[#202A40] bg-[#080C1E] flex items-center justify-between text-[10px] font-mono text-[#64748B]">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <span>SYNTAX VERIFIED • ZERO RUNTIME BLOAT</span>
-                </span>
-                <span>UTF-8</span>
+              {/* Footer */}
+              <div className="px-4 py-2 border-t border-[#1C2438] bg-[#070B18] flex items-center justify-between text-[10px] font-mono text-[#94A3B8]">
+                <span>Language: {activeTab.language.toUpperCase()}</span>
+                <span>Production Implementation</span>
               </div>
             </div>
           </div>

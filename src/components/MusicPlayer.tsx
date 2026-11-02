@@ -29,29 +29,29 @@ let globalAudio: HTMLAudioElement | null = null;
 let hasUserExplicitlyPaused = false;
 let globalCurrentTrackIndex = 0;
 let wasPlayingBeforeVideo = false;
-let activeVideoCount = 0;
+// isDucked replaces the fragile activeVideoCount counter; it's a simple
+// boolean flag so repeated duck/restore calls cannot skew a counter.
+let isDucked = false;
 
 /**
  * Pause background music when portfolio video starts playing,
  * and resume it at previous position only if it was playing before.
  */
 export const pauseBackgroundAudioForVideo = () => {
-  if (!globalAudio) return;
-  activeVideoCount++;
-  if (activeVideoCount === 1) {
-    if (!globalAudio.paused) {
-      wasPlayingBeforeVideo = true;
-      globalAudio.pause();
-    } else {
-      wasPlayingBeforeVideo = false;
-    }
+  if (!globalAudio || isDucked) return;
+  isDucked = true;
+  if (!globalAudio.paused) {
+    wasPlayingBeforeVideo = true;
+    globalAudio.pause();
+  } else {
+    wasPlayingBeforeVideo = false;
   }
 };
 
 export const resumeBackgroundAudioAfterVideo = () => {
-  if (!globalAudio) return;
-  activeVideoCount = Math.max(0, activeVideoCount - 1);
-  if (activeVideoCount === 0 && wasPlayingBeforeVideo && !hasUserExplicitlyPaused) {
+  if (!globalAudio || !isDucked) return;
+  isDucked = false;
+  if (wasPlayingBeforeVideo && !hasUserExplicitlyPaused) {
     globalAudio.play().catch(() => {});
     wasPlayingBeforeVideo = false;
   }
@@ -283,7 +283,7 @@ export const MusicPlayer: React.FC = () => {
           onClick={handlePlayPrompt}
           type="button"
           aria-label="Enable and play background soundtrack"
-          className="group flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#101525]/95 backdrop-blur-xl border border-[#2563EB] text-white shadow-[0_4px_25px_rgba(37,99,235,0.5)] hover:bg-[#2563EB] transition-all duration-200 animate-bounce"
+          className="group flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0D1224]/95 backdrop-blur-xl border border-[#2563EB] text-white shadow-[0_4px_25px_rgba(37,99,235,0.4)] hover:bg-[#2563EB] transition-all duration-200"
         >
           <div className="w-5 h-5 rounded-full bg-[#2563EB] group-hover:bg-white text-white group-hover:text-[#2563EB] flex items-center justify-center transition-colors">
             <Play size={10} className="translate-x-0.5" />
@@ -297,7 +297,7 @@ export const MusicPlayer: React.FC = () => {
 
       {/* Main Floating Music Controller Bar */}
       <div
-        className={`bg-[#101525]/95 backdrop-blur-xl rounded-full p-2 border border-[#202A40] shadow-[0_12px_40px_rgba(5,8,23,0.95)] flex items-center gap-3 transition-all ${
+        className={`bg-[#0D1224]/95 backdrop-blur-xl rounded-full p-2 border border-[#1C2438] shadow-[0_12px_40px_rgba(5,8,23,0.95)] flex items-center gap-3 transition-all ${
           isExpanded ? "pr-4" : "pr-3"
         } ${autoplayBlocked && !isPlaying ? "ring-1 ring-[#2563EB]/40" : ""}`}
       >

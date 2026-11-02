@@ -2,28 +2,32 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const viewport: Viewport = {
-  themeColor: "#050505",
+  themeColor: "#050817",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
 };
 
 export const metadata: Metadata = {
-  title: "Saimon Rana Magar — Digital Creator & Developer",
+  metadataBase: new URL("https://saimon-portfolio-psi.vercel.app"),
+  title: "Saimon Rana Magar | Digital Creator & Developer",
   description:
-    "Official portfolio of Saimon Rana Magar. Digital Creator & Developer exploring AI filmmaking, visual storytelling, and modern web technology. Based in Nepal.",
+    "Explore the creative work, AI filmmaking experiments, video editing, web development, and digital projects of Saimon Rana Magar.",
   keywords: [
     "Saimon Rana Magar",
     "Digital Creator",
     "Developer",
-    "AI Filmmaker",
-    "Content Creator",
-    "Web Developer",
+    "AI Filmmaking",
+    "Video Editing",
+    "Web Development",
+    "Creative Direction",
     "Nepal",
     "BudgetMandu",
     "Google Flow",
     "Adobe Premiere Pro",
     "CapCut",
+    "Discord Bot Development",
+    "Python Automation",
     "Next.js Developer",
   ],
   authors: [{ name: "Saimon Rana Magar" }],
@@ -31,18 +35,27 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://saimon.dev",
-    title: "Saimon Rana Magar — Digital Creator & Developer",
+    url: "https://saimon-portfolio-psi.vercel.app/",
+    title: "Saimon Rana Magar | Digital Creator & Developer",
     description:
-      "I create. I develop. I bring ideas to life. AI Filmmaker, Content Creator and Web Developer based in Nepal.",
+      "Explore the creative work, AI filmmaking experiments, video editing, web development, and digital projects of Saimon Rana Magar.",
     siteName: "Saimon Rana Magar Portfolio",
+    images: [
+      {
+        url: "/saimon-portrait.png",
+        width: 1200,
+        height: 630,
+        alt: "Saimon Rana Magar — Digital Creator & Developer",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Saimon Rana Magar — Digital Creator & Developer",
+    title: "Saimon Rana Magar | Digital Creator & Developer",
     description:
-      "AI Filmmaker, Content Creator and Web Developer exploring the intersection of creative cinema and code.",
-    creator: "@saimon",
+      "Explore the creative work, AI filmmaking experiments, video editing, web development, and digital projects of Saimon Rana Magar.",
+    images: ["/saimon-portrait.png"],
+    creator: "@shymoneyyyyyy",
   },
   icons: {
     icon: "/favicon.svg",
@@ -64,7 +77,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
-      <body className="bg-[#050505] text-[#f4f4f1] antialiased selection:bg-[#9fbdff] selection:text-[#050505] min-h-screen relative">
+      <body className="bg-[#050817] text-[#F5F7FF] antialiased selection:bg-[#2563EB] selection:text-white min-h-screen relative font-sans">
         <div className="film-grain" aria-hidden="true" />
         {children}
       </body>

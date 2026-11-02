@@ -5,10 +5,9 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowUpRight, Menu, X, 
-  Home, User, Briefcase, Film, Code, FolderGit2, Wrench, Mail 
+  Home, User, Film, Code, FolderGit2, Wrench, Briefcase, Sliders, Mail 
 } from "lucide-react";
 import { SocialLinks } from "./SocialLinks";
-import { Magnetic } from "./Magnetic";
 
 interface NavbarProps {
   activeSection?: string;
@@ -19,25 +18,26 @@ export const Navbar: React.FC<NavbarProps> = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Nav items with icons matching reference layout
+  // Nav items matching page flow
   const navItems = [
     { label: "Home", href: "#home", id: "home", icon: Home },
     { label: "About", href: "#about", id: "about", icon: User },
-    { label: "Experience", href: "#experience", id: "experience", icon: Briefcase },
     { label: "Creative", href: "#creative-studio", id: "creative-studio", icon: Film },
     { label: "Dev", href: "#development-studio", id: "development-studio", icon: Code },
     { label: "Projects", href: "#projects", id: "projects", icon: FolderGit2 },
     { label: "Skills", href: "#skills", id: "skills", icon: Wrench },
+    { label: "Experience", href: "#experience", id: "experience", icon: Briefcase },
+    { label: "Services", href: "#services", id: "services", icon: Sliders },
     { label: "Contact", href: "#contact", id: "contact", icon: Mail },
   ];
 
-  // Scroll listener for sticky background & active section
+  // Scroll listener for sticky background & active section detection
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
 
       const sections = navItems.map((item) => document.getElementById(item.id));
-      const scrollPos = window.scrollY + 200;
+      const scrollPos = window.scrollY + 220;
 
       for (let i = sections.length - 1; i >= 0; i--) {
         const sec = sections[i];
@@ -56,23 +56,21 @@ export const Navbar: React.FC<NavbarProps> = () => {
 
   return (
     <>
-      <header
-        className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 sm:py-4 px-3 sm:px-6 flex justify-center"
-      >
+      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-3 sm:py-4 px-3 sm:px-6 flex justify-center">
         <div
-          className={`w-full max-w-7xl mx-auto flex items-center justify-between px-3 sm:px-5 py-2 sm:py-2.5 rounded-full border transition-all duration-300 ${
+          className={`w-full max-w-7xl mx-auto flex items-center justify-between px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full border transition-all duration-300 ${
             isScrolled
-              ? "bg-[#101525]/90 backdrop-blur-xl border-[#202A40] shadow-[0_12px_40px_rgba(5,8,23,0.8)]"
-              : "bg-[#101525]/70 backdrop-blur-md border-[#202A40]/80"
+              ? "bg-[#0D1224]/90 backdrop-blur-xl border-[#1C2438] shadow-[0_12px_40px_rgba(5,8,23,0.8)]"
+              : "bg-[#0D1224]/70 backdrop-blur-md border-[#1C2438]/80"
           }`}
         >
-          {/* Brand with face-focused avatar and live green dot (Reference Style) */}
+          {/* Brand with face-focused avatar and status indicator */}
           <a
             href="#home"
             className="flex items-center gap-2.5 group focus-visible:ring-1 focus-visible:ring-[#2563EB] rounded-full shrink-0"
             aria-label="Saimon Rana Magar Home"
           >
-            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-[#080C1E] border border-[#202A40] flex items-center justify-center">
+            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-[#070B18] border border-[#1C2438] flex items-center justify-center">
               <Image
                 src="/saimon-avatar.png"
                 alt="Saimon Rana Magar Avatar"
@@ -90,13 +88,13 @@ export const Navbar: React.FC<NavbarProps> = () => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                 </span>
-                <span className="hidden sm:inline">Digital Creator &amp; Dev</span>
+                <span className="hidden sm:inline">Creator &amp; Developer</span>
               </div>
             </div>
           </a>
 
-          {/* Desktop Nav Links (Reference Screenshot Pill Style) */}
-          <nav className="hidden xl:flex items-center gap-1 px-3 py-1 rounded-full bg-[#080C1E]/80 border border-[#202A40]/80 text-xs font-medium text-[#94A3B8]">
+          {/* Desktop Nav Links */}
+          <nav className="hidden xl:flex items-center gap-1 px-3 py-1 rounded-full bg-[#070B18]/80 border border-[#1C2438]/80 text-xs font-medium text-[#94A3B8]">
             {navItems.map((item) => {
               const isActive = activeSection === item.id;
               const Icon = item.icon;
@@ -122,30 +120,26 @@ export const Navbar: React.FC<NavbarProps> = () => {
             })}
           </nav>
 
-          {/* Actions: Social Icons & Contact CTA */}
+          {/* Header Social Icons & Contact CTA */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Header Social Icons */}
             <div className="hidden md:block">
               <SocialLinks size="sm" />
             </div>
 
-            {/* Direct CTA (Reference Accent Blue) with Magnetic Hover */}
-            <Magnetic strength={0.25}>
-              <a
-                href="#contact"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200 font-heading shadow-[0_0_15px_rgba(37,99,235,0.35)] shrink-0 min-h-[36px]"
-              >
-                <span>Let&apos;s Talk</span>
-                <ArrowUpRight size={13} />
-              </a>
-            </Magnetic>
+            <a
+              href="#contact"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200 font-heading shadow-md shrink-0 min-h-[36px]"
+            >
+              <span>Get in Touch</span>
+              <ArrowUpRight size={13} />
+            </a>
 
-            {/* Mobile Menu Button with WCAG Touch Target */}
+            {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               type="button"
-              className="xl:hidden w-9 h-9 rounded-full flex items-center justify-center border border-[#202A40] bg-[#080C1E] text-white hover:text-[#2563EB] hover:border-[#2563EB] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
-              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              className="xl:hidden w-9 h-9 rounded-full flex items-center justify-center border border-[#1C2438] bg-[#070B18] text-white hover:text-[#2563EB] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
@@ -161,10 +155,10 @@ export const Navbar: React.FC<NavbarProps> = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-4 top-20 z-40 bg-[#101525]/95 backdrop-blur-2xl border border-[#202A40] rounded-2xl p-6 shadow-2xl xl:hidden flex flex-col gap-4"
+            className="fixed inset-x-4 top-20 z-40 bg-[#0D1224]/95 backdrop-blur-2xl border border-[#1C2438] rounded-2xl p-6 shadow-2xl xl:hidden flex flex-col gap-4"
           >
-            <div className="flex items-center justify-between pb-3 border-b border-[#202A40]">
-              <span className="text-xs uppercase tracking-widest text-[#64748B] font-mono">Navigation</span>
+            <div className="flex items-center justify-between pb-3 border-b border-[#1C2438]">
+              <span className="text-xs uppercase tracking-widest text-[#94A3B8] font-mono">Navigation</span>
               <span className="text-[11px] text-[#2563EB] font-mono font-medium">Saimon Rana Magar</span>
             </div>
 
@@ -180,7 +174,7 @@ export const Navbar: React.FC<NavbarProps> = () => {
                     className={`text-xs py-2 px-3 rounded-lg transition-colors flex items-center gap-2 ${
                       isActive
                         ? "bg-[#2563EB]/20 border border-[#2563EB]/40 text-white font-medium"
-                        : "text-[#94A3B8] hover:text-white hover:bg-[#161D33]"
+                        : "text-[#94A3B8] hover:text-white hover:bg-[#131930]"
                     }`}
                   >
                     <Icon size={14} className={isActive ? "text-[#2563EB]" : "text-[#64748B]"} />
@@ -190,20 +184,20 @@ export const Navbar: React.FC<NavbarProps> = () => {
               })}
             </div>
 
-            <div className="pt-3 border-t border-[#202A40] flex flex-col gap-3">
+            <div className="pt-3 border-t border-[#1C2438] flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-[#94A3B8] font-mono">Direct Connect:</span>
+                <span className="text-xs text-[#94A3B8] font-mono">Connect:</span>
                 <SocialLinks size="sm" />
               </div>
               <a
                 href="#contact"
                 onClick={closeMenu}
-                className="w-full text-center py-2.5 rounded-full text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors font-heading shadow-[0_0_15px_rgba(37,99,235,0.4)]"
+                className="w-full text-center py-2.5 rounded-full text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors font-heading shadow-md"
               >
                 Let&apos;s Collaborate ↗
               </a>
               <div className="text-center text-[11px] text-[#64748B] font-mono">
-                Based in Nepal • Available Worldwide
+                Kathmandu, Nepal • Available Worldwide
               </div>
             </div>
           </motion.div>

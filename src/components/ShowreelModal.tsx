@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   X, Play, Pause, Volume2, VolumeX, Maximize, Minimize, 
-  Sparkles, Film, RotateCcw, MonitorPlay, CheckCircle2 
+  Sparkles, Film, RotateCcw, ChevronLeft
 } from "lucide-react";
 import { duckBackgroundAudio, restoreBackgroundAudio } from "./MusicPlayer";
 
@@ -22,33 +22,33 @@ export interface ShowreelVideo {
 export const SHOWREEL_PLAYLIST: ShowreelVideo[] = [
   {
     id: "intro",
-    title: "Introduction",
-    category: "Google Flow",
+    title: "Cinematic Identity",
+    category: "AI Filmmaking",
     src: "/videos/intro.mp4",
-    description: "A cinematic introduction presenting who I am, my creative identity, and my vision through AI-generated visuals.",
+    description: "A cinematic piece exploring character presence, natural key-to-fill lighting, and atmospheric depth in 2.39:1 widescreen, created using prompt-directed generation.",
     durationLabel: "00:10",
-    tagline: "AI-Generated Personal Introduction",
-    pipeline: ["Google Flow"],
+    tagline: "Anamorphic Generative Introduction",
+    pipeline: ["Google Flow", "Adobe Premiere Pro"],
   },
   {
     id: "work",
-    title: "My Work",
-    category: "Google Gemini AI",
+    title: "Creative Visual Reel",
+    category: "Visual Synthesis",
     src: "/videos/work.mp4",
-    description: "A showcase of my creative work, ideas, and projects developed with the assistance of Google Gemini AI.",
+    description: "A showcase of visual experiments testing scene transitions, camera moves, and lighting mood across speculative narrative environments.",
     durationLabel: "00:10",
-    tagline: "AI-Assisted Creative Showcase",
-    pipeline: ["Google Gemini AI"],
+    tagline: "Scene Continuity & Motion Experiments",
+    pipeline: ["Google Flow", "Generative Cinema"],
   },
   {
     id: "overview",
-    title: "Creative Overview",
-    category: "ChatGPT",
+    title: "Rhythm & Narrative Flow",
+    category: "Video Editing",
     src: "/videos/vid 3.mp4",
-    description: "The final presentation bringing my skills, creative process, and capabilities together through structured storytelling and editing.",
+    description: "A structured montage focusing on rhythmic audio-visual synchronization, transient-aligned cuts, and cohesive post-production color timing.",
     durationLabel: "00:10",
-    tagline: "AI-Assisted Video Editing & Storytelling",
-    pipeline: ["ChatGPT"],
+    tagline: "Timeline Pacing & Audio Design",
+    pipeline: ["Adobe Premiere Pro", "CapCut Pro"],
   },
 ];
 
@@ -73,6 +73,10 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const modalContainerRef = useRef<HTMLDivElement>(null);
+  // Save scroll position when modal opens so we can restore it on close
+  const savedScrollY = useRef(0);
+  // Track whether history entry was pushed so we pop it exactly once
+  const historyPushed = useRef(false);
 
   // Set initial video if specified
   useEffect(() => {
@@ -86,10 +90,57 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
 
   const activeVideo = SHOWREEL_PLAYLIST[activeVideoIndex];
 
-  // Esc key listener & body scroll lock
+  // ── Browser history integration ────────────────────────────────────────────
+  // Push a history state when the modal opens so that pressing Back closes
+  // the modal instead of navigating away from the page.
+  useEffect(() => {
+    if (isOpen) {
+      savedScrollY.current = window.scrollY;
+      // Only push if we don't already have an entry (prevents duplicates)
+      if (!historyPushed.current) {
+        window.history.pushState({ showreelOpen: true }, "");
+        historyPushed.current = true;
+      }
+    }
+  }, [isOpen]);
+
+  // Listen for the browser Back button while the modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handlePopState = (e: PopStateEvent) => {
+      // The user pressed Back — close the modal without pushing another entry
+      historyPushed.current = false;
+      onClose();
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [isOpen, onClose]);
+
+  // ── Fullscreen state sync ──────────────────────────────────────────────────
+  // Keep isFullscreen in sync with the actual browser fullscreen state so that
+  // the button icon is always correct, even when the user presses ESC natively.
+  useEffect(() => {
+    const onFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", onFsChange);
+    return () => document.removeEventListener("fullscreenchange", onFsChange);
+  }, []);
+
+  // ── ESC key & body scroll lock ─────────────────────────────────────────────
+  // ESC behaviour: if the browser is in native fullscreen, let the browser
+  // exit fullscreen first (it does so automatically). The fullscreenchange
+  // listener above updates the icon. A *second* ESC (or ESC when not
+  // fullscreen) closes the modal.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        if (document.fullscreenElement) {
+          // Let the browser handle exiting fullscreen; don't close the modal yet
+          return;
+        }
         handleClose();
       }
       if (e.code === "Space") {
@@ -107,6 +158,7 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
       document.body.style.overflow = "unset";
       window.removeEventListener("keydown", handleKeyDown);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   // Video element event synchronization & background audio ducking
@@ -196,23 +248,39 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
   };
 
   const handleClose = () => {
+    // Exit native fullscreen if active before closing the modal
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
     if (videoRef.current) {
       videoRef.current.pause();
+      videoRef.current.currentTime = 0;
     }
     restoreBackgroundAudio();
+
+    // If we pushed a history state, pop it so the URL stays clean.
+    // Calling history.back() would fire popstate which calls onClose again,
+    // so we use replaceState to just clean up without another navigation.
+    if (historyPushed.current) {
+      historyPushed.current = false;
+      // Use go(-1) to properly pop the state we pushed; guard against the
+      // popstate handler calling onClose a second time by unsetting the flag
+      // first (already done above).
+      window.history.go(-1);
+    }
+
+    // Restore scroll position
+    window.scrollTo({ top: savedScrollY.current, behavior: "instant" });
     onClose();
   };
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       modalContainerRef.current?.requestFullscreen().catch(() => {});
-      setIsFullscreen(true);
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-      }
-      setIsFullscreen(false);
+      document.exitFullscreen().catch(() => {});
     }
+    // isFullscreen is kept in sync by the fullscreenchange event listener above
   };
 
   const formatTime = (seconds: number) => {
@@ -227,28 +295,48 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
 
   return (
     <AnimatePresence>
+      <React.Fragment key="showreel-modal">
+      {/* ── Backdrop: clicking outside the inner panel closes the modal ── */}
+      <div
+        className="fixed inset-0 z-[120] bg-[#02040a]/98 backdrop-blur-2xl"
+        onClick={handleClose}
+        aria-hidden="true"
+      />
+
       <div
         ref={modalContainerRef}
         role="dialog"
         aria-modal="true"
         aria-label="Full-screen cinematic AI showreel"
-        className="fixed inset-0 z-[120] bg-[#02040a]/98 backdrop-blur-2xl flex flex-col justify-between p-3 sm:p-6 md:p-8 select-none"
+        className="fixed inset-0 z-[121] flex flex-col justify-between p-3 sm:p-6 md:p-8 select-none"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Bar */}
-        <div className="flex items-center justify-between text-xs font-mono text-[#94A3B8] z-20 pb-4 border-b border-[#202A40]/80">
+        <div className="flex items-center justify-between text-xs font-mono text-[#94A3B8] z-20 pb-4 border-b border-[#1C2438]">
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#101525] border border-[#202A40] text-[#2563EB] font-bold">
+            {/* Prominent Back / Close button — always visible */}
+            <button
+              onClick={handleClose}
+              type="button"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0D1224] border border-[#2563EB] text-white hover:bg-[#2563EB] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] font-semibold text-[11px]"
+              aria-label="Go back and close showreel"
+            >
+              <ChevronLeft size={14} />
+              <span className="hidden xs:inline">Back</span>
+            </button>
+
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0D1224] border border-[#1C2438] text-[#2563EB] font-bold">
               <Film size={13} />
               <span>CINEMATIC SHOWREEL</span>
             </span>
-            <span className="hidden sm:inline text-[#64748B]">
+            <span className="hidden sm:inline text-[#94A3B8]">
               SAIMON RANA MAGAR • AI FILMMAKER &amp; DEVELOPER
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Aspect Ratio Switcher */}
-            <div className="hidden sm:flex items-center gap-1 p-1 rounded-xl bg-[#101525] border border-[#202A40]">
+            <div className="hidden sm:flex items-center gap-1 p-1 rounded-xl bg-[#0D1224] border border-[#1C2438]">
               {(["2.39:1", "16:9", "9:16"] as const).map((ratio) => (
                 <button
                   key={ratio}
@@ -265,10 +353,11 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
               ))}
             </div>
 
+            {/* Secondary X close button (top-right corner) */}
             <button
               onClick={handleClose}
               type="button"
-              className="w-9 h-9 rounded-full bg-[#101525] border border-[#202A40] text-white hover:border-[#2563EB] hover:bg-[#161D33] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+              className="w-9 h-9 rounded-full bg-[#0D1224] border border-[#1C2438] text-white hover:border-[#2563EB] hover:bg-[#131930] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
               aria-label="Close showreel"
             >
               <X size={18} />
@@ -280,7 +369,7 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
         <div className="my-auto relative w-full max-w-5xl mx-auto flex items-center justify-center py-4">
           <motion.div
             layout
-            className={`relative rounded-2xl overflow-hidden border border-[#202A40] shadow-[0_25px_90px_rgba(5,8,23,0.98)] transition-all duration-500 w-full bg-black ${
+            className={`relative rounded-2xl overflow-hidden border border-[#1C2438] shadow-[0_25px_90px_rgba(5,8,23,0.98)] transition-all duration-500 w-full bg-black ${
               aspectRatio === "2.39:1"
                 ? "aspect-[21/9] max-h-[62vh]"
                 : aspectRatio === "16:9"
@@ -349,7 +438,7 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
         </div>
 
         {/* Playlist Strip & Bottom Transport Controls */}
-        <div className="w-full max-w-5xl mx-auto space-y-4 z-20 pt-2 border-t border-[#202A40]/80">
+        <div className="w-full max-w-5xl mx-auto space-y-4 z-20 pt-2 border-t border-[#1C2438]">
           {/* Playlist Thumbnail Selector */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {SHOWREEL_PLAYLIST.map((video, idx) => {
@@ -364,8 +453,8 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
                   type="button"
                   className={`p-2.5 sm:p-3 rounded-xl border text-left transition-all flex items-center justify-between gap-3 ${
                     isCurrent
-                      ? "border-[#2563EB] bg-[#101525] shadow-[0_0_20px_rgba(37,99,235,0.25)]"
-                      : "border-[#202A40] bg-[#080C1E] hover:border-[#2563EB]/60 hover:bg-[#101525]"
+                      ? "border-[#2563EB] bg-[#0D1224] shadow-[0_0_20px_rgba(37,99,235,0.25)]"
+                      : "border-[#1C2438] bg-[#070B18] hover:border-[#2563EB]/60 hover:bg-[#0D1224]"
                   }`}
                 >
                   <div className="overflow-hidden">
@@ -376,7 +465,7 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
                       {video.title}
                     </div>
                   </div>
-                  <div className="shrink-0 flex items-center gap-1.5 text-[10px] font-mono text-[#64748B]">
+                  <div className="shrink-0 flex items-center gap-1.5 text-[10px] font-mono text-[#94A3B8]">
                     {isCurrent && isPlaying ? (
                       <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     ) : (
@@ -399,7 +488,7 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
                 videoRef.current.currentTime = newPercent * duration;
               }
             }}
-            className="w-full h-1.5 bg-[#101525] rounded-full overflow-hidden cursor-pointer relative border border-[#202A40] group"
+            className="w-full h-1.5 bg-[#0D1224] rounded-full overflow-hidden cursor-pointer relative border border-[#1C2438] group"
           >
             <motion.div
               className="h-full bg-gradient-to-r from-[#2563EB] to-[#38BDF8] relative"
@@ -463,6 +552,7 @@ export const ShowreelModal: React.FC<ShowreelModalProps> = ({
           </div>
         </div>
       </div>
+      </React.Fragment>
     </AnimatePresence>
   );
 };

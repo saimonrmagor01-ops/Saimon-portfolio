@@ -27,7 +27,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#050817] text-[#f8fafc] selection:bg-[#2563eb] selection:text-white">
+    <div className="relative min-h-screen bg-[#050817] text-[#F5F7FF] selection:bg-[#2563EB] selection:text-white">
       {/* Brand Identity Preloader Curtain */}
       <Preloader />
 
