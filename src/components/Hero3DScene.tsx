@@ -166,12 +166,13 @@ export const Hero3DScene: React.FC = () => {
     const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
 
     const onPointerMove = (e: MouseEvent) => {
-      // Normalize to -1 ... 1
       mouse.targetX = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.targetY = -(e.clientY / window.innerHeight) * 2 + 1;
     };
 
-    window.addEventListener("mousemove", onPointerMove, { passive: true });
+    if (!prefersReducedMotion) {
+      window.addEventListener("mousemove", onPointerMove, { passive: true });
+    }
 
     // Handle Window Resize
     const onResize = () => {
@@ -185,33 +186,20 @@ export const Hero3DScene: React.FC = () => {
       renderer.setSize(newWidth, newHeight);
 
       mainGroup.position.set(mobileCheck ? 0 : 2.2, mobileCheck ? -0.8 : 0, 0);
+      if (prefersReducedMotion) renderer.render(scene, camera);
     };
 
     window.addEventListener("resize", onResize);
 
-    // IntersectionObserver to pause rendering when out of viewport (0% GPU usage when scrolled down)
-    let isVisible = true;
-    let animationFrameId: number;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          isVisible = entry.isIntersecting;
-        });
-      },
-      { threshold: 0.05 }
-    );
-    observer.observe(container);
-
-    // Animation Render Loop
-    let clock = new THREE.Clock();
+    let startTime = 0;
+    let isVisible = false;
+    let animationFrameId: number | undefined;
 
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
+      animationFrameId = undefined;
+      if (!isVisible || prefersReducedMotion) return;
 
-      if (!isVisible) return;
-
-      const elapsedTime = clock.getElapsedTime();
+      const elapsedTime = (performance.now() - startTime) / 1000;
 
       // Smooth mouse lerp
       mouse.x += (mouse.targetX - mouse.x) * 0.05;
@@ -248,16 +236,47 @@ export const Hero3DScene: React.FC = () => {
       }
 
       renderer.render(scene, camera);
+      animationFrameId = requestAnimationFrame(animate);
     };
 
-    animate();
+    const startRendering = () => {
+      isVisible = true;
+      if (prefersReducedMotion) {
+        renderer.render(scene, camera);
+      } else if (animationFrameId === undefined) {
+        startTime = performance.now();
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+
+    const stopRendering = () => {
+      isVisible = false;
+      if (animationFrameId !== undefined) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = undefined;
+      }
+    };
+
+    const observer = "IntersectionObserver" in window
+      ? new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) startRendering();
+          else stopRendering();
+        }, { threshold: 0.05 })
+      : null;
+
+    renderer.render(scene, camera);
+    if (observer) {
+      observer.observe(container);
+    } else {
+      startRendering();
+    }
 
     // Cleanup resources on unmount
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      window.removeEventListener("mousemove", onPointerMove);
+      if (animationFrameId !== undefined) cancelAnimationFrame(animationFrameId);
+      if (!prefersReducedMotion) window.removeEventListener("mousemove", onPointerMove);
       window.removeEventListener("resize", onResize);
-      observer.disconnect();
+      observer?.disconnect();
 
       // Dispose geometries & materials
       coreGeometry.dispose();

@@ -1,15 +1,83 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, Sparkles } from "lucide-react";
+import { X, ArrowRight, Sparkles, Volume2, VolumeX } from "lucide-react";
 import { SOCIAL_LINKS } from "@/data/socials";
 
 let hasDismissedInCurrentVisit = false;
 
+type DragonSound = "launch" | "blast";
+
+type DragonSoundBuffers = Record<DragonSound, AudioBuffer>;
+
+type DragonAudioEngine = {
+  context: AudioContext;
+  masterGain: GainNode;
+  buffers: DragonSoundBuffers | null;
+  loadPromise: Promise<DragonSoundBuffers> | null;
+  sources: Set<AudioBufferSourceNode>;
+  stateChangeHandler?: () => void;
+};
+
+const SOUND_PREFERENCE_KEY = "saimon_dragon_sfx_enabled";
+
+const playDragonSound = (
+  engine: DragonAudioEngine,
+  sound: DragonSound
+): boolean => {
+  const { context, buffers, masterGain, sources } = engine;
+  if (!buffers || context.state !== "running") {
+    return false;
+  }
+
+  const now = context.currentTime;
+  const source = context.createBufferSource();
+  const envelope = context.createGain();
+  const compressor = context.createDynamicsCompressor();
+
+  source.buffer = buffers[sound];
+  envelope.gain.setValueAtTime(0.0001, now);
+  envelope.gain.exponentialRampToValueAtTime(sound === "launch" ? 0.9 : 1.15, now + (sound === "launch" ? 0.04 : 0.018));
+  envelope.gain.setTargetAtTime(sound === "launch" ? 0.68 : 0.95, now + (sound === "launch" ? 0.4 : 0.12), sound === "launch" ? 0.12 : 0.24);
+  compressor.threshold.setValueAtTime(sound === "launch" ? -18 : -6, now);
+  compressor.knee.setValueAtTime(sound === "launch" ? 18 : 6, now);
+  compressor.ratio.setValueAtTime(sound === "launch" ? 8 : 2.5, now);
+  compressor.attack.setValueAtTime(0.003, now);
+  compressor.release.setValueAtTime(0.24, now);
+  source.connect(envelope);
+  envelope.connect(compressor);
+  compressor.connect(masterGain);
+  sources.add(source);
+  source.addEventListener("ended", () => {
+    sources.delete(source);
+    source.disconnect();
+    envelope.disconnect();
+    compressor.disconnect();
+  }, { once: true });
+  source.start(now);
+  return true;
+};
+
 export const WelcomePopup: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundPreferenceLoaded, setSoundPreferenceLoaded] = useState(false);
+  const [soundUnlocked, setSoundUnlocked] = useState(false);
+  const [soundInitializing, setSoundInitializing] = useState(false);
+  const [soundError, setSoundError] = useState("");
+  const [dragonRun, setDragonRun] = useState(0);
+  const engineRef = useRef<DragonAudioEngine | null>(null);
+  const soundEnabledRef = useRef(true);
+  const soundUnlockedRef = useRef(false);
+  const isOpenRef = useRef(false);
+  const soundUnlockingRef = useRef(false);
+  const audioWarningRef = useRef("");
+  const playedDragonSoundsRef = useRef<{ run: number; sounds: Set<DragonSound> }>({
+    run: 0,
+    sounds: new Set(),
+  });
 
   useEffect(() => {
     try {
@@ -17,6 +85,20 @@ export const WelcomePopup: React.FC = () => {
       localStorage.removeItem("saimon_popup_closed");
       sessionStorage.removeItem("saimon_welcome_shown");
     } catch {}
+
+    try {
+      const savedPreference = localStorage.getItem(SOUND_PREFERENCE_KEY);
+      soundEnabledRef.current = savedPreference !== "false";
+      setSoundEnabled(soundEnabledRef.current);
+      if (savedPreference !== "true" && savedPreference !== "false") {
+        localStorage.setItem(SOUND_PREFERENCE_KEY, String(soundEnabledRef.current));
+      }
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[WelcomePopup] Could not restore the SFX preference.", error);
+      }
+    }
+    setSoundPreferenceLoaded(true);
 
     if (hasDismissedInCurrentVisit) {
       return;
@@ -40,6 +122,250 @@ export const WelcomePopup: React.FC = () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
+
+  const restartDragonIntro = () => {
+    const engine = engineRef.current;
+    if (
+      soundEnabledRef.current &&
+      soundUnlockedRef.current &&
+      engine?.context.state === "running"
+    ) {
+      setDragonRun((run) => run + 1);
+    }
+  };
+
+  const updateSoundPreference = (enabled: boolean) => {
+    soundEnabledRef.current = enabled;
+    setSoundEnabled(enabled);
+    setSoundError("");
+
+    try {
+      localStorage.setItem(SOUND_PREFERENCE_KEY, String(enabled));
+    } catch (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[WelcomePopup] Could not save the SFX preference.", error);
+      }
+      setSoundError("This browser could not save your sound preference.");
+    }
+
+    const engine = engineRef.current;
+    if (!engine || engine.context.state === "closed") {
+      return;
+    }
+
+    const now = engine.context.currentTime;
+    engine.masterGain.gain.cancelScheduledValues(now);
+    engine.masterGain.gain.setValueAtTime(enabled ? 1 : 0, now);
+    if (!enabled) {
+      engine.sources.forEach((source) => source.stop());
+    }
+  };
+
+  const activateDragonSound = async (): Promise<boolean> => {
+    if (!soundEnabledRef.current || soundUnlockingRef.current) {
+      return false;
+    }
+
+    soundUnlockingRef.current = true;
+    setSoundInitializing(true);
+    let newlyReady = false;
+    try {
+      const AudioContextConstructor =
+        window.AudioContext ||
+        (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextConstructor) {
+        throw new Error("Web Audio is not supported in this browser.");
+      }
+
+      let engine = engineRef.current;
+      if (!engine || engine.context.state === "closed") {
+        const context = new AudioContextConstructor();
+        const masterGain = context.createGain();
+        masterGain.gain.value = soundEnabledRef.current ? 1 : 0;
+        masterGain.connect(context.destination);
+        const newEngine: DragonAudioEngine = {
+          context,
+          masterGain,
+          buffers: null,
+          loadPromise: null,
+          sources: new Set(),
+        };
+        engine = newEngine;
+        engineRef.current = newEngine;
+        newEngine.stateChangeHandler = () => {
+          if (engineRef.current !== newEngine) {
+            return;
+          }
+          const running = newEngine.context.state === "running" && newEngine.buffers !== null;
+          soundUnlockedRef.current = running;
+          setSoundUnlocked(running);
+        };
+        context.addEventListener("statechange", newEngine.stateChangeHandler);
+      }
+
+      const activeEngine = engine;
+      if (!activeEngine) {
+        throw new Error("The audio engine could not be initialized.");
+      }
+
+      if (activeEngine.context.state === "closed") {
+        throw new Error("The browser closed the audio context.");
+      }
+
+      if (activeEngine.context.state !== "running") {
+        await activeEngine.context.resume();
+      }
+      if (activeEngine.context.state !== "running") {
+        throw new Error("The browser kept the audio context suspended.");
+      }
+
+      if (!activeEngine.buffers) {
+        if (!activeEngine.loadPromise) {
+          const context = activeEngine.context;
+          activeEngine.loadPromise = (async () => {
+            const paths = [
+              "/sounds/dragon-fire-launch.wav",
+              "/sounds/dragon-fire-blast.wav",
+            ] as const;
+            const responses = await Promise.all(paths.map((path) => fetch(path)));
+            const failedResponse = responses.find((response) => !response.ok);
+            if (failedResponse) {
+              throw new Error(`Could not load ${failedResponse.url} (${failedResponse.status}).`);
+            }
+            const data = await Promise.all(responses.map((response) => response.arrayBuffer()));
+            const [launch, blast] = await Promise.all(
+              data.map((audioData) => context.decodeAudioData(audioData))
+            );
+            return { launch, blast };
+          })();
+        }
+
+        try {
+          activeEngine.buffers = await activeEngine.loadPromise;
+        } catch (error) {
+          activeEngine.loadPromise = null;
+          throw error;
+        }
+      }
+
+      if (!soundEnabledRef.current) {
+        return false;
+      }
+      newlyReady = !soundUnlockedRef.current;
+      soundUnlockedRef.current = true;
+      setSoundUnlocked(true);
+      setSoundError("");
+      audioWarningRef.current = "";
+      if (newlyReady && isOpenRef.current) {
+        setDragonRun((run) => run + 1);
+      }
+      return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown audio initialization error.";
+      if (audioWarningRef.current !== message) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("[WelcomePopup] Dragon SFX could not be enabled:", error);
+        }
+        audioWarningRef.current = message;
+      }
+      setSoundUnlocked(false);
+      soundUnlockedRef.current = false;
+      setSoundError("Could not start sound effects. Tap the SFX button to retry.");
+      return false;
+    } finally {
+      soundUnlockingRef.current = false;
+      setSoundInitializing(false);
+    }
+  };
+
+  const handleDragonAnimationStart = (event: React.AnimationEvent<HTMLElement>) => {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
+    const animationName = event.animationName;
+    const sound: DragonSound | null =
+      animationName === "welcome-fireball-launch"
+        ? "launch"
+        : animationName === "welcome-dragon-boom"
+          ? "blast"
+          : null;
+    const engine = engineRef.current;
+    if (!sound || !soundEnabledRef.current || !soundUnlockedRef.current || !engine) {
+      return;
+    }
+
+    if (playedDragonSoundsRef.current.run !== dragonRun) {
+      playedDragonSoundsRef.current = { run: dragonRun, sounds: new Set() };
+    }
+    if (playedDragonSoundsRef.current.sounds.has(sound)) {
+      return;
+    }
+    try {
+      if (!playDragonSound(engine, sound)) {
+        return;
+      }
+      playedDragonSoundsRef.current.sounds.add(sound);
+    } catch (error) {
+      playedDragonSoundsRef.current.sounds.delete(sound);
+      const message = error instanceof Error ? error.message : "Unknown audio playback error.";
+      if (audioWarningRef.current !== message) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn(`[WelcomePopup] Dragon ${sound} sound could not play:`, error);
+        }
+        audioWarningRef.current = message;
+      }
+      setSoundError("A dragon sound could not play. Tap the SFX button to retry.");
+    }
+  };
+
+  useEffect(() => () => {
+    const engine = engineRef.current;
+    if (engine) {
+      if (engine.stateChangeHandler) {
+        engine.context.removeEventListener("statechange", engine.stateChangeHandler);
+      }
+      if (engine.context.state !== "closed") {
+        engine.sources.forEach((source) => source.stop());
+        void engine.context.close();
+      }
+    }
+  }, []);
+
+  const handleSoundToggle = async () => {
+    if (!soundPreferenceLoaded || soundUnlockingRef.current) {
+      return;
+    }
+
+    if (soundEnabledRef.current) {
+      const engine = engineRef.current;
+      if (!soundUnlockedRef.current || engine?.context.state !== "running") {
+        await activateDragonSound();
+        return;
+      }
+
+      updateSoundPreference(false);
+      return;
+    }
+
+    updateSoundPreference(true);
+    if (await activateDragonSound()) {
+      restartDragonIntro();
+    }
+  };
+
+  const replayDragonIntro = async () => {
+    if (!soundEnabledRef.current) {
+      return;
+    }
+    if (await activateDragonSound()) {
+      restartDragonIntro();
+    }
+  };
 
   const handleClose = () => {
     hasDismissedInCurrentVisit = true;
@@ -70,8 +396,124 @@ export const WelcomePopup: React.FC = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             onClick={handleClose}
-            className="fixed inset-0 bg-[#050817]/85 backdrop-blur-md"
+            className="fixed inset-0 z-0 bg-[#050817]/85 backdrop-blur-md"
           />
+
+          <div
+            key={dragonRun}
+            className="welcome-dragon-flight"
+            aria-hidden="true"
+          >
+            <div className="welcome-dragon-pass">
+              <svg
+                className="welcome-dragon"
+                viewBox="0 0 460 230"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                focusable="false"
+              >
+                <defs>
+                  <linearGradient id="dragon-scale" x1="140" y1="68" x2="390" y2="190" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#5279AD" />
+                    <stop offset="0.3" stopColor="#263F6B" />
+                    <stop offset="0.72" stopColor="#101D39" />
+                    <stop offset="1" stopColor="#241A3E" />
+                  </linearGradient>
+                  <linearGradient id="dragon-edge" x1="200" y1="38" x2="373" y2="183" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#BAE6FD" stopOpacity="0.95" />
+                    <stop offset="0.58" stopColor="#60A5FA" stopOpacity="0.82" />
+                    <stop offset="1" stopColor="#C4B5FD" stopOpacity="0.78" />
+                  </linearGradient>
+                  <linearGradient id="dragon-wing" x1="181" y1="66" x2="267" y2="151" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#526F9E" />
+                    <stop offset="0.58" stopColor="#1B2B4B" />
+                    <stop offset="1" stopColor="#111629" />
+                  </linearGradient>
+                  <linearGradient id="dragon-belly" x1="239" y1="151" x2="345" y2="175" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#647DA5" stopOpacity="0.88" />
+                    <stop offset="1" stopColor="#34305A" stopOpacity="0.72" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M58 171C105 150 139 137 185 145C150 161 126 178 94 189C140 184 169 169 202 153"
+                  stroke="url(#dragon-edge)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  opacity="0.52"
+                />
+                <path d="M225 145C207 112 186 88 155 67C164 103 179 134 207 155Z" fill="url(#dragon-wing)" stroke="url(#dragon-edge)" strokeWidth="2" strokeLinejoin="round" opacity="0.88" />
+                <path d="M159 72C183 99 199 122 211 148M177 91L207 127" stroke="#BAE6FD" strokeOpacity="0.34" strokeWidth="1.5" />
+                <g className="welcome-dragon-wing">
+                  <path
+                    d="M218 143C225 105 235 59 223 18C259 35 311 56 346 103C315 91 284 105 264 133C247 134 231 141 218 151Z"
+                    fill="url(#dragon-wing)"
+                    stroke="url(#dragon-edge)"
+                    strokeWidth="2.6"
+                    strokeLinejoin="round"
+                  />
+                  <path d="M226 24C242 67 250 101 251 135M239 47C269 68 291 86 320 97M247 73C269 89 280 108 284 124M273 87C293 91 310 96 329 104" stroke="#BAE6FD" strokeOpacity="0.62" strokeWidth="1.8" />
+                </g>
+                <path d="M230 153C245 174 255 194 255 214C277 193 287 180 289 167L278 153Z" fill="url(#dragon-scale)" stroke="url(#dragon-edge)" strokeWidth="2" strokeLinejoin="round" opacity="0.78" />
+                <path d="M250 161L255 207M264 167L276 188" stroke="#7DD3FC" strokeOpacity="0.48" strokeWidth="1.5" />
+                <path
+                  d="M183 137C205 120 231 116 255 125C273 131 289 144 313 145L347 133L368 139L390 131L380 145L405 153L384 163L353 158C337 177 309 184 280 174C245 162 215 160 188 153L166 159L151 151L170 143L158 135L183 137Z"
+                  transform="translate(0 6)"
+                  fill="#030817"
+                  opacity="0.58"
+                />
+                <path
+                  d="M183 137C205 120 231 116 255 125C273 131 289 144 313 145L347 133L368 139L390 131L380 145L405 153L384 163L353 158C337 177 309 184 280 174C245 162 215 160 188 153L166 159L151 151L170 143L158 135L183 137Z"
+                  fill="url(#dragon-scale)"
+                  stroke="url(#dragon-edge)"
+                  strokeWidth="2.6"
+                  strokeLinejoin="round"
+                />
+                <path d="M244 125L249 108L260 125L268 111L279 131L289 120L300 140M350 136L356 120L363 134M367 139L379 126L380 141M194 153L184 172L198 164L207 158M270 171L262 190L278 178L289 174" fill="url(#dragon-scale)" stroke="url(#dragon-edge)" strokeWidth="2.2" strokeLinejoin="round" />
+                <path d="M244 158C263 166 278 170 295 171C310 173 326 170 339 164C321 180 298 181 280 175C266 171 254 166 244 158Z" fill="url(#dragon-belly)" opacity="0.74" />
+                <path d="M230 143C250 140 270 143 289 151M238 149C251 148 263 151 275 156M299 149C315 154 330 154 345 150M304 156C318 160 330 159 340 157" stroke="#BAE6FD" strokeOpacity="0.34" strokeWidth="1.3" strokeLinecap="round" />
+                <path d="M286 152C306 162 327 164 349 157M298 162C313 170 329 171 340 166" stroke="#7DD3FC" strokeOpacity="0.55" strokeWidth="1.5" strokeLinecap="round" />
+                <path d="M374 151L385 151" stroke="#FED7AA" strokeWidth="2.4" strokeLinecap="round" />
+                <circle cx="370" cy="143" r="5" fill="#F97316" opacity="0.32" />
+                <circle cx="370" cy="143" r="2.4" fill="#FFF7D6" />
+              </svg>
+              <span
+                className="welcome-dragon-fireball"
+                onAnimationStart={handleDragonAnimationStart}
+              />
+            </div>
+            <div
+              className="welcome-dragon-impact"
+              onAnimationStart={handleDragonAnimationStart}
+            >
+              <span className="welcome-dragon-shockwave" />
+              <span className="welcome-dragon-shockwave welcome-dragon-shockwave-inner" />
+              <span className="welcome-dragon-sparks" aria-hidden="true">
+                {Array.from({ length: 8 }, (_, index) => (
+                  <span key={index} />
+                ))}
+              </span>
+            </div>
+            <div className="welcome-impact-copy">
+              <span>WELCOME</span>
+              <small>TO MY CREATIVE WORLD</small>
+            </div>
+          </div>
+
+          <div className="welcome-snowfall" aria-hidden="true">
+            {Array.from({ length: 10 }, (_, index) => (
+              <span key={index} />
+            ))}
+            <div className="welcome-snowflakes">
+              {Array.from({ length: 5 }, (_, index) => (
+                <span key={index}>❄</span>
+              ))}
+            </div>
+          </div>
+          <div className="welcome-lightfall" aria-hidden="true">
+            {Array.from({ length: 3 }, (_, index) => (
+              <span key={index} />
+            ))}
+          </div>
 
           {/* Modal Container */}
           <motion.div
@@ -90,6 +532,62 @@ export const WelcomePopup: React.FC = () => {
             >
               <X size={16} />
             </button>
+            <button
+              onClick={() => void handleSoundToggle()}
+              type="button"
+              data-dragon-sound-toggle
+              disabled={!soundPreferenceLoaded || soundInitializing}
+              className={`absolute top-4 left-4 sm:top-5 sm:left-5 h-9 px-2.5 rounded-full border flex items-center justify-center gap-1.5 transition-colors ${
+                soundEnabled
+                  ? "bg-[#10243A] border-[#38BDF8] text-[#7DD3FC]"
+                  : "bg-[#070B18] border-[#1C2438] text-[#94A3B8] hover:text-white hover:border-[#2563EB]"
+              }`}
+              aria-label={
+                soundInitializing
+                  ? "Activating sound effects"
+                  : soundEnabled
+                    ? soundUnlocked ? "Mute sound effects" : "Tap to enable sound effects"
+                    : "Unmute sound effects"
+              }
+              aria-pressed={soundEnabled && soundUnlocked}
+              aria-busy={soundInitializing}
+              title={
+                soundInitializing
+                  ? "Activating sound effects"
+                  : soundEnabled
+                    ? soundUnlocked ? "Mute sound effects" : "Tap to enable sound effects"
+                    : "Unmute sound effects"
+              }
+            >
+              {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+              <span className="text-[9px] font-mono font-semibold tracking-wider">
+                {soundInitializing
+                  ? "LOADING SOUND"
+                  : soundEnabled
+                    ? soundUnlocked ? "SOUND ON" : "TAP TO ENABLE SOUND"
+                    : "SOUND OFF"}
+              </span>
+            </button>
+            {soundEnabled && soundUnlocked && (
+              <button
+                onClick={replayDragonIntro}
+                type="button"
+                className="absolute top-[4.25rem] left-4 sm:left-5 rounded-full border border-[#1C2438] bg-[#070B18]/90 px-2.5 py-1 text-[9px] font-mono font-semibold tracking-wider text-[#BAE6FD] transition-colors hover:border-[#38BDF8] hover:text-white"
+                aria-label="Replay dragon fire and blast sound effects"
+                title="Replay dragon intro with sound"
+              >
+                REPLAY SFX
+              </button>
+            )}
+            {soundError && (
+              <span
+                className="absolute top-14 left-4 z-20 max-w-48 rounded-lg border border-amber-400/30 bg-[#0D1224] px-2 py-1 text-left text-[10px] text-amber-200 sm:left-5"
+                role="status"
+                aria-live="polite"
+              >
+                {soundError}
+              </span>
+            )}
 
             {/* Top Eyebrow */}
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#070B18] border border-[#1C2438] text-[11px] font-mono text-[#38BDF8] tracking-wider uppercase mb-5">

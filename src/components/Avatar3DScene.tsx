@@ -37,7 +37,8 @@ export const Avatar3DScene: React.FC<Avatar3DSceneProps> = ({ className = "" }) 
       return;
     }
 
-    let animationFrameId: number;
+    let animationFrameId: number | undefined;
+    let isVisible = false;
     let renderer: THREE.WebGLRenderer;
 
     const width = container.clientWidth || 400;
@@ -280,6 +281,7 @@ export const Avatar3DScene: React.FC<Avatar3DSceneProps> = ({ className = "" }) 
         avatarGroup.add(avatarMesh);
 
         setIsLoaded(true);
+        if (prefersReducedMotion && isVisible) renderer.render(scene, camera);
       });
     });
 
@@ -309,9 +311,11 @@ export const Avatar3DScene: React.FC<Avatar3DSceneProps> = ({ className = "" }) 
       targetMouse.y = 0;
     };
 
-    container.addEventListener("pointermove", handlePointerMove);
-    container.addEventListener("pointerenter", handlePointerEnter);
-    container.addEventListener("pointerleave", handlePointerLeave);
+    if (!prefersReducedMotion) {
+      container.addEventListener("pointermove", handlePointerMove);
+      container.addEventListener("pointerenter", handlePointerEnter);
+      container.addEventListener("pointerleave", handlePointerLeave);
+    }
 
     // 7. Responsive Resize Observer
     const handleResize = () => {
@@ -321,18 +325,21 @@ export const Avatar3DScene: React.FC<Avatar3DSceneProps> = ({ className = "" }) 
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
+      if (prefersReducedMotion && isVisible) renderer.render(scene, camera);
     };
 
     const resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(container);
 
-    // 8. Main 60fps Render Loop
-    const clock = new THREE.Clock();
+    let startTime = 0;
 
     const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
+      animationFrameId = undefined;
+      if (!isVisible) return;
 
-      const elapsedTime = clock.getElapsedTime();
+      const elapsedTime = prefersReducedMotion
+        ? 0
+        : (performance.now() - startTime) / 1000;
 
       // Smooth mouse interpolation (Damped Spring / Lerp)
       const lerpSpeed = 0.055;
@@ -392,18 +399,53 @@ export const Avatar3DScene: React.FC<Avatar3DSceneProps> = ({ className = "" }) 
       }
 
       renderer.render(scene, camera);
+      if (!prefersReducedMotion) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
     };
 
-    animate();
+    const startRendering = () => {
+      isVisible = true;
+      if (prefersReducedMotion) {
+        animate();
+      } else if (animationFrameId === undefined) {
+        startTime = performance.now();
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+
+    const stopRendering = () => {
+      isVisible = false;
+      if (animationFrameId !== undefined) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = undefined;
+      }
+    };
+
+    const visibilityObserver = "IntersectionObserver" in window
+      ? new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) startRendering();
+          else stopRendering();
+        }, { threshold: 0.05 })
+      : null;
+
+    if (visibilityObserver) {
+      visibilityObserver.observe(container);
+    } else {
+      startRendering();
+    }
 
     // 9. Comprehensive Resource Disposal on Unmount
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId !== undefined) cancelAnimationFrame(animationFrameId);
+      visibilityObserver?.disconnect();
       resizeObserver.disconnect();
 
-      container.removeEventListener("pointermove", handlePointerMove);
-      container.removeEventListener("pointerenter", handlePointerEnter);
-      container.removeEventListener("pointerleave", handlePointerLeave);
+      if (!prefersReducedMotion) {
+        container.removeEventListener("pointermove", handlePointerMove);
+        container.removeEventListener("pointerenter", handlePointerEnter);
+        container.removeEventListener("pointerleave", handlePointerLeave);
+      }
 
       glowGeo.dispose();
       glowMat.dispose();

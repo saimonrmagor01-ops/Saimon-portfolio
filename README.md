@@ -5,6 +5,8 @@ Official personal portfolio website for **Saimon Rana Magar** — Digital Creato
 > **Primary Identity:** AI Filmmaker, Content Creator and Web Developer  
 > **Headline:** "I create. I develop. I bring ideas to life."
 
+The Next.js application is the canonical implementation. The root `index.html` is a separate standalone snapshot and is not updated by changes to the Next.js app.
+
 ---
 
 ## Architecture & Technology Stack
@@ -14,12 +16,12 @@ The project offers two production-ready avenues:
 1. **Next.js App Router Application (Modern Modular Architecture)**
    - **Framework:** Next.js 14 (App Router)
    - **Language:** TypeScript
-   - **Styling:** Tailwind CSS with custom editorial dark design system (`#050505`)
+   - **Styling:** Tailwind CSS with a custom editorial dark design system (`#050817`)
    - **Animations:** Framer Motion
    - **Icons:** Lucide React
    - **Static Export:** Configured with `output: 'export'` for zero-latency hosting
 
-2. **Standalone Production Build (`index.html`)**
+2. **Standalone Snapshot (`index.html`)**
    - Self-contained, zero-dependency static build that can be opened directly in any browser (via double click) or deployed directly to any static web host (GitHub Pages, Netlify, Vercel, Cloudflare Pages).
    - Includes full interactive capabilities: interactive cinema reel selector, live Python/TypeScript code inspection tabs, project category filtering, modal inspector, Web Audio API ambient drone synthesizer, live Nepal time clock (NPT GMT+5:45), service inquiry preselection, and validated project inquiry form.
 
@@ -55,13 +57,13 @@ saimon-portfolio/
 │   │   ├── ProjectModal.tsx      # Immersive project detail modal (Esc to close)
 │   │   ├── Skills.tsx            # 5 taxonomy categories (zero fake percentages)
 │   │   ├── Experience.tsx        # Timeline (Digital Communications Assistant)
-│   │   ├── Services.tsx          # 7 services with auto-fill inquiry triggers
-│   │   ├── Contact.tsx           # Validated inquiry form & live Nepal time clock
+│   │   ├── Services.tsx          # Four service cards with inquiry preselection
+│   │   ├── Contact.tsx           # Direct contact channels and live Nepal time clock
 │   │   └── Footer.tsx            # Credits, quick links & back-to-top button
 │   ├── data/
 │   │   ├── projects.ts           # Typed project data including BudgetMandu
 │   │   ├── skills.ts             # Verified skills organized by discipline
-│   │   └── services.ts           # 7 professional service packages
+│   │   └── services.ts           # Four professional service offerings
 │   └── lib/
 │       └── utils.ts              # cn() utility helper for Tailwind classes
 └── out/                          # Generated static build from `npm run build`

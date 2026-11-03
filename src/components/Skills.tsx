@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { 
   Film, Scissors, Code2, Bot, Wrench, 
   ArrowUpRight, X, Terminal, ChevronRight 
@@ -9,6 +9,7 @@ import {
 import { skillCategories, SkillCategory, SkillItem } from "@/data/skills";
 
 export const Skills: React.FC = () => {
+  const prefersReducedMotion = useReducedMotion();
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const [activeSkill, setActiveSkill] = useState<{
     skill: SkillItem;
@@ -66,18 +67,18 @@ export const Skills: React.FC = () => {
   }, [activeSkill]);
 
   return (
-    <section id="skills" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-[#1C2438] relative bg-[#050817]">
+    <section id="skills" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-white/10 relative bg-[#050817]">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-8 border-b border-[#1C2438]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-8 border-b border-white/10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D1224] border border-[#1C2438] text-xs font-medium text-[#2563EB] mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#080C18] border border-white/10 text-xs font-medium text-[#38BDF8] mb-3">
               <Wrench size={12} />
               <span>05 / SKILLS &amp; EXPERTISE</span>
             </div>
             <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
               Practical Skills &amp; <br />
-              <span className="text-[#94A3B8] font-normal font-serif italic">Creative Tools.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-slate-400 to-sky-300 font-normal font-serif italic">Creative Tools.</span>
             </h2>
           </div>
           <p className="max-w-md text-sm sm:text-base text-[#94A3B8] font-normal leading-relaxed">
@@ -117,9 +118,17 @@ export const Skills: React.FC = () => {
           {filteredCategories.map((category, catIdx) => {
             const Icon = getCategoryIcon(category.id);
             return (
-              <div
+              <motion.div
                 key={category.id}
-                className="p-6 rounded-2xl border border-[#1C2438] bg-[#0D1224] hover:border-[#2563EB]/70 transition-all duration-300 flex flex-col justify-between shadow-lg"
+                className="skills-reveal p-6 rounded-2xl border border-[#1C2438] bg-[#0D1224] hover:border-[#2563EB]/70 transition-all duration-300 flex flex-col justify-between shadow-lg"
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 14 }}
+                whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.15 }}
+                transition={{
+                  duration: 0.5,
+                  delay: catIdx * 0.08,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
               >
                 <div>
                   {/* Category Header */}
@@ -175,7 +184,7 @@ export const Skills: React.FC = () => {
                   <span>Production Ready</span>
                   <span className="text-[#38BDF8]">{category.skills.length} Capabilities</span>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

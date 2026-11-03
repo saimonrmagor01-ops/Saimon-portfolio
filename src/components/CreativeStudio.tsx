@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { 
   Film, Play, Pause, Maximize2, 
   Volume2, VolumeX, Sparkles, SlidersHorizontal 
@@ -22,6 +23,7 @@ interface CreativePiece {
 }
 
 export const CreativeStudio: React.FC = () => {
+  const prefersReducedMotion = useReducedMotion();
   const pieces: CreativePiece[] = [
     {
       id: "intro",
@@ -172,21 +174,21 @@ export const CreativeStudio: React.FC = () => {
   const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <section id="creative-studio" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-[#1C2438] relative bg-[#050817]">
+    <section id="creative-studio" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-white/10 relative bg-[#050817]">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 pb-8 border-b border-[#1C2438]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 pb-8 border-b border-white/10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D1224] border border-[#1C2438] text-xs font-medium text-[#2563EB] mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#080C18] border border-white/10 text-xs font-medium text-[#38BDF8] mb-3">
               <Film size={12} />
               <span>02 / CREATIVE STUDIO</span>
             </div>
             <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
               AI Filmmaking &amp; <br />
-              <span className="text-[#94A3B8] font-normal font-serif italic">Video Production.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-slate-400 to-sky-300 font-normal font-serif italic">Video Production.</span>
             </h2>
           </div>
-          <p className="max-w-md text-sm sm:text-base text-[#94A3B8] font-normal leading-relaxed">
+          <p className="max-w-md text-sm sm:text-base text-slate-400 font-normal leading-relaxed">
             A showcase of generative scene creation, visual pacing, and frame-accurate video editing produced with Google Flow, Premiere Pro, and CapCut.
           </p>
         </div>
@@ -194,8 +196,14 @@ export const CreativeStudio: React.FC = () => {
         {/* Master Cinema Viewport & Piece Selector */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-16">
           {/* Main Cinema Viewport */}
-          <div className="lg:col-span-8 space-y-4">
-            <div className="relative rounded-2xl border border-[#1C2438] bg-[#0D1224] p-3 sm:p-4 shadow-2xl overflow-hidden group">
+          <motion.div
+            className="studio-reveal lg:col-span-8 space-y-4"
+            initial={prefersReducedMotion ? false : { opacity: 0, y: 18 }}
+            whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="relative rounded-2xl border border-white/10 bg-[#080C18]/85 backdrop-blur-2xl p-3 sm:p-4 shadow-2xl overflow-hidden group">
               {/* Aspect Ratio Framing */}
               <div
                 className={`relative w-full rounded-xl overflow-hidden flex flex-col justify-between bg-black transition-all duration-500 ${
@@ -333,10 +341,16 @@ export const CreativeStudio: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Piece Selector Column */}
-          <div className="lg:col-span-4 space-y-3">
+          <motion.div
+            className="studio-reveal lg:col-span-4 space-y-3"
+            initial={prefersReducedMotion ? false : { opacity: 0, x: 14 }}
+            whileInView={prefersReducedMotion ? undefined : { opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.55, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          >
             <div className="text-xs font-mono uppercase tracking-widest text-[#94A3B8] mb-2 flex items-center justify-between">
               <span>Production Reel</span>
               <span>3 Pieces</span>
@@ -416,7 +430,7 @@ export const CreativeStudio: React.FC = () => {
                 </li>
               </ul>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 

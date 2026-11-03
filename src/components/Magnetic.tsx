@@ -20,13 +20,17 @@ export const Magnetic: React.FC<MagneticProps> = ({
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
+    if (
+      !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) return;
     const { clientX, clientY } = e;
     const { left, top, width, height } = ref.current.getBoundingClientRect();
     const centerX = left + width / 2;
     const centerY = top + height / 2;
 
-    const distanceX = (clientX - centerX) * strength;
-    const distanceY = (clientY - centerY) * strength;
+    const distanceX = Math.max(-8, Math.min(8, (clientX - centerX) * strength));
+    const distanceY = Math.max(-8, Math.min(8, (clientY - centerY) * strength));
 
     x.set(distanceX);
     y.set(distanceY);

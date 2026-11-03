@@ -1,157 +1,282 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { motion } from "framer-motion";
-import { ArrowUpRight, CheckCircle2, Sliders } from "lucide-react";
-import { services, Service } from "@/data/services";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  ArrowUpRight,
+  AudioLines,
+  Bot,
+  CheckCircle2,
+  Code2,
+  Film,
+  LucideIcon,
+  Sliders,
+  Sparkles,
+} from "lucide-react";
+import { projects } from "@/data/projects";
+import { Service, services } from "@/data/services";
 import { ServiceDetailModal } from "./ServiceDetailModal";
 
 interface ServicesProps {
   onSelectService?: (serviceTitle: string) => void;
 }
 
+interface ServiceVisual {
+  Icon: LucideIcon;
+  accent: string;
+  caption: string;
+}
+
+interface ServiceCardProps {
+  service: Service;
+  index: number;
+  onOpenDetails: (service: Service, origin: HTMLElement) => void;
+  onInquire: (serviceTitle: string) => void;
+}
+
+const serviceVisuals: Record<string, ServiceVisual> = {
+  "ai-filmmaking": { Icon: Film, accent: "#67c8ff", caption: "CINEMATIC DIRECTION" },
+  "short-form-video-editing": { Icon: AudioLines, accent: "#b69aff", caption: "RHYTHM & PACING" },
+  "website-development": { Icon: Code2, accent: "#5ec9ff", caption: "DIGITAL EXPERIENCES" },
+  "discord-bot-automation": { Icon: Bot, accent: "#76e0b0", caption: "INTELLIGENT AUTOMATION" },
+};
+
+const ServiceCard: React.FC<ServiceCardProps> = ({
+  service,
+  index,
+  onOpenDetails,
+  onInquire,
+}) => {
+  const cardRef = useRef<HTMLElement>(null);
+  const surfaceRef = useRef<HTMLDivElement>(null);
+  const visual = serviceVisuals[service.id] ?? {
+    Icon: Sparkles,
+    accent: "#67c8ff",
+    caption: service.category.toUpperCase(),
+  };
+  const relatedProject = service.relatedProjectId
+    ? projects.find((project) => project.id === service.relatedProjectId)
+    : undefined;
+  const visualStyle: React.CSSProperties & {
+    "--service-accent": string;
+    "--service-stagger": string;
+  } = {
+    "--service-accent": visual.accent,
+    "--service-stagger": `${index * 100}ms`,
+  };
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card || !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const handlePointerMove = (event: PointerEvent) => {
+      const bounds = card.getBoundingClientRect();
+      if (bounds.width === 0 || bounds.height === 0) return;
+      const x = (event.clientX - bounds.left) / bounds.width;
+      const y = (event.clientY - bounds.top) / bounds.height;
+      card.style.setProperty("--tilt-x", `${(0.5 - y) * 3}deg`);
+      card.style.setProperty("--tilt-y", `${(x - 0.5) * 3}deg`);
+      card.style.setProperty("--pointer-x", `${x * 100}%`);
+      card.style.setProperty("--pointer-y", `${y * 100}%`);
+    };
+    const resetTilt = () => {
+      card.style.setProperty("--tilt-x", "0deg");
+      card.style.setProperty("--tilt-y", "0deg");
+      card.style.setProperty("--pointer-x", "50%");
+      card.style.setProperty("--pointer-y", "50%");
+    };
+
+    card.addEventListener("pointermove", handlePointerMove, { passive: true });
+    card.addEventListener("pointerleave", resetTilt);
+    return () => {
+      card.removeEventListener("pointermove", handlePointerMove);
+      card.removeEventListener("pointerleave", resetTilt);
+    };
+  }, []);
+
+  return (
+    <article
+      ref={cardRef}
+      className="service-scroll-card group"
+      style={visualStyle}
+    >
+      <div className="service-card-aura" aria-hidden="true" />
+
+      <div ref={surfaceRef} className="service-card-surface">
+        <div className="service-card-topline">
+          <span className="service-card-index">{service.number}</span>
+          <span className="service-card-category">{service.category}</span>
+          <span className="service-card-arrow" aria-hidden="true">
+            <ArrowUpRight size={15} />
+          </span>
+        </div>
+
+        <div className="service-card-visual" aria-hidden="true">
+          {relatedProject?.thumbnailUrl ? (
+            <img
+              src={relatedProject.thumbnailUrl}
+              alt=""
+              loading="lazy"
+            />
+          ) : (
+            <div className="service-card-abstract">
+              <span className="service-card-orbit service-card-orbit-one" />
+              <span className="service-card-orbit service-card-orbit-two" />
+              <visual.Icon size={34} strokeWidth={1.2} />
+            </div>
+          )}
+          <div className="service-card-visual-shade" />
+          <span className="service-card-caption">{relatedProject?.title ?? visual.caption}</span>
+        </div>
+
+        <div className="service-card-heading">
+          <h3>{service.title}</h3>
+        </div>
+
+        <div className="service-card-details">
+          <p className="service-card-tagline">{service.tagline}</p>
+          <p className="service-card-description">{service.description}</p>
+
+          <div className="service-card-scope">
+            <span className="service-card-eyebrow">Included scope</span>
+            <ul>
+              {service.deliverables.map((item) => (
+                <li key={item}>
+                  <CheckCircle2 size={13} aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="service-card-footer">
+            <div className="service-card-tools" aria-label="Tools">
+              {service.tools.map((tool) => <span key={tool}>{tool}</span>)}
+            </div>
+            <div className="service-card-actions">
+              <button
+                type="button"
+                onClick={(event) => onOpenDetails(service, event.currentTarget)}
+                aria-label={`View details for ${service.title}`}
+                aria-haspopup="dialog"
+              >
+                View details <ArrowUpRight size={13} />
+              </button>
+              <button
+                type="button"
+                onClick={() => onInquire(service.title)}
+                aria-label={`Inquire about ${service.title}`}
+              >
+                Inquire <ArrowUpRight size={13} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+};
+
 export const Services: React.FC<ServicesProps> = ({ onSelectService }) => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const cardRowRef = useRef<HTMLDivElement>(null);
   const [selectedModalService, setSelectedModalService] = useState<Service | null>(null);
   const originCardRef = useRef<HTMLElement | null>(null);
 
+  useEffect(() => {
+    const section = sectionRef.current;
+    const row = cardRowRef.current;
+    if (
+      !section ||
+      !row ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !("IntersectionObserver" in window)
+    ) return;
+
+    const cards = Array.from(row.querySelectorAll<HTMLElement>(".service-scroll-card"));
+    if (cards.length === 0) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-revealed");
+        entry.target.removeAttribute("inert");
+        observer.unobserve(entry.target);
+      });
+    }, { threshold: 0.15 });
+
+    cards.forEach((card) => {
+      card.setAttribute("inert", "");
+      observer.observe(card);
+    });
+    section.classList.add("services-reveal-ready");
+
+    return () => {
+      observer.disconnect();
+      section.classList.remove("services-reveal-ready");
+      cards.forEach((card) => {
+        card.classList.remove("is-revealed");
+        card.removeAttribute("inert");
+      });
+    };
+  }, []);
+
   const handleInquiry = (serviceTitle: string) => {
-    if (onSelectService) {
-      onSelectService(serviceTitle);
-    }
-    const contactSection = document.getElementById("contact");
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: "smooth" });
-    }
+    onSelectService?.(serviceTitle);
+    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const openServiceModal = (service: Service, e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
-    originCardRef.current = e.currentTarget;
+  const openServiceModal = (service: Service, origin: HTMLElement) => {
+    originCardRef.current = origin;
     setSelectedModalService(service);
   };
 
   const handleCloseModal = () => {
     setSelectedModalService(null);
-    setTimeout(() => {
-      originCardRef.current?.focus();
-    }, 50);
+    window.setTimeout(() => originCardRef.current?.focus(), 50);
   };
 
   return (
-    <section id="services" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-[#1C2438] relative bg-[#050817]">
-      <div className="max-w-6xl mx-auto">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 pb-8 border-b border-[#1C2438]">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D1224] border border-[#1C2438] text-xs font-medium text-[#2563EB] mb-3">
-              <Sliders size={12} />
-              <span>07 / SERVICES &amp; COLLABORATION</span>
+    <section ref={sectionRef} id="services" className="services-scroll-section">
+      <div className="services-scroll-stage">
+        <div className="services-stage-inner">
+          <header className="services-editorial-header">
+            <div className="services-heading-block">
+              <div className="services-kicker">
+                <Sliders size={12} />
+                <span>07 / SERVICES &amp; COLLABORATION</span>
+              </div>
+              <h2>
+                Capabilities &amp; <br />
+                <span>Freelance Offerings.</span>
+              </h2>
             </div>
-            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
-              Capabilities &amp; <br />
-              <span className="text-[#94A3B8] font-normal font-serif italic">Freelance Offerings.</span>
-            </h2>
+            <div className="services-header-description">
+              <p>
+                I work directly with founders, creators, and brands as an independent creative developer. Here is what I can genuinely deliver.
+              </p>
+              <div className="services-timeline" aria-hidden="true">
+                <span />
+              </div>
+              <span className="services-scroll-instruction">SCROLL TO EXPLORE</span>
+            </div>
+          </header>
+
+          <div ref={cardRowRef} className="services-card-row">
+            {services.map((service, index) => (
+              <ServiceCard
+                key={service.id}
+                service={service}
+                index={index}
+                onOpenDetails={openServiceModal}
+                onInquire={handleInquiry}
+              />
+            ))}
           </div>
-          <p className="max-w-md text-sm sm:text-base text-[#94A3B8] font-normal leading-relaxed">
-            I work directly with founders, creators, and brands as an independent creative developer. Here is what I can genuinely deliver.
-          </p>
-        </div>
-
-        {/* 4-Item Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-          {services.map((service, idx) => (
-            <motion.div
-              key={service.id}
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: idx * 0.06 }}
-              className="h-full"
-            >
-              <article
-                onClick={(e) => openServiceModal(service, e)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    openServiceModal(service, e);
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                aria-haspopup="dialog"
-                aria-label={`View details for ${service.title}`}
-                className="group h-full p-6 sm:p-8 rounded-2xl border border-[#1C2438] bg-[#0D1224] hover:bg-[#11172e] hover:border-[#2563EB] transition-all duration-200 flex flex-col justify-between cursor-pointer shadow-lg select-none"
-              >
-                <div>
-                  {/* Top Meta Bar */}
-                  <div className="flex items-center justify-between pb-4 mb-4 border-b border-[#1C2438]">
-                    <span className="text-xs font-mono text-[#2563EB] font-bold">
-                      {service.number} • {service.category.toUpperCase()}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-mono text-[#38BDF8] group-hover:text-white transition-colors">
-                      <span>View details</span>
-                      <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                    </span>
-                  </div>
-
-                  <h3 className="text-xl sm:text-2xl font-bold text-white group-hover:text-[#2563EB] transition-colors font-heading">
-                    {service.title}
-                  </h3>
-                  <div className="text-xs font-semibold text-[#38BDF8] mt-1 font-heading">
-                    {service.tagline}
-                  </div>
-                  <p className="text-xs sm:text-sm text-[#94A3B8] mt-3 leading-relaxed">
-                    {service.description}
-                  </p>
-
-                  {/* Deliverables */}
-                  <div className="mt-5 space-y-2">
-                    <div className="text-[10px] font-mono uppercase tracking-widest text-[#94A3B8]">
-                      Included Scope
-                    </div>
-                    <div className="space-y-1.5">
-                      {service.deliverables.slice(0, 3).map((item, dIdx) => (
-                        <div key={dIdx} className="flex items-start gap-2 text-xs text-[#CBD5E1]">
-                          <CheckCircle2 size={13} className="text-[#2563EB] mt-0.5 shrink-0" />
-                          <span>{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Bottom: Tools & Direct Inquire Action */}
-                <div className="pt-6 mt-6 border-t border-[#1C2438] flex items-center justify-between gap-3">
-                  <div className="flex flex-wrap gap-1">
-                    {service.tools.slice(0, 2).map((t) => (
-                      <span
-                        key={t}
-                        className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#070B18] text-[#94A3B8] border border-[#1C2438]"
-                      >
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleInquiry(service.title);
-                    }}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold text-white bg-[#070B18] border border-[#1C2438] hover:border-[#2563EB] hover:bg-[#2563EB] transition-all min-h-[36px] font-heading"
-                    aria-label={`Inquire directly about ${service.title}`}
-                  >
-                    <span>Inquire</span>
-                    <ArrowUpRight size={13} />
-                  </button>
-                </div>
-              </article>
-            </motion.div>
-          ))}
+          <div className="services-floor-glow" aria-hidden="true" />
         </div>
       </div>
 
-      {/* Accessible Service Detail Dialog */}
       <ServiceDetailModal
         service={selectedModalService}
         onClose={handleCloseModal}

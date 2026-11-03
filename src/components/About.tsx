@@ -29,21 +29,21 @@ export const About: React.FC = () => {
   ];
 
   return (
-    <section id="about" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-[#1C2438] relative bg-[#050817] overflow-hidden">
+    <section id="about" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-white/10 relative bg-[#050817] overflow-hidden">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 pb-8 border-b border-[#1C2438]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 pb-8 border-b border-white/10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D1224] border border-[#1C2438] text-xs font-medium text-[#2563EB] mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#080C18] border border-white/10 text-xs font-medium text-[#38BDF8] mb-3">
               <Sparkles size={12} />
               <span>01 / ABOUT ME</span>
             </div>
             <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
               Building at the intersection of <br />
-              <span className="text-[#94A3B8] font-normal font-serif italic">storytelling and code.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-slate-400 to-sky-300 font-normal font-serif italic">storytelling and code.</span>
             </h2>
           </div>
-          <p className="max-w-md text-sm sm:text-base text-[#94A3B8] font-normal leading-relaxed">
+          <p className="max-w-md text-sm sm:text-base text-slate-400 font-normal leading-relaxed">
             I’m an independent creator from Nepal combining visual cinema, rhythmic video editing, and modern software development.
           </p>
         </div>
@@ -124,15 +124,15 @@ export const About: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.45, delay: idx * 0.08 }}
-                  className="p-6 rounded-2xl border border-[#1C2438] bg-[#0D1224] hover:border-[#2563EB] transition-all duration-300 group"
+                  className="p-6 rounded-2xl border border-white/10 bg-[#080C18]/80 backdrop-blur-xl hover:border-[#2563EB]/50 hover:shadow-[0_12px_35px_rgba(37,99,235,0.18)] transition-all duration-300 group shadow-md"
                 >
-                  <div className="p-3 rounded-xl bg-[#070B18] border border-[#1C2438] text-[#2563EB] group-hover:scale-105 group-hover:bg-[#2563EB]/10 transition-all w-fit mb-4">
+                  <div className="p-3 rounded-xl bg-[#050817] border border-white/10 text-[#38BDF8] group-hover:scale-105 group-hover:bg-[#2563EB]/15 group-hover:border-[#38BDF8]/40 transition-all w-fit mb-4">
                     <Icon size={20} />
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-2 font-heading group-hover:text-[#2563EB] transition-colors">
+                  <h3 className="text-lg font-bold text-white mb-2 font-heading group-hover:text-[#38BDF8] transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                     {item.description}
                   </p>
                 </motion.div>

@@ -10,10 +10,10 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="py-16 px-4 sm:px-8 border-t border-[#1C2438] bg-[#050817] relative">
+    <footer className="py-16 px-4 sm:px-8 border-t border-white/10 bg-[#050817] relative">
       <div className="max-w-6xl mx-auto space-y-12">
         {/* Top Footer Banner */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-[#1C2438]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-8 border-b border-white/10">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-white font-bold tracking-wider text-sm font-heading">
               <span className="w-2 h-2 rounded-full bg-[#2563EB]" />

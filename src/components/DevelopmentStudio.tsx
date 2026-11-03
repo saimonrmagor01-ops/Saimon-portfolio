@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Code, Terminal, Bot, Cpu, Check, Copy, ExternalLink } from "lucide-react";
 
 interface TechTab {
@@ -19,6 +20,7 @@ interface TechTab {
 }
 
 export const DevelopmentStudio: React.FC = () => {
+  const prefersReducedMotion = useReducedMotion();
   const tabs: TechTab[] = [
     {
       id: "web-dev",
@@ -170,27 +172,27 @@ def send_inquiry_notification(client_name: str, inquiry_topic: str) -> bool:
   };
 
   return (
-    <section id="development-studio" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-[#1C2438] relative bg-[#050817]">
+    <section id="development-studio" className="py-24 sm:py-28 px-4 sm:px-8 border-t border-white/10 relative bg-[#050817]">
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 pb-8 border-b border-[#1C2438]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 sm:mb-16 pb-8 border-b border-white/10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0D1224] border border-[#1C2438] text-xs font-medium text-[#2563EB] mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#080C18] border border-white/10 text-xs font-medium text-[#38BDF8] mb-3">
               <Terminal size={12} />
               <span>03 / DEVELOPMENT STUDIO</span>
             </div>
             <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tightest text-white leading-tight font-heading">
               Engineering &amp; <br />
-              <span className="text-[#94A3B8] font-normal font-serif italic">Practical Software.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-200 via-slate-400 to-sky-300 font-normal font-serif italic">Practical Software.</span>
             </h2>
           </div>
-          <p className="max-w-md text-sm sm:text-base text-[#94A3B8] font-normal leading-relaxed">
+          <p className="max-w-md text-sm sm:text-base text-slate-400 font-normal leading-relaxed">
             I write clean, maintainable code for responsive web applications, community automation bots, and lightweight script pipelines.
           </p>
         </div>
 
         {/* Tab Selection */}
-        <div className="flex flex-wrap items-center gap-2 mb-8 p-1 rounded-2xl bg-[#0D1224] border border-[#1C2438] w-fit">
+        <div className="flex flex-wrap items-center gap-2 mb-8 p-1.5 rounded-2xl bg-[#080C18]/90 border border-white/10 w-fit backdrop-blur-xl">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isSelected = activeTab.id === tab.id;
@@ -215,7 +217,13 @@ def send_inquiry_notification(client_name: str, inquiry_topic: str) -> bool:
         {/* Tab Content Body */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left: Overview & Architecture Highlights */}
-          <div className="lg:col-span-5 space-y-6">
+          <motion.div
+            className="studio-reveal lg:col-span-5 space-y-6"
+            initial={prefersReducedMotion ? false : { opacity: 0, x: -14 }}
+            whileInView={prefersReducedMotion ? undefined : { opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          >
             <div>
               <div className="text-[11px] font-mono text-[#2563EB] uppercase tracking-wider mb-1 font-bold">
                 Technical Focus
@@ -283,10 +291,16 @@ def send_inquiry_notification(client_name: str, inquiry_topic: str) -> bool:
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right: Code Viewer */}
-          <div className="lg:col-span-7">
+          <motion.div
+            className="studio-reveal lg:col-span-7"
+            initial={prefersReducedMotion ? false : { opacity: 0, x: 14 }}
+            whileInView={prefersReducedMotion ? undefined : { opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.15 }}
+            transition={{ duration: 0.55, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          >
             <div className="rounded-2xl border border-[#1C2438] bg-[#0D1224] shadow-2xl overflow-hidden">
               {/* Header Bar */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-[#1C2438] bg-[#070B18]">
@@ -323,7 +337,7 @@ def send_inquiry_notification(client_name: str, inquiry_topic: str) -> bool:
                 <span>Production Implementation</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

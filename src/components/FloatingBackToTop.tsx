@@ -8,18 +8,25 @@ export const FloatingBackToTop: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    let frameId = 0;
+
     const handleScroll = () => {
-      if (window.scrollY > 400) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
+      if (frameId !== 0) return;
+
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0;
+        const shouldBeVisible = window.scrollY > 400;
+        setIsVisible((current) => current === shouldBeVisible ? current : shouldBeVisible);
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (frameId !== 0) window.cancelAnimationFrame(frameId);
+    };
   }, []);
 
   const scrollToTop = () => {

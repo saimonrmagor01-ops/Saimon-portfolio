@@ -1,132 +1,106 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { motion, useSpring } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue } from "framer-motion";
+
+type CursorTarget = "none" | "link" | "button" | "card" | "image";
 
 export const CustomCursor: React.FC = () => {
+  const [isEnabled, setIsEnabled] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [hoverState, setHoverState] = useState<"none" | "link" | "button" | "card">("none");
-  const [isTouch, setIsTouch] = useState(true);
-
-  // Smooth springs for trailing ring
-  const springX = useSpring(0, { damping: 26, stiffness: 240, mass: 0.45 });
-  const springY = useSpring(0, { damping: 26, stiffness: 240, mass: 0.45 });
+  const [hoverState, setHoverState] = useState<CursorTarget>("none");
+  const enabledRef = useRef(false);
+  const visibleRef = useRef(false);
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
 
   useEffect(() => {
-    // Only enable on desktop pointer devices
-    const isFinePointer = window.matchMedia("(pointer: fine)").matches;
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    if (!isFinePointer || prefersReducedMotion) {
-      setIsTouch(true);
-      return;
-    }
-    setIsTouch(false);
-
-    const onMouseMove = (e: MouseEvent) => {
-      springX.set(e.clientX);
-      springY.set(e.clientY);
-      if (!isVisible) setIsVisible(true);
-    };
-
-    const onMouseEnter = () => setIsVisible(true);
-    const onMouseLeave = () => setIsVisible(false);
-
-    const onMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-
-      const isServiceCard = Boolean(target.closest(".service-card"));
-      const projectCard = !isServiceCard && (target.closest(".project-card") || target.closest(".cinema-viewport-card") || target.closest("article"));
-      const button = target.closest("button") || target.closest(".btn-main") || target.closest(".btn-secondary");
-      const link = target.closest("a") || target.closest("select") || target.closest("input");
-
-      if (isServiceCard) {
-        if (button || link) {
-          setHoverState("button");
-        } else {
-          setHoverState("link");
-        }
-      } else if (projectCard) {
-        setHoverState("card");
-      } else if (button) {
-        setHoverState("button");
-      } else if (link) {
-        setHoverState("link");
-      } else {
+    const syncPreferences = () => {
+      const enabled = finePointer.matches && !reducedMotion.matches;
+      document.documentElement.classList.toggle("custom-cursor-enabled", enabled);
+      enabledRef.current = enabled;
+      setIsEnabled((current) => current === enabled ? current : enabled);
+      if (!enabled) {
+        visibleRef.current = false;
+        setIsVisible(false);
         setHoverState("none");
       }
     };
 
-    window.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseenter", onMouseEnter);
-    document.addEventListener("mouseleave", onMouseLeave);
-    document.addEventListener("mouseover", onMouseOver);
+    const updateTarget = (event: PointerEvent) => {
+      if (!enabledRef.current || event.pointerType === "touch") return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const nextState: CursorTarget = target.closest("button, [role='button'], .btn-main, .btn-secondary")
+        ? "button"
+        : target.closest("a, select")
+          ? "link"
+          : target.closest(".project-scroll-card, .service-scroll-card, .cinema-viewport-card")
+            ? "card"
+            : target.closest("img")
+              ? "image"
+              : "none";
+
+      setHoverState((current) => current === nextState ? current : nextState);
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (!enabledRef.current || event.pointerType === "touch") return;
+      pointerX.set(event.clientX);
+      pointerY.set(event.clientY);
+      if (!visibleRef.current) {
+        visibleRef.current = true;
+        setIsVisible(true);
+      }
+      updateTarget(event);
+    };
+
+    const onPointerOut = (event: PointerEvent) => {
+      if (event.relatedTarget !== null) return;
+      visibleRef.current = false;
+      setIsVisible(false);
+      setHoverState("none");
+    };
+
+    const onWindowBlur = () => {
+      visibleRef.current = false;
+      setIsVisible(false);
+    };
+
+    syncPreferences();
+    finePointer.addEventListener("change", syncPreferences);
+    reducedMotion.addEventListener("change", syncPreferences);
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
+    window.addEventListener("pointerout", onPointerOut);
+    window.addEventListener("blur", onWindowBlur);
 
     return () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseenter", onMouseEnter);
-      document.removeEventListener("mouseleave", onMouseLeave);
-      document.removeEventListener("mouseover", onMouseOver);
+      finePointer.removeEventListener("change", syncPreferences);
+      reducedMotion.removeEventListener("change", syncPreferences);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerout", onPointerOut);
+      window.removeEventListener("blur", onWindowBlur);
+      document.documentElement.classList.remove("custom-cursor-enabled");
     };
-  }, [springX, springY, isVisible]);
+  }, [pointerX, pointerY]);
 
-  if (isTouch || !isVisible) return null;
-
-  const isHovered = hoverState !== "none";
+  if (!isEnabled || !isVisible) return null;
 
   return (
     <>
-      {/* Outer trailing ring with dynamic states */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[100] rounded-full border mix-blend-difference"
-        style={{
-          x: springX,
-          y: springY,
-          translateX: "-50%",
-          translateY: "-50%",
-        }}
-        animate={{
-          width: hoverState === "card" ? 58 : hoverState === "button" ? 44 : isHovered ? 38 : 24,
-          height: hoverState === "card" ? 58 : hoverState === "button" ? 44 : isHovered ? 38 : 24,
-          borderColor:
-            hoverState === "card"
-              ? "rgba(37, 99, 235, 0.9)"
-              : isHovered
-              ? "rgba(59, 130, 246, 0.85)"
-              : "rgba(255, 255, 255, 0.35)",
-          backgroundColor:
-            hoverState === "card"
-              ? "rgba(37, 99, 235, 0.16)"
-              : isHovered
-              ? "rgba(37, 99, 235, 0.08)"
-              : "transparent",
-        }}
-        transition={{ type: "spring", damping: 24, stiffness: 320, mass: 0.2 }}
-      >
-        {hoverState === "card" && (
-          <span className="text-[9px] font-mono tracking-widest text-[#93C5FD] uppercase flex items-center justify-center h-full font-bold">
-            VIEW
-          </span>
-        )}
-      </motion.div>
-
-      {/* Center pinpoint dot */}
+        aria-hidden="true"
+        className={`custom-cursor-ring custom-cursor-ring-${hoverState}`}
+        style={{ x: pointerX, y: pointerY }}
+      />
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[100] rounded-full bg-white mix-blend-difference"
-        style={{
-          x: springX,
-          y: springY,
-          translateX: "-50%",
-          translateY: "-50%",
-        }}
-        animate={{
-          width: isHovered ? (hoverState === "card" ? 0 : 4) : 4,
-          height: isHovered ? (hoverState === "card" ? 0 : 4) : 4,
-          opacity: hoverState === "card" ? 0 : 1,
-          backgroundColor: isHovered ? "#3B82F6" : "#ffffff",
-        }}
-        transition={{ type: "spring", damping: 30, stiffness: 450 }}
+        aria-hidden="true"
+        className="custom-cursor-point"
+        style={{ x: pointerX, y: pointerY }}
       />
     </>
   );
