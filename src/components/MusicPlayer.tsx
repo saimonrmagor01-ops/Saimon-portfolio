@@ -5,7 +5,6 @@ import React, {
   useRef,
   useEffect,
   useCallback,
-  useMemo,
 } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,13 +19,13 @@ import {
   ChevronUp,
   ChevronDown,
   Sparkles,
-  Maximize2,
-  Minimize2,
   Disc3,
-  Layers,
+  Loader2,
+  AlertCircle,
+  RotateCcw,
 } from "lucide-react";
 
-interface Track {
+export interface Track {
   title: string;
   artist: string;
   src: string;
@@ -39,19 +38,33 @@ interface Track {
   bgTint: string;
 }
 
-// Verified tracks with high-resolution official album covers
-const PLAYLIST: Track[] = [
+// 6 Verified Tracks:
+// Family Affair and Girl Like Me are prioritized as primary tracks to guarantee
+// immediate verified playback across both production CDN (Vercel) and local dev environments.
+export const PLAYLIST: Track[] = [
   {
-    title: "CHIHIRO",
-    artist: "Billie Eilish",
-    src: "/music/CHIHIRO%20-%20Billie%20Eilish.mp3",
-    album: "HIT ME HARD AND SOFT",
-    year: "2024",
-    coverArt: "/music/chihiro-cover.jpg",
-    accentColor: "#38BDF8", // deep ocean cyan
-    secondaryColor: "#1D4ED8", // abyssal blue
-    glowColor: "rgba(56, 189, 248, 0.45)",
-    bgTint: "rgba(56, 189, 248, 0.08)",
+    title: "Family Affair",
+    artist: "Mary J. Blige",
+    src: "/music/Family%20Affair%20-%20Mary%20J.%20Blige.mp3",
+    album: "No More Drama",
+    year: "2001",
+    coverArt: "/music/family-affair-cover.jpg",
+    accentColor: "#F59E0B", // warm golden amber
+    secondaryColor: "#8B5CF6", // royal violet
+    glowColor: "rgba(245, 158, 11, 0.45)",
+    bgTint: "rgba(245, 158, 11, 0.08)",
+  },
+  {
+    title: "Girl Like Me",
+    artist: "Black Eyed Peas & Shakira",
+    src: "/music/Girl%20Like%20Me%20-%20Hot%20Black%20Eyed%20Peas.mp3",
+    album: "Translation",
+    year: "2020",
+    coverArt: "/music/girl-like-me-cover.jpg",
+    accentColor: "#EC4899", // neon magenta
+    secondaryColor: "#06B6D4", // cyber cyan
+    glowColor: "rgba(236, 72, 153, 0.45)",
+    bgTint: "rgba(236, 72, 153, 0.08)",
   },
   {
     title: "Timeless",
@@ -66,6 +79,18 @@ const PLAYLIST: Track[] = [
     bgTint: "rgba(225, 29, 72, 0.08)",
   },
   {
+    title: "CHIHIRO",
+    artist: "Billie Eilish",
+    src: "/music/CHIHIRO%20-%20Billie%20Eilish.mp3",
+    album: "HIT ME HARD AND SOFT",
+    year: "2024",
+    coverArt: "/music/chihiro-cover.jpg",
+    accentColor: "#38BDF8", // deep ocean cyan
+    secondaryColor: "#1D4ED8", // abyssal blue
+    glowColor: "rgba(56, 189, 248, 0.45)",
+    bgTint: "rgba(56, 189, 248, 0.08)",
+  },
+  {
     title: "MUTT",
     artist: "Leon Thomas",
     src: "/music/MUTT%20-%20Leon%20Thomas.mp3",
@@ -76,18 +101,6 @@ const PLAYLIST: Track[] = [
     secondaryColor: "#6366F1", // midnight indigo
     glowColor: "rgba(217, 119, 6, 0.45)",
     bgTint: "rgba(217, 119, 6, 0.08)",
-  },
-  {
-    title: "Family Affair",
-    artist: "Mary J. Blige",
-    src: "/music/Family%20Affair%20-%20Mary%20J.%20Blige.mp3",
-    album: "No More Drama",
-    year: "2001",
-    coverArt: "/music/family-affair-cover.jpg",
-    accentColor: "#F59E0B", // warm golden amber
-    secondaryColor: "#8B5CF6", // royal violet
-    glowColor: "rgba(245, 158, 11, 0.45)",
-    bgTint: "rgba(245, 158, 11, 0.08)",
   },
   {
     title: "Black and Yellow",
@@ -101,21 +114,9 @@ const PLAYLIST: Track[] = [
     glowColor: "rgba(234, 179, 8, 0.45)",
     bgTint: "rgba(234, 179, 8, 0.08)",
   },
-  {
-    title: "Girl Like Me",
-    artist: "Black Eyed Peas & Shakira",
-    src: "/music/Girl%20Like%20Me%20-%20Hot%20Black%20Eyed%20Peas.mp3",
-    album: "Translation",
-    year: "2020",
-    coverArt: "/music/girl-like-me-cover.jpg",
-    accentColor: "#EC4899", // neon magenta
-    secondaryColor: "#06B6D4", // cyber cyan
-    glowColor: "rgba(236, 72, 153, 0.45)",
-    bgTint: "rgba(236, 72, 153, 0.08)",
-  },
 ];
 
-// Module-level singletons: Guarantee single audio instance & Web Audio nodes
+// Module-level singletons: Guarantee single authoritative audio instance
 let globalAudio: HTMLAudioElement | null = null;
 let globalAudioContext: AudioContext | null = null;
 let globalMediaSource: MediaElementAudioSourceNode | null = null;
@@ -173,7 +174,8 @@ const formatTime = (seconds: number): string => {
 };
 
 /**
- * Safe initializer for Web Audio API AudioContext and AnalyserNode
+ * Safe initializer for Web Audio API AudioContext and AnalyserNode.
+ * Wrapped in try/catch to ensure standard audio playback is never blocked.
  */
 const getOrCreateAudioNodes = (audioEl: HTMLAudioElement) => {
   if (globalAnalyser) return globalAnalyser;
@@ -201,8 +203,8 @@ const getOrCreateAudioNodes = (audioEl: HTMLAudioElement) => {
     }
 
     return globalAnalyser;
-  } catch (err) {
-    // If Web Audio source already connected or restricted, continue gracefully
+  } catch {
+    // If Web Audio API is restricted by CORS or browser policy, fallback gracefully
     return globalAnalyser;
   }
 };
@@ -212,15 +214,18 @@ export const MusicPlayer: React.FC = () => {
     globalCurrentTrackIndex
   );
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.7);
   const [isExpanded, setIsExpanded] = useState(false);
   const [autoplayBlocked, setAutoplayBlocked] = useState(false);
   const [hasAudioError, setHasAudioError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isSeeking, setIsSeeking] = useState(false);
   const [seekTime, setSeekTime] = useState(0);
+  const [failedCoverArts, setFailedCoverArts] = useState<Record<string, boolean>>({});
 
   // Direct DOM Refs for 60 FPS performance without React state overhead
   const playerContainerRef = useRef<HTMLElement | null>(null);
@@ -232,6 +237,12 @@ export const MusicPlayer: React.FC = () => {
   const miniVisualizerCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
 
+  // Synchronization refs to eliminate re-render listener churn
+  const isSeekingRef = useRef(false);
+  const playPromiseRef = useRef<Promise<void> | null>(null);
+  const currentTrackIndexRef = useRef(currentTrackIndex);
+  currentTrackIndexRef.current = currentTrackIndex;
+
   const currentTrack = PLAYLIST[currentTrackIndex];
 
   // Resume Web Audio context if suspended
@@ -241,31 +252,116 @@ export const MusicPlayer: React.FC = () => {
     }
   }, []);
 
-  // Safe playback start
-  const startPlayback = useCallback(
+  // Safe playback start with promise resolution tracking
+  const safePlay = useCallback(
     async (audioEl: HTMLAudioElement) => {
       try {
         setHasAudioError(false);
+        setErrorMessage(null);
+        setIsLoading(true);
         ensureAudioContextRunning();
-        const playPromise = audioEl.play();
-        if (playPromise !== undefined) {
-          await playPromise;
+
+        // Wait for any previous pending play promise to settle
+        if (playPromiseRef.current) {
+          try {
+            await playPromiseRef.current;
+          } catch {
+            // previous play request settled/aborted
+          }
+        }
+
+        const promise = audioEl.play();
+        if (promise !== undefined) {
+          playPromiseRef.current = promise;
+          await promise;
+          playPromiseRef.current = null;
           setIsPlaying(true);
+          setIsLoading(false);
           setAutoplayBlocked(false);
+          setHasAudioError(false);
+          setErrorMessage(null);
           hasUserExplicitlyPaused = false;
+
           // Connect Web Audio graph once playing
           getOrCreateAudioNodes(audioEl);
           ensureAudioContextRunning();
         }
-      } catch {
-        setIsPlaying(false);
-        setAutoplayBlocked(true);
+      } catch (err: unknown) {
+        playPromiseRef.current = null;
+        const error = err as Error;
+        setIsLoading(false);
+
+        if (error.name === "NotAllowedError") {
+          // Standard browser autoplay policy: not an audio error, wait for user gesture
+          setIsPlaying(false);
+          setAutoplayBlocked(true);
+        } else if (error.name === "AbortError") {
+          // Playback interrupted cleanly by pause or track change
+        } else {
+          console.warn("[MusicPlayer] SafePlay failed:", error.name, error.message);
+          setIsPlaying(false);
+        }
       }
     },
     [ensureAudioContextRunning]
   );
 
-  // Initialize Audio & Bind Singleton
+  // Safe atomic pause
+  const safePause = useCallback(async (audioEl: HTMLAudioElement) => {
+    hasUserExplicitlyPaused = true;
+    setAutoplayBlocked(false);
+    try {
+      if (playPromiseRef.current) {
+        await playPromiseRef.current;
+      }
+    } catch {
+      // ignore
+    }
+    audioEl.pause();
+    setIsPlaying(false);
+    setIsLoading(false);
+  }, []);
+
+  // Change Track atomically
+  const changeTrack = useCallback(
+    async (targetIndex: number, shouldAutoPlay: boolean = true) => {
+      const nextIdx =
+        ((targetIndex % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
+      globalCurrentTrackIndex = nextIdx;
+      setCurrentTrackIndex(nextIdx);
+
+      if (!globalAudio) return;
+      const audio = globalAudio;
+
+      try {
+        if (playPromiseRef.current) {
+          await playPromiseRef.current;
+        }
+      } catch {
+        // ignore
+      }
+
+      audio.pause();
+      setIsPlaying(false);
+      setIsLoading(true);
+      setHasAudioError(false);
+      setErrorMessage(null);
+      setCurrentTime(0);
+
+      const targetTrack = PLAYLIST[nextIdx];
+      audio.src = targetTrack.src;
+      audio.load();
+
+      if (shouldAutoPlay && !hasUserExplicitlyPaused) {
+        await safePlay(audio);
+      } else {
+        setIsLoading(false);
+      }
+    },
+    [safePlay]
+  );
+
+  // Initialize Audio & Bind Listeners once
   useEffect(() => {
     let initialVolume = 0.7;
     let initialMute = false;
@@ -307,7 +403,7 @@ export const MusicPlayer: React.FC = () => {
     const audio = globalAudio;
 
     const onTimeUpdate = () => {
-      if (!isSeeking) {
+      if (!isSeekingRef.current) {
         setCurrentTime(audio.currentTime);
       }
     };
@@ -324,48 +420,79 @@ export const MusicPlayer: React.FC = () => {
       }
     };
 
-    const onEnded = () => {
-      globalCurrentTrackIndex =
-        (globalCurrentTrackIndex + 1) % PLAYLIST.length;
-      setCurrentTrackIndex(globalCurrentTrackIndex);
-      audio.src = PLAYLIST[globalCurrentTrackIndex].src;
-      startPlayback(audio);
+    const onCanPlay = () => {
+      setIsLoading(false);
     };
 
-    const onError = () => {
-      setHasAudioError(true);
-      setIsPlaying(false);
+    const onWaiting = () => {
+      setIsLoading(true);
     };
 
-    const onPlay = () => {
+    const onPlaying = () => {
       setIsPlaying(true);
+      setIsLoading(false);
+      setHasAudioError(false);
+      setErrorMessage(null);
       getOrCreateAudioNodes(audio);
       ensureAudioContextRunning();
     };
 
     const onPause = () => {
       setIsPlaying(false);
+      setIsLoading(false);
+    };
+
+    const onEnded = () => {
+      // Automatically advance to the next track on track end
+      const nextIndex =
+        (currentTrackIndexRef.current + 1) % PLAYLIST.length;
+      changeTrack(nextIndex, true);
+    };
+
+    const onError = () => {
+      const err = audio.error;
+      const track = PLAYLIST[currentTrackIndexRef.current];
+      console.warn(
+        `[MusicPlayer] Audio element error for "${track.title}" (${track.src}):`,
+        err?.code,
+        err?.message
+      );
+
+      setIsPlaying(false);
+      setIsLoading(false);
+      setHasAudioError(true);
+
+      let msg = "Track unavailable";
+      if (err?.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED) {
+        msg = "Track file not found on server";
+      } else if (err?.code === MediaError.MEDIA_ERR_NETWORK) {
+        msg = "Network connection interrupted";
+      } else if (err?.code === MediaError.MEDIA_ERR_DECODE) {
+        msg = "Audio format decoding error";
+      }
+      setErrorMessage(msg);
     };
 
     audio.addEventListener("timeupdate", onTimeUpdate);
     audio.addEventListener("durationchange", onDurationChange);
     audio.addEventListener("loadedmetadata", onLoadedMetadata);
+    audio.addEventListener("canplay", onCanPlay);
+    audio.addEventListener("waiting", onWaiting);
+    audio.addEventListener("playing", onPlaying);
+    audio.addEventListener("pause", onPause);
     audio.addEventListener("ended", onEnded);
     audio.addEventListener("error", onError);
-    audio.addEventListener("play", onPlay);
-    audio.addEventListener("pause", onPause);
 
     // Initial autoplay attempt
     if (!hasUserExplicitlyPaused && audio.paused) {
-      startPlayback(audio);
+      safePlay(audio);
     }
 
-    // Unlock audio on first user gesture
+    // Unlock audio on first user gesture anywhere on page
     const handleFirstGesture = () => {
+      ensureAudioContextRunning();
       if (globalAudio && !hasUserExplicitlyPaused && globalAudio.paused) {
-        startPlayback(globalAudio);
-      } else {
-        ensureAudioContextRunning();
+        safePlay(globalAudio);
       }
     };
 
@@ -376,39 +503,23 @@ export const MusicPlayer: React.FC = () => {
       audio.removeEventListener("timeupdate", onTimeUpdate);
       audio.removeEventListener("durationchange", onDurationChange);
       audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+      audio.removeEventListener("canplay", onCanPlay);
+      audio.removeEventListener("waiting", onWaiting);
+      audio.removeEventListener("playing", onPlaying);
+      audio.removeEventListener("pause", onPause);
       audio.removeEventListener("ended", onEnded);
       audio.removeEventListener("error", onError);
-      audio.removeEventListener("play", onPlay);
-      audio.removeEventListener("pause", onPause);
       window.removeEventListener("pointerdown", handleFirstGesture);
       window.removeEventListener("keydown", handleFirstGesture);
     };
-  }, [startPlayback, isSeeking, ensureAudioContextRunning]);
+  }, [changeTrack, safePlay, ensureAudioContextRunning]);
 
-  // Handle Track Changes
-  useEffect(() => {
-    if (!globalAudio) return;
-    const isDifferentTrack =
-      globalAudio.src !== window.location.origin + currentTrack.src;
-    if (isDifferentTrack) {
-      const wasPlaying = !globalAudio.paused;
-      globalAudio.src = currentTrack.src;
-      globalAudio.load();
-      setCurrentTime(0);
-      if (wasPlaying || !hasUserExplicitlyPaused) {
-        startPlayback(globalAudio);
-      }
-    }
-  }, [currentTrack, startPlayback]);
-
-  // Click outside to minimize expanded player
+  // Click outside to collapse expanded player
   useEffect(() => {
     if (!isExpanded) return;
 
     const handlePointerDownOutside = (event: PointerEvent) => {
-      // Do not collapse if user is actively dragging the scrubber
-      if (isSeeking) return;
-
+      if (isSeekingRef.current) return;
       if (
         playerContainerRef.current &&
         !playerContainerRef.current.contains(event.target as Node)
@@ -418,11 +529,10 @@ export const MusicPlayer: React.FC = () => {
     };
 
     document.addEventListener("pointerdown", handlePointerDownOutside);
-
     return () => {
       document.removeEventListener("pointerdown", handlePointerDownOutside);
     };
-  }, [isExpanded, isSeeking]);
+  }, [isExpanded]);
 
   // =========================================================================
   // HIGH-PERFORMANCE AUDIO-REACTIVE 60 FPS ANIMATION LOOP (Zero React Re-renders)
@@ -438,15 +548,15 @@ export const MusicPlayer: React.FC = () => {
 
       if (!active) {
         idleDecayFrames++;
-        if (idleDecayFrames > 25) {
-          // Idle resting state reached; stop RAF to conserve GPU/CPU
+        if (idleDecayFrames > 30) {
+          // Resting state reached; pause RAF loop to conserve CPU/GPU
           return;
         }
       } else {
         idleDecayFrames = 0;
       }
 
-      // 1. Fetch real frequency data or generate smooth fallback
+      // 1. Fetch real frequency data or generate smooth harmonic waveform
       let hasRealData = false;
       if (globalAnalyser && active) {
         try {
@@ -649,13 +759,17 @@ export const MusicPlayer: React.FC = () => {
     if (!globalAudio) return;
 
     if (isPlaying) {
-      globalAudio.pause();
-      setIsPlaying(false);
-      hasUserExplicitlyPaused = true;
-      setAutoplayBlocked(false);
+      safePause(globalAudio);
     } else {
-      hasUserExplicitlyPaused = false;
-      startPlayback(globalAudio);
+      if (hasAudioError) {
+        // Clear error and retry loading track
+        setHasAudioError(false);
+        setErrorMessage(null);
+        changeTrack(currentTrackIndex, true);
+      } else {
+        hasUserExplicitlyPaused = false;
+        safePlay(globalAudio);
+      }
     }
   };
 
@@ -663,16 +777,11 @@ export const MusicPlayer: React.FC = () => {
     e.stopPropagation();
     if (!globalAudio) return;
     hasUserExplicitlyPaused = false;
-    startPlayback(globalAudio);
+    safePlay(globalAudio);
   };
 
   const nextTrack = () => {
-    globalCurrentTrackIndex = (globalCurrentTrackIndex + 1) % PLAYLIST.length;
-    setCurrentTrackIndex(globalCurrentTrackIndex);
-    if (globalAudio) {
-      globalAudio.src = PLAYLIST[globalCurrentTrackIndex].src;
-      startPlayback(globalAudio);
-    }
+    changeTrack(currentTrackIndex + 1, true);
   };
 
   const prevTrack = () => {
@@ -681,13 +790,13 @@ export const MusicPlayer: React.FC = () => {
       setCurrentTime(0);
       return;
     }
-    globalCurrentTrackIndex =
-      (globalCurrentTrackIndex - 1 + PLAYLIST.length) % PLAYLIST.length;
-    setCurrentTrackIndex(globalCurrentTrackIndex);
-    if (globalAudio) {
-      globalAudio.src = PLAYLIST[globalCurrentTrackIndex].src;
-      startPlayback(globalAudio);
-    }
+    changeTrack(currentTrackIndex - 1, true);
+  };
+
+  const retryPlayback = () => {
+    setHasAudioError(false);
+    setErrorMessage(null);
+    changeTrack(currentTrackIndex, true);
   };
 
   const toggleMute = () => {
@@ -730,6 +839,7 @@ export const MusicPlayer: React.FC = () => {
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (!duration) return;
+    isSeekingRef.current = true;
     setIsSeeking(true);
     const newTime = calculateSeekTime(e.clientX);
     setSeekTime(newTime);
@@ -745,6 +855,7 @@ export const MusicPlayer: React.FC = () => {
         globalAudio.currentTime = finalTime;
         setCurrentTime(finalTime);
       }
+      isSeekingRef.current = false;
       setIsSeeking(false);
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
@@ -938,14 +1049,43 @@ export const MusicPlayer: React.FC = () => {
                       transition={{ duration: 0.4, ease: "easeOut" }}
                       className="w-full h-full relative"
                     >
-                      <Image
-                        src={currentTrack.coverArt}
-                        alt={`${currentTrack.title} official album artwork`}
-                        fill
-                        priority
-                        sizes="(max-width: 640px) 270px, 290px"
-                        className="object-cover"
-                      />
+                      {failedCoverArts[currentTrack.coverArt] ? (
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#12192B] to-[#080C18] p-5 text-center relative overflow-hidden">
+                          <div
+                            className="absolute inset-0 opacity-20 pointer-events-none"
+                            style={{
+                              background: `radial-gradient(circle at center, ${currentTrack.accentColor} 0%, transparent 70%)`,
+                            }}
+                          />
+                          <Disc3
+                            className={`w-16 h-16 text-white/80 ${
+                              isPlaying ? "animate-spin" : ""
+                            }`}
+                            style={{ animationDuration: "8s" }}
+                          />
+                          <span className="text-sm font-bold text-white mt-3 font-heading truncate max-w-full">
+                            {currentTrack.title}
+                          </span>
+                          <span className="text-xs text-slate-400 font-sans truncate max-w-full">
+                            {currentTrack.artist}
+                          </span>
+                        </div>
+                      ) : (
+                        <Image
+                          src={currentTrack.coverArt}
+                          alt={`${currentTrack.title} official album artwork`}
+                          fill
+                          priority
+                          sizes="(max-width: 640px) 270px, 290px"
+                          className="object-cover"
+                          onError={() =>
+                            setFailedCoverArts((prev) => ({
+                              ...prev,
+                              [currentTrack.coverArt]: true,
+                            }))
+                          }
+                        />
+                      )}
                     </motion.div>
                   </AnimatePresence>
 
@@ -956,20 +1096,28 @@ export const MusicPlayer: React.FC = () => {
 
               {/* Track Metadata Typography */}
               <div
-                className="flex flex-col text-left px-1"
+                className="flex flex-col text-left px-1 gap-0.5"
                 style={{ transform: "translateZ(34px)" }}
               >
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="text-base sm:text-lg font-bold text-white tracking-tight font-heading leading-tight truncate">
-                    {hasAudioError ? "Audio Error" : currentTrack.title}
+                    {currentTrack.title}
                   </h3>
                   <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 shrink-0">
                     {currentTrack.album}
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 font-sans truncate">
-                  {currentTrack.artist}
-                </p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-xs text-slate-300 font-sans truncate">
+                    {currentTrack.artist}
+                  </p>
+                  {hasAudioError && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-mono text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">
+                      <AlertCircle size={10} />
+                      {errorMessage || "Unavailable"}
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Real-time Audio-Reactive Frequency Waveform Canvas */}
@@ -1044,30 +1192,44 @@ export const MusicPlayer: React.FC = () => {
                   <SkipBack size={17} />
                 </button>
 
-                {/* Primary Animated Play / Pause Centerpiece */}
-                <button
-                  onClick={togglePlay}
-                  type="button"
-                  aria-label={
-                    isPlaying
-                      ? `Pause ${currentTrack.title}`
-                      : `Play ${currentTrack.title}`
-                  }
-                  title={isPlaying ? "Pause soundtrack" : "Play soundtrack"}
-                  className="w-12 h-12 rounded-full text-slate-950 flex items-center justify-center font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
-                  style={{
-                    background: `linear-gradient(135deg, #FFFFFF 0%, ${currentTrack.accentColor} 100%)`,
-                    boxShadow: isPlaying
-                      ? `0 0 28px ${currentTrack.glowColor}`
-                      : "0 8px 24px rgba(0,0,0,0.4)",
-                  }}
-                >
-                  {isPlaying ? (
-                    <Pause size={19} className="fill-current" />
-                  ) : (
-                    <Play size={19} className="translate-x-0.5 fill-current" />
-                  )}
-                </button>
+                {/* Primary Animated Play / Pause / Retry Centerpiece */}
+                {hasAudioError ? (
+                  <button
+                    onClick={retryPlayback}
+                    type="button"
+                    aria-label="Retry audio playback"
+                    title="Retry audio source"
+                    className="w-12 h-12 rounded-full text-slate-950 flex items-center justify-center font-bold shadow-lg hover:scale-105 active:scale-95 transition-all bg-amber-400 hover:bg-amber-300"
+                  >
+                    <RotateCcw size={19} className="text-slate-950" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={togglePlay}
+                    type="button"
+                    aria-label={
+                      isPlaying
+                        ? `Pause ${currentTrack.title}`
+                        : `Play ${currentTrack.title}`
+                    }
+                    title={isPlaying ? "Pause soundtrack" : "Play soundtrack"}
+                    className="w-12 h-12 rounded-full text-slate-950 flex items-center justify-center font-bold shadow-lg hover:scale-105 active:scale-95 transition-all"
+                    style={{
+                      background: `linear-gradient(135deg, #FFFFFF 0%, ${currentTrack.accentColor} 100%)`,
+                      boxShadow: isPlaying
+                        ? `0 0 28px ${currentTrack.glowColor}`
+                        : "0 8px 24px rgba(0,0,0,0.4)",
+                    }}
+                  >
+                    {isLoading ? (
+                      <Loader2 size={19} className="animate-spin text-slate-950" />
+                    ) : isPlaying ? (
+                      <Pause size={19} className="fill-current" />
+                    ) : (
+                      <Play size={19} className="translate-x-0.5 fill-current" />
+                    )}
+                  </button>
+                )}
 
                 {/* Skip Forward */}
                 <button
@@ -1124,39 +1286,70 @@ export const MusicPlayer: React.FC = () => {
                 className="relative w-10 h-10 rounded-xl overflow-hidden shrink-0 cursor-pointer shadow-md border border-white/15 hover:scale-105 transition-transform"
                 title="Click to expand player"
               >
-                <Image
-                  src={currentTrack.coverArt}
-                  alt={`${currentTrack.title} cover`}
-                  fill
-                  sizes="40px"
-                  className="object-cover"
-                />
+                {failedCoverArts[currentTrack.coverArt] ? (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-950">
+                    <Disc3
+                      className={`w-5 h-5 text-white/80 ${
+                        isPlaying ? "animate-spin" : ""
+                      }`}
+                      style={{ animationDuration: "5s" }}
+                    />
+                  </div>
+                ) : (
+                  <Image
+                    src={currentTrack.coverArt}
+                    alt={`${currentTrack.title} cover`}
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                    onError={() =>
+                      setFailedCoverArts((prev) => ({
+                        ...prev,
+                        [currentTrack.coverArt]: true,
+                      }))
+                    }
+                  />
+                )}
               </div>
 
               {/* Play / Pause Circular Center Button */}
-              <button
-                onClick={togglePlay}
-                type="button"
-                aria-label={
-                  isPlaying
-                    ? `Pause ${currentTrack.title}`
-                    : `Play ${currentTrack.title}`
-                }
-                title={isPlaying ? "Pause soundtrack" : "Play soundtrack"}
-                className="w-8 h-8 rounded-full text-slate-950 flex items-center justify-center shrink-0 shadow-md hover:scale-105 active:scale-95 transition-transform"
-                style={{
-                  background: `linear-gradient(135deg, #FFFFFF 0%, ${currentTrack.accentColor} 100%)`,
-                  boxShadow: isPlaying
-                    ? `0 0 16px ${currentTrack.glowColor}`
-                    : undefined,
-                }}
-              >
-                {isPlaying ? (
-                  <Pause size={13} className="fill-current" />
-                ) : (
-                  <Play size={13} className="translate-x-0.5 fill-current" />
-                )}
-              </button>
+              {hasAudioError ? (
+                <button
+                  onClick={retryPlayback}
+                  type="button"
+                  aria-label="Retry audio"
+                  title="Retry audio source"
+                  className="w-8 h-8 rounded-full text-slate-950 flex items-center justify-center shrink-0 shadow-md hover:scale-105 active:scale-95 transition-transform bg-amber-400"
+                >
+                  <RotateCcw size={13} className="text-slate-950" />
+                </button>
+              ) : (
+                <button
+                  onClick={togglePlay}
+                  type="button"
+                  aria-label={
+                    isPlaying
+                      ? `Pause ${currentTrack.title}`
+                      : `Play ${currentTrack.title}`
+                  }
+                  title={isPlaying ? "Pause soundtrack" : "Play soundtrack"}
+                  className="w-8 h-8 rounded-full text-slate-950 flex items-center justify-center shrink-0 shadow-md hover:scale-105 active:scale-95 transition-transform"
+                  style={{
+                    background: `linear-gradient(135deg, #FFFFFF 0%, ${currentTrack.accentColor} 100%)`,
+                    boxShadow: isPlaying
+                      ? `0 0 16px ${currentTrack.glowColor}`
+                      : undefined,
+                  }}
+                >
+                  {isLoading ? (
+                    <Loader2 size={13} className="animate-spin text-slate-950" />
+                  ) : isPlaying ? (
+                    <Pause size={13} className="fill-current" />
+                  ) : (
+                    <Play size={13} className="translate-x-0.5 fill-current" />
+                  )}
+                </button>
+              )}
 
               {/* Mini Real-Time Audio-Reactive Visualizer Canvas */}
               <div
@@ -1180,10 +1373,14 @@ export const MusicPlayer: React.FC = () => {
                 title="Click to expand player"
               >
                 <span className="text-xs font-semibold text-white truncate tracking-tight font-heading leading-tight">
-                  {hasAudioError ? "Audio Error" : currentTrack.title}
+                  {currentTrack.title}
                 </span>
                 <span className="text-[10px] text-slate-400 truncate font-sans leading-tight">
-                  {isPlaying ? currentTrack.artist : "Soundtrack"}
+                  {hasAudioError
+                    ? errorMessage || "Unavailable"
+                    : isPlaying
+                    ? currentTrack.artist
+                    : "Soundtrack"}
                 </span>
               </div>
 
