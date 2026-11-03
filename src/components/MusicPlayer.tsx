@@ -43,28 +43,16 @@ export interface Track {
 // immediate verified playback across both production CDN (Vercel) and local dev environments.
 export const PLAYLIST: Track[] = [
   {
-    title: "Family Affair",
-    artist: "Mary J. Blige",
-    src: "/music/Family%20Affair%20-%20Mary%20J.%20Blige.mp3",
-    album: "No More Drama",
-    year: "2001",
-    coverArt: "/music/family-affair-cover.jpg",
-    accentColor: "#F59E0B", // warm golden amber
-    secondaryColor: "#8B5CF6", // royal violet
-    glowColor: "rgba(245, 158, 11, 0.45)",
-    bgTint: "rgba(245, 158, 11, 0.08)",
-  },
-  {
-    title: "Girl Like Me",
-    artist: "Black Eyed Peas & Shakira",
-    src: "/music/Girl%20Like%20Me%20-%20Hot%20Black%20Eyed%20Peas.mp3",
-    album: "Translation",
-    year: "2020",
-    coverArt: "/music/girl-like-me-cover.jpg",
-    accentColor: "#EC4899", // neon magenta
-    secondaryColor: "#06B6D4", // cyber cyan
-    glowColor: "rgba(236, 72, 153, 0.45)",
-    bgTint: "rgba(236, 72, 153, 0.08)",
+    title: "CHIHIRO",
+    artist: "Billie Eilish",
+    src: "/music/CHIHIRO%20-%20Billie%20Eilish.mp3",
+    album: "HIT ME HARD AND SOFT",
+    year: "2024",
+    coverArt: "/music/chihiro-cover.jpg",
+    accentColor: "#38BDF8", // deep ocean cyan
+    secondaryColor: "#1D4ED8", // abyssal blue
+    glowColor: "rgba(56, 189, 248, 0.45)",
+    bgTint: "rgba(56, 189, 248, 0.08)",
   },
   {
     title: "Timeless",
@@ -79,18 +67,6 @@ export const PLAYLIST: Track[] = [
     bgTint: "rgba(225, 29, 72, 0.08)",
   },
   {
-    title: "CHIHIRO",
-    artist: "Billie Eilish",
-    src: "/music/CHIHIRO%20-%20Billie%20Eilish.mp3",
-    album: "HIT ME HARD AND SOFT",
-    year: "2024",
-    coverArt: "/music/chihiro-cover.jpg",
-    accentColor: "#38BDF8", // deep ocean cyan
-    secondaryColor: "#1D4ED8", // abyssal blue
-    glowColor: "rgba(56, 189, 248, 0.45)",
-    bgTint: "rgba(56, 189, 248, 0.08)",
-  },
-  {
     title: "MUTT",
     artist: "Leon Thomas",
     src: "/music/MUTT%20-%20Leon%20Thomas.mp3",
@@ -103,6 +79,18 @@ export const PLAYLIST: Track[] = [
     bgTint: "rgba(217, 119, 6, 0.08)",
   },
   {
+    title: "Family Affair",
+    artist: "Mary J. Blige",
+    src: "/music/Family%20Affair%20-%20Mary%20J.%20Blige.mp3",
+    album: "No More Drama",
+    year: "2001",
+    coverArt: "/music/family-affair-cover.jpg",
+    accentColor: "#F59E0B", // warm golden amber
+    secondaryColor: "#8B5CF6", // royal violet
+    glowColor: "rgba(245, 158, 11, 0.45)",
+    bgTint: "rgba(245, 158, 11, 0.08)",
+  },
+  {
     title: "Black and Yellow",
     artist: "Wiz Khalifa",
     src: "/music/Black%20and%20Yellow%20-%20Wiz%20Khalifa.mp3",
@@ -113,6 +101,18 @@ export const PLAYLIST: Track[] = [
     secondaryColor: "#F97316", // amber orange
     glowColor: "rgba(234, 179, 8, 0.45)",
     bgTint: "rgba(234, 179, 8, 0.08)",
+  },
+  {
+    title: "Girl Like Me",
+    artist: "Black Eyed Peas & Shakira",
+    src: "/music/Girl%20Like%20Me%20-%20Hot%20Black%20Eyed%20Peas.mp3",
+    album: "Translation",
+    year: "2020",
+    coverArt: "/music/girl-like-me-cover.jpg",
+    accentColor: "#EC4899", // neon magenta
+    secondaryColor: "#06B6D4", // cyber cyan
+    glowColor: "rgba(236, 72, 153, 0.45)",
+    bgTint: "rgba(236, 72, 153, 0.08)",
   },
 ];
 
