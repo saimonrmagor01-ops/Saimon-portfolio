@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
 interface AnimatedHeadingProps {
   text: string;
@@ -21,9 +21,9 @@ export const AnimatedHeading: React.FC<AnimatedHeadingProps> = ({
   highlightClassName = "text-[#2563EB]",
 }) => {
   const words = text.split(" ");
-  const Tag = motion[tag] as any;
+  const Tag = motion[tag];
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -34,7 +34,7 @@ export const AnimatedHeading: React.FC<AnimatedHeadingProps> = ({
     },
   };
 
-  const wordVariants = {
+  const wordVariants: Variants = {
     hidden: {
       y: "105%",
       opacity: 0,
