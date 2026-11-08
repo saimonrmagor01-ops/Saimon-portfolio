@@ -1,152 +1,93 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Radio, Users, Globe, ShieldCheck, ChevronUp, ChevronDown, CheckCircle2 } from "lucide-react";
-import { getPublicTrustStats, PublicTrustStats } from "@/lib/publicTrustData";
+import React, { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ChevronDown, Radio, Users } from "lucide-react";
+import type { PublicTrustStats } from "@/lib/publicTrustData";
 
-export const LivePublicPresence: React.FC = () => {
-  const [stats, setStats] = useState<PublicTrustStats>(getPublicTrustStats());
+interface LivePublicPresenceProps {
+  stats: PublicTrustStats;
+}
+
+export const LivePublicPresence: React.FC<LivePublicPresenceProps> = ({ stats }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    setStats(getPublicTrustStats());
-
-    // Update whenever an analytics broadcast or storage event occurs
-    const updateStats = () => {
-      setStats(getPublicTrustStats());
-    };
-
-    let channel: BroadcastChannel | null = null;
-    try {
-      if (typeof window !== "undefined" && "BroadcastChannel" in window) {
-        channel = new BroadcastChannel("saimon_portfolio_analytics_channel");
-        channel.onmessage = () => updateStats();
-      }
-    } catch {
-      // Graceful fallback
-    }
-
-    const interval = setInterval(updateStats, 10000);
-    window.addEventListener("storage", updateStats);
-
-    return () => {
-      clearInterval(interval);
-      if (channel) channel.close();
-      window.removeEventListener("storage", updateStats);
-    };
-  }, []);
-
-  if (!mounted) return null;
+  const prefersReducedMotion = useReducedMotion();
+  const motionOff = prefersReducedMotion ?? false;
 
   return (
-    <div className="fixed bottom-5 left-4 sm:left-6 z-40 select-none font-sans">
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="relative"
+    <div className="mx-auto mt-4 w-full max-w-6xl">
+      <button
+        type="button"
+        aria-expanded={isExpanded}
+        aria-controls="public-presence-details"
+        onClick={() => setIsExpanded((current) => !current)}
+        className="group inline-flex min-h-11 max-w-full items-center gap-2.5 rounded-full border border-sky-200/10 bg-[#080d19]/85 px-4 py-2.5 text-left shadow-[0_8px_24px_rgba(0,0,0,0.22),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl transition-[border-color,background-color,box-shadow] duration-200 hover:border-sky-200/20 hover:bg-[#0b1321] hover:shadow-[0_10px_28px_rgba(0,0,0,0.3),0_0_18px_rgba(56,189,248,0.05)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-sky-300"
       >
-        {/* Expanded Telemetry Card */}
-        <AnimatePresence>
-          {isExpanded && (
-            <motion.div
-              initial={{ opacity: 0, y: 8, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 8, scale: 0.96 }}
-              transition={{ duration: 0.2 }}
-              className="mb-2.5 w-72 sm:w-80 p-4 rounded-2xl bg-[#080C18]/95 backdrop-blur-2xl border border-white/15 shadow-[0_20px_45px_rgba(2,4,12,0.9),inset_0_1px_1px_rgba(255,255,255,0.12)] space-y-3"
-            >
-              <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-white font-heading">
-                  <ShieldCheck size={14} className="text-[#38BDF8]" />
-                  <span>Public Proof Telemetry</span>
-                </div>
-                <span className="text-[10px] font-mono text-slate-400">
-                  {stats.lastUpdated}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                <div className="p-2.5 rounded-xl bg-[#0D1224] border border-white/5 space-y-0.5">
-                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
-                    Unique Viewers
-                  </span>
-                  <div className="text-sm font-bold text-white">
-                    {stats.uniqueVisitors.toLocaleString()}+
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-[#0D1224] border border-white/5 space-y-0.5">
-                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
-                    Global Reach
-                  </span>
-                  <div className="text-sm font-bold text-[#38BDF8]">
-                    {stats.countriesCount}+ Countries
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-[#0D1224] border border-white/5 space-y-0.5">
-                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
-                    Verified Works
-                  </span>
-                  <div className="text-sm font-bold text-emerald-400">
-                    {stats.completedProjectsCount} Completed
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-[#0D1224] border border-white/5 space-y-0.5">
-                  <span className="text-[10px] text-slate-400 uppercase tracking-wider block">
-                    Client Success
-                  </span>
-                  <div className="text-sm font-bold text-emerald-400">
-                    {stats.deliverySuccessRate} Delivery
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-1 flex items-center justify-between text-[10px] font-mono text-slate-400">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Aggregated first-party metrics</span>
-                </div>
-                <span className="text-slate-500">Zero fake counts</span>
-              </div>
-            </motion.div>
+        <span className="relative grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/[0.08] bg-white/[0.03] text-sky-200/80">
+          <Radio size={13} strokeWidth={1.7} />
+          {stats.activeViewers > 0 && (
+            <span className="absolute right-0.5 top-0.5 h-1.5 w-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_rgba(110,231,183,0.45)]" />
           )}
-        </AnimatePresence>
+        </span>
+        <span className="font-mono text-[11px] text-slate-300">
+          <strong className="font-semibold text-slate-100">{stats.activeViewers}</strong>
+          <span className="text-slate-400"> active here</span>
+        </span>
+        <span className="hidden h-4 w-px bg-white/10 sm:block" />
+        <span className="hidden items-center gap-1.5 font-mono text-[10px] text-slate-400 sm:inline-flex">
+          <Users size={12} className="text-sky-200/70" />
+          {stats.uniqueVisitors.toLocaleString()} local visitors
+        </span>
+        <ChevronDown
+          size={14}
+          className={`ml-1 shrink-0 text-slate-500 transition-transform duration-200 group-hover:text-slate-300 ${
+            isExpanded ? "rotate-180" : ""
+          }`}
+        />
+      </button>
 
-        {/* Compact Pill Button */}
-        <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          type="button"
-          aria-expanded={isExpanded}
-          className="inline-flex items-center gap-2.5 px-3.5 py-2 rounded-full bg-[#080C18]/90 hover:bg-[#0D1224] backdrop-blur-xl border border-white/15 hover:border-white/30 text-xs text-white shadow-[0_8px_25px_rgba(2,4,12,0.8),inset_0_1px_1px_rgba(255,255,255,0.15)] transition-all group"
-        >
-          {/* Pulsing Live Dot */}
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.9)]" />
-          </span>
-
-          <span className="font-mono text-[11px] font-medium text-slate-200">
-            <strong className="text-white font-bold">{stats.activeViewers}</strong>{" "}
-            {stats.activeViewers === 1 ? "visitor online" : "visitors online"}
-          </span>
-
-          <span className="text-slate-600 hidden sm:inline">•</span>
-
-          <span className="font-mono text-[11px] text-[#38BDF8] hidden sm:inline">
-            {stats.uniqueVisitors.toLocaleString()}+ reach
-          </span>
-
-          <span className="text-slate-400 group-hover:text-white transition-colors ml-0.5">
-            {isExpanded ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
-          </span>
-        </button>
-      </motion.div>
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            id="public-presence-details"
+            initial={motionOff ? false : { opacity: 0, height: 0, y: -4 }}
+            animate={{ opacity: 1, height: "auto", y: 0 }}
+            exit={motionOff ? undefined : { opacity: 0, height: 0, y: -4 }}
+            transition={{ duration: motionOff ? 0 : 0.22, ease: "easeOut" }}
+            className="overflow-hidden"
+          >
+            <div className="mt-3 grid grid-cols-1 gap-2 rounded-2xl border border-white/[0.07] bg-[#080d19]/75 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:grid-cols-3">
+              <div className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-3 py-2.5">
+                <p className="font-mono text-[9px] uppercase tracking-[0.13em] text-slate-500">
+                  Recorded sessions
+                </p>
+                <p className="mt-1 font-mono text-sm font-medium text-slate-200">
+                  {stats.totalSessions.toLocaleString()}
+                </p>
+              </div>
+              <div className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-3 py-2.5">
+                <p className="font-mono text-[9px] uppercase tracking-[0.13em] text-slate-500">
+                  Estimated regions
+                </p>
+                <p className="mt-1 font-mono text-sm font-medium text-slate-200">
+                  {stats.countriesCount || "—"}
+                </p>
+              </div>
+              <div className="rounded-xl border border-white/[0.05] bg-white/[0.02] px-3 py-2.5">
+                <p className="font-mono text-[9px] uppercase tracking-[0.13em] text-slate-500">
+                  Collection
+                </p>
+                <p className="mt-1 font-mono text-sm font-medium text-slate-200">
+                  First-party only
+                </p>
+              </div>
+              <p className="px-1 pt-1 text-[10px] leading-relaxed text-slate-500 sm:col-span-3">
+                Activity shown here is stored in this browser. It is not a site-wide visitor count.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

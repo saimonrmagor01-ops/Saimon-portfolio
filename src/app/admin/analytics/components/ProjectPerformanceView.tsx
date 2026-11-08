@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import {
   FolderGit2,
   ExternalLink,
-  Github,
   Clock,
   Eye,
   UserCheck,
@@ -130,7 +129,7 @@ export const ProjectPerformanceView: React.FC = () => {
                     <span>{project.externalClicks} clicks</span>
                   </span>
                   <span className="flex items-center gap-1">
-                    <Github size={12} className="text-[#62626C]" />
+                    <FolderGit2 size={12} className="text-[#62626C]" />
                     <span>{project.githubClicks} repos</span>
                   </span>
                 </div>

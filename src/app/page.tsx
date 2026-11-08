@@ -18,7 +18,6 @@ import { WelcomePopup } from "@/components/WelcomePopup";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { Preloader } from "@/components/Preloader";
 import { FloatingBackToTop } from "@/components/FloatingBackToTop";
-import { LivePublicPresence } from "@/components/public-trust/LivePublicPresence";
 import { PublicTrustStrip } from "@/components/public-trust/PublicTrustStrip";
 import { VerifiedClientReviews } from "@/components/public-trust/VerifiedClientReviews";
 
@@ -48,9 +47,6 @@ export default function Home() {
 
       {/* Floating Back-To-Top Button (Bottom-Left) */}
       <FloatingBackToTop />
-
-      {/* Real-time Public Presence & Proof Badge (Floating Bottom-Left) */}
-      <LivePublicPresence />
 
       {/* Navigation Header */}
       <Navbar />

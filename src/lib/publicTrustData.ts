@@ -1,17 +1,28 @@
-import { getAggregatedKpiMetrics, getActiveVisitorsCount, getStoredSessions } from "./analytics/storage";
+import { getActiveVisitorsCount, getStoredSessions } from "./analytics/storage";
 import { projects } from "@/data/projects";
 
 export interface PublicTrustStats {
   uniqueVisitors: number;
-  totalVisits: number;
+  totalSessions: number;
   activeViewers: number;
   completedProjectsCount: number;
-  verifiedClientsCount: number;
   countriesCount: number;
   countries: string[];
-  deliverySuccessRate: string;
-  yearsActive: string;
+  verifiedClientsCount: number | null;
   lastUpdated: string;
+}
+
+export function getEmptyPublicTrustStats(): PublicTrustStats {
+  return {
+    uniqueVisitors: 0,
+    totalSessions: 0,
+    activeViewers: 0,
+    completedProjectsCount: projects.length,
+    countriesCount: 0,
+    countries: [],
+    verifiedClientsCount: null,
+    lastUpdated: "Waiting for records",
+  };
 }
 
 export interface VerifiedClientTestimonial {
@@ -102,62 +113,22 @@ export const VERIFIED_MILESTONES: ProfessionalMilestone[] = [
 ];
 
 export function getPublicTrustStats(): PublicTrustStats {
-  if (typeof window === "undefined") {
-    return {
-      uniqueVisitors: 1240,
-      totalVisits: 1680,
-      activeViewers: 1,
-      completedProjectsCount: projects.length,
-      verifiedClientsCount: 3,
-      countriesCount: 8,
-      countries: ["Nepal", "United States", "India", "United Kingdom", "Germany", "Singapore"],
-      deliverySuccessRate: "100%",
-      yearsActive: "2+",
-      lastUpdated: "Just now",
-    };
-  }
+  const sessions = typeof window === "undefined" ? [] : getStoredSessions();
+  const visitors = new Set(sessions.map((session) => session.visitorId));
+  const countries = new Set(
+    sessions.flatMap((session) => session.geo?.country ? [session.geo.country] : []),
+  );
 
-  try {
-    const kpi = getAggregatedKpiMetrics();
-    const active = getActiveVisitorsCount();
-    const sessions = getStoredSessions();
-
-    const distinctCountries = new Set<string>();
-    distinctCountries.add("Nepal");
-    distinctCountries.add("United States");
-    distinctCountries.add("India");
-    distinctCountries.add("United Kingdom");
-    distinctCountries.add("Germany");
-    distinctCountries.add("Singapore");
-
-    sessions.forEach((s) => {
-      if (s.geo?.country) distinctCountries.add(s.geo.country);
-    });
-
-    return {
-      uniqueVisitors: Math.max(kpi.uniqueVisitors, 1240),
-      totalVisits: Math.max(kpi.totalVisits, 1680),
-      activeViewers: Math.max(active, 1),
-      completedProjectsCount: Math.max(projects.length, 4),
-      verifiedClientsCount: Math.max(kpi.confirmedClientsCount, 3),
-      countriesCount: Math.max(distinctCountries.size, 8),
-      countries: Array.from(distinctCountries),
-      deliverySuccessRate: "100%",
-      yearsActive: "2+",
-      lastUpdated: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-  } catch {
-    return {
-      uniqueVisitors: 1240,
-      totalVisits: 1680,
-      activeViewers: 1,
-      completedProjectsCount: projects.length,
-      verifiedClientsCount: 3,
-      countriesCount: 8,
-      countries: ["Nepal", "United States", "India", "United Kingdom", "Germany", "Singapore"],
-      deliverySuccessRate: "100%",
-      yearsActive: "2+",
-      lastUpdated: "Just now",
-    };
-  }
+  return {
+    uniqueVisitors: visitors.size,
+    totalSessions: sessions.length,
+    activeViewers: getActiveVisitorsCount(),
+    completedProjectsCount: projects.length,
+    countriesCount: countries.size,
+    countries: Array.from(countries),
+    verifiedClientsCount: null,
+    lastUpdated: sessions.length
+      ? new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      : "No local records yet",
+  };
 }

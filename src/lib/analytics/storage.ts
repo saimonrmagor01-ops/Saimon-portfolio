@@ -144,14 +144,12 @@ export function saveSession(session: VisitorSession): void {
 }
 
 export function getActiveVisitorsCount(timeoutMinutes = 3): number {
-  if (typeof window === "undefined") return 1;
+  if (typeof window === "undefined") return 0;
   const sessions = getStoredSessions();
   const threshold = Date.now() - timeoutMinutes * 60 * 1000;
-  const activeSessions = sessions.filter(
+  return sessions.filter(
     (s) => s.lastActiveAt > threshold && s.quality !== "likely_bot"
-  );
-  // Default to at least 1 (the current viewing tab)
-  return Math.max(1, activeSessions.length);
+  ).length;
 }
 
 // ----------------------------------------------------

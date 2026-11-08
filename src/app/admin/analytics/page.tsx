@@ -54,7 +54,7 @@ export default function AdminAnalyticsPage() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [settings, setSettings] = useState<DashboardSettings>(getSettings());
   const [dailyTrend, setDailyTrend] = useState(generateSeedDailyStats());
-  const [activeCount, setActiveCount] = useState<number>(1);
+  const [activeCount, setActiveCount] = useState<number>(0);
 
   // Load and refresh state
   const refreshData = useCallback(() => {
