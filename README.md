@@ -14,9 +14,9 @@ The Next.js application is the canonical implementation. The root `index.html` i
 The project offers two production-ready avenues:
 
 1. **Next.js App Router Application (Modern Modular Architecture)**
-   - **Framework:** Next.js 14 (App Router)
+   - **Framework:** Next.js 16 (App Router)
    - **Language:** TypeScript
-   - **Styling:** Tailwind CSS with a custom editorial dark design system (`#050817`)
+   - **Styling:** Tailwind CSS 4 with a custom editorial dark design system (`#050817`)
    - **Animations:** Framer Motion
    - **Icons:** Lucide React
    - **Static Export:** Configured with `output: 'export'` for zero-latency hosting
@@ -72,6 +72,8 @@ saimon-portfolio/
 ---
 
 ## Getting Started
+
+Use Node.js 22.13 or newer.
 
 ### Option 1: Instant Local Preview
 Simply open `index.html` in your web browser (Safari, Chrome, Arc, Firefox, Edge). No build step or server is required.
