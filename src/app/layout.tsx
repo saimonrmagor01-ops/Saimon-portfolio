@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { PortfolioTracker } from "@/components/analytics/PortfolioTracker";
 
 export const viewport: Viewport = {
   themeColor: "#050817",
@@ -78,6 +79,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       </head>
       <body className="bg-[#050817] text-[#F5F7FF] antialiased selection:bg-[#2563EB] selection:text-white min-h-screen relative font-sans">
+        <PortfolioTracker />
         <div className="film-grain" aria-hidden="true" />
         {children}
       </body>

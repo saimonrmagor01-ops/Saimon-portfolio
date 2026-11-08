@@ -18,6 +18,8 @@ import { WelcomePopup } from "@/components/WelcomePopup";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { Preloader } from "@/components/Preloader";
 import { FloatingBackToTop } from "@/components/FloatingBackToTop";
+import { PublicTrustStrip } from "@/components/public-trust/PublicTrustStrip";
+import { VerifiedClientReviews } from "@/components/public-trust/VerifiedClientReviews";
 
 export default function Home() {
   const [selectedService, setSelectedService] = useState<string>("");
@@ -54,6 +56,9 @@ export default function Home() {
         {/* Section A: Home / Hero */}
         <Hero />
 
+        {/* Public Credibility & Social Proof Strip */}
+        <PublicTrustStrip />
+
         {/* Section B: About Me with Illustrated Portrait */}
         <About />
 
@@ -74,6 +79,9 @@ export default function Home() {
 
         {/* Section H: Services */}
         <Services onSelectService={handleSelectService} />
+
+        {/* Section H.5: Verified Client Experience & Feedback */}
+        <VerifiedClientReviews />
 
         {/* Section I: Contact with Social Links */}
         <Contact

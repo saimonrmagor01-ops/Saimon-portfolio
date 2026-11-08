@@ -106,6 +106,14 @@ export const Hero: React.FC = () => {
               <span className="text-slate-600">•</span>
               <span className="text-[10px] text-slate-500">GMT+5:45</span>
             </div>
+
+            {/* Verified Social Proof Pill */}
+            <div className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-[#080C18]/75 backdrop-blur-xl text-[11px] font-mono text-slate-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="text-white font-medium">100% Verified Delivery</span>
+              <span className="text-slate-600">•</span>
+              <span className="text-slate-400">4 Shipped Works</span>
+            </div>
           </div>
 
           {/* Social Links */}
