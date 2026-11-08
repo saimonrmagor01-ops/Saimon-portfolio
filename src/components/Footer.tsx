@@ -125,8 +125,17 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Credits */}
         <div className="pt-8 border-t border-[#1C2438] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[#94A3B8]">
-          <div>
-            &copy; {new Date().getFullYear()} Saimon Rana Magar. All rights reserved.
+          <div className="flex items-center gap-2">
+            <span>&copy; {new Date().getFullYear()} Saimon Rana Magar. All rights reserved.</span>
+            <span className="text-[#334155]">•</span>
+            <a
+              href="/admin/analytics"
+              className="inline-flex items-center gap-1.5 text-[11px] text-[#64748B] hover:text-[#94A3B8] transition-colors"
+              title="Portfolio Intelligence Admin"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/80 animate-pulse" />
+              <span>Intelligence</span>
+            </a>
           </div>
           <div className="text-center sm:text-right text-[#64748B]">
             Crafted with Next.js, TypeScript &amp; Tailwind CSS.
