@@ -18,6 +18,9 @@ import { WelcomePopup } from "@/components/WelcomePopup";
 import { ScrollProgressBar } from "@/components/ScrollProgressBar";
 import { Preloader } from "@/components/Preloader";
 import { FloatingBackToTop } from "@/components/FloatingBackToTop";
+import { LivePublicPresence } from "@/components/public-trust/LivePublicPresence";
+import { PublicTrustStrip } from "@/components/public-trust/PublicTrustStrip";
+import { VerifiedClientReviews } from "@/components/public-trust/VerifiedClientReviews";
 
 export default function Home() {
   const [selectedService, setSelectedService] = useState<string>("");
@@ -46,6 +49,9 @@ export default function Home() {
       {/* Floating Back-To-Top Button (Bottom-Left) */}
       <FloatingBackToTop />
 
+      {/* Real-time Public Presence & Proof Badge (Floating Bottom-Left) */}
+      <LivePublicPresence />
+
       {/* Navigation Header */}
       <Navbar />
 
@@ -53,6 +59,9 @@ export default function Home() {
       <main className="relative z-10 flex flex-col">
         {/* Section A: Home / Hero */}
         <Hero />
+
+        {/* Public Credibility & Social Proof Strip */}
+        <PublicTrustStrip />
 
         {/* Section B: About Me with Illustrated Portrait */}
         <About />
@@ -74,6 +83,9 @@ export default function Home() {
 
         {/* Section H: Services */}
         <Services onSelectService={handleSelectService} />
+
+        {/* Section H.5: Verified Client Experience & Feedback */}
+        <VerifiedClientReviews />
 
         {/* Section I: Contact with Social Links */}
         <Contact

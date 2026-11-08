@@ -228,7 +228,12 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
       <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
         <div>
           <div className="flex items-center justify-between text-[10px] font-mono text-[#94A3B8] uppercase tracking-wider mb-2">
-            <span>{project.category}</span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="text-emerald-400 font-semibold lowercase first-letter:uppercase">Verified Project</span>
+              <span className="text-slate-600">•</span>
+              <span>{project.category}</span>
+            </span>
             <span>{project.year}</span>
           </div>
           <h3 className="text-xl font-bold text-white group-hover:text-[#38BDF8] transition-colors font-heading">
